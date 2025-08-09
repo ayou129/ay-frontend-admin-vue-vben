@@ -22,16 +22,21 @@ export {
 // API 相关类型
 export type * from './api';
 
+// 会员等级相关类型
+export type * from './member-level';
+
+// 会员等级相关枚举（需要作为值导出）
+export { MemberLevelStatus } from './member-level';
 // 资源相关类型
 export type * from './resource';
-
 // Store 相关类型
 export type * from './store/category';
 export type * from './store/coupon';
 export type * from './store/order';
-export type * from './store/sku';
-export type * from './store/spu';
 
+export type * from './store/sku';
+
+export type * from './store/spu';
 // 系统管理员相关类型
 export type * from './sys_user';
 
