@@ -1,5 +1,4 @@
 import type {
-  CustomPageResponse,
   RequestFilterQuery,
   RequestFilterSortOption,
   UserStatus,
@@ -16,17 +15,15 @@ import {
   getUserPageApi,
   updateUserApi,
 } from '#/api/core/user';
-import { EMPTY_CUSTOM_PAGE_RESPONSE } from '#/store/common';
 
 export const useUserStore = defineStore('user', () => {
-  const state = reactive<
-    CustomPageResponse<UserVO> & {
-      filters: RequestFilterQuery[];
-      filter_sort_option: RequestFilterSortOption;
-      loading: boolean;
-    }
-  >({
-    ...EMPTY_CUSTOM_PAGE_RESPONSE,
+  const state = reactive<{
+    filters: RequestFilterQuery[];
+    filter_sort_option: RequestFilterSortOption;
+    loading: boolean;
+  }>({
+    filters: [],
+    filter_sort_option: { sort_field: 'id', sort_order: 'desc' },
     loading: false,
   });
 
@@ -52,17 +49,20 @@ export const useUserStore = defineStore('user', () => {
   };
 
   // 获取分页数据
-  const fetchPage = async () => {
+  const fetchPage = async (page: number, pageSize: number) => {
     state.loading = true;
     try {
       const response = await getUserPageApi({
-        page: state.page,
-        page_size: state.page_size,
+        page,
+        page_size: pageSize,
         filters: state.filters,
         filter_sort_option: state.filter_sort_option,
       });
-      Object.assign(state, response);
+      
+      return response; // 直接返回数据给VxeTable
     } catch (error) {
+      console.error('❌ API请求失败:', error);
+      return { items: [], total: 0 }; // 返回空数据
     } finally {
       state.loading = false;
     }
@@ -72,7 +72,6 @@ export const useUserStore = defineStore('user', () => {
   const create = async (dto: Partial<UserVO>) => {
     try {
       await createUserApi(dto);
-      await fetchPage();
       return true;
     } catch {
       return false;
@@ -83,7 +82,6 @@ export const useUserStore = defineStore('user', () => {
   const update = async (id: number, dto: Partial<UserVO>) => {
     try {
       await updateUserApi(id, dto);
-      await fetchPage();
       return true;
     } catch {
       return false;
@@ -94,7 +92,6 @@ export const useUserStore = defineStore('user', () => {
   const deleteUser = async (id: number) => {
     try {
       await deleteUserApi(id);
-      await fetchPage();
       return true;
     } catch {
       return false;
@@ -104,13 +101,11 @@ export const useUserStore = defineStore('user', () => {
   // 设置过滤条件
   const setFilters = (filters: RequestFilterQuery[]) => {
     state.filters = filters;
-    state.page = 1;
   };
 
   // 重置过滤条件
   const resetFilters = () => {
     state.filters = [];
-    state.page = 1;
   };
 
   return {

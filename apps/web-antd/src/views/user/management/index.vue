@@ -1,9 +1,5 @@
 <script setup lang="ts">
-import type { VbenFormProps } from '#/adapter/form';
-import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { UserVO } from '#/types';
-
-import { onMounted, reactive } from 'vue';
 
 import { Page, useVbenModal } from '@vben/common-ui';
 
@@ -17,102 +13,104 @@ import { ValueTypes } from '#/types';
 // Store
 const userStore = useUserStore();
 
-// 搜索表单配置
-const searchFormOptions: VbenFormProps = {
-  collapsed: false,
-  schema: [
-    {
-      component: 'Input',
-      fieldName: 'phone',
-      label: '手机号',
-    },
-    {
-      component: 'Input',
-      fieldName: 'real_name',
-      label: '真实姓名',
-    },
-    {
-      component: 'Input',
-      fieldName: 'nick_name',
-      label: '昵称',
-    },
-    {
-      component: 'Input',
-      fieldName: 'email',
-      label: '邮箱',
-    },
-    {
-      component: 'Select',
-      componentProps: {
-        allowClear: true,
-        options: [
-          { label: '未激活', value: 0 },
-          { label: '正常', value: 1 },
-          { label: '冻结', value: 2 },
-          { label: '已删除', value: 3 },
-        ],
-        placeholder: '请选择状态',
+// 表格配置和gridApi声明需要先定义
+const [VxeGrid, gridApi] = useVbenVxeGrid({
+  gridOptions: {
+    columns: [
+      { type: 'checkbox', width: 50 },
+      { field: 'id', title: 'ID', width: 80 },
+      { field: 'phone', title: '手机号', width: 130 },
+      { field: 'real_name', title: '真实姓名', width: 120 },
+      { field: 'nick_name', title: '昵称', width: 120 },
+      { field: 'email', title: '邮箱', width: 200 },
+      {
+        field: 'status',
+        title: '状态',
+        width: 100,
+        slots: { default: 'status' },
       },
-      fieldName: 'status',
-      label: '状态',
+      { field: 'created_at', title: '创建时间', width: 180 },
+      {
+        field: 'action',
+        title: '操作',
+        width: 150,
+        slots: { default: 'action' },
+      },
+    ],
+    proxyConfig: {
+      ajax: {
+        query: async ({
+          page,
+        }: {
+          page: { currentPage: number; pageSize: number };
+        }) => {
+          const response = await userStore.fetchPage(
+            page.currentPage,
+            page.pageSize,
+          );
+          return {
+            items: response.items || [],
+            total: response.total || 0,
+          };
+        },
+      },
     },
-  ],
-  showCollapseButton: true,
-  submitOnChange: true,
-  handleSubmit: (values: Record<string, any>) => {
-    const filters = Object.entries(values)
-      .filter(
-        ([_, value]) => value !== undefined && value !== null && value !== '',
-      )
-      .map(([field, value]) => ({
-        field,
-        operator: 'like',
-        value,
-        value_type: ValueTypes.STRING,
-      }));
-    userStore.setFilters(filters);
-    userStore.fetchPage();
   },
-};
-
-// 表格配置
-const gridOptions: VxeTableGridOptions<UserVO> = reactive({
-  columns: [
-    { type: 'checkbox', width: 50 },
-    { field: 'id', title: 'ID', width: 80 },
-    { field: 'phone', title: '手机号', width: 130 },
-    { field: 'real_name', title: '真实姓名', width: 120 },
-    { field: 'nick_name', title: '昵称', width: 120 },
-    { field: 'email', title: '邮箱', width: 200 },
-    {
-      field: 'status',
-      title: '状态',
-      width: 100,
-      slots: { default: 'status' },
-    },
-    { field: 'created_at', title: '创建时间', width: 180 },
-    {
-      field: 'action',
-      title: '操作',
-      width: 150,
-      slots: { default: 'action' },
-    },
-  ],
-  get data() {
-    return userStore.items;
-  },
-  get loading() {
-    return userStore.loading;
-  },
-  pagerConfig: {
-    get currentPage() {
-      return userStore.page;
-    },
-    get pageSize() {
-      return userStore.page_size;
-    },
-    get total() {
-      return userStore.total;
+  formOptions: {
+    collapsed: false,
+    schema: [
+      {
+        component: 'Input',
+        fieldName: 'phone',
+        label: '手机号',
+      },
+      {
+        component: 'Input',
+        fieldName: 'real_name',
+        label: '真实姓名',
+      },
+      {
+        component: 'Input',
+        fieldName: 'nick_name',
+        label: '昵称',
+      },
+      {
+        component: 'Input',
+        fieldName: 'email',
+        label: '邮箱',
+      },
+      {
+        component: 'Select',
+        componentProps: {
+          allowClear: true,
+          options: [
+            { label: '未激活', value: 0 },
+            { label: '正常', value: 1 },
+            { label: '冻结', value: 2 },
+            { label: '已删除', value: 3 },
+          ],
+          placeholder: '请选择状态',
+        },
+        fieldName: 'status',
+        label: '状态',
+      },
+    ],
+    showCollapseButton: true,
+    submitOnChange: true,
+    handleSubmit: (values: Record<string, any>) => {
+      const filters = Object.entries(values)
+        .filter(
+          ([_, value]) => value !== undefined && value !== null && value !== '',
+        )
+        .map(([field, value]) => ({
+          field,
+          operator: 'like',
+          value,
+          value_type: ValueTypes.STRING,
+        }));
+      userStore.setFilters(filters);
+      // 触发表格重新查询
+      gridApi.query();
     },
   },
 });
@@ -179,6 +177,8 @@ const [CreateModal, createModalApi] = useVbenModal({
       if (success) {
         createModalApi.close();
         createFormApi.resetForm();
+        // 刷新表格数据
+        gridApi.query();
       }
     }
   },
@@ -201,6 +201,8 @@ const [EditModal, editModalApi] = useVbenModal({
       const success = await userStore.update(id, formData);
       if (success) {
         editModalApi.close();
+        // 刷新表格数据
+        gridApi.query();
       }
     }
   },
@@ -212,10 +214,7 @@ const [EditForm, editFormApi] = useVbenForm({
   showDefaultActions: false,
 });
 
-// 初始化
-onMounted(() => {
-  userStore.fetchPage();
-});
+// 不需要手动初始化，VxeGrid会自动加载数据
 
 // 事件处理
 const handleCreate = () => {
@@ -230,13 +229,12 @@ const handleEdit = (user: UserVO) => {
 };
 
 const handleDelete = async (id: number) => {
-  await userStore.delete(id);
+  const success = await userStore.delete(id);
+  if (success) {
+    // 刷新表格数据
+    gridApi.query();
+  }
 };
-
-const [VxeGrid] = useVbenVxeGrid({
-  gridOptions,
-  formOptions: searchFormOptions,
-});
 </script>
 
 <template>

@@ -1,9 +1,4 @@
-import type {
-  ApiResponse,
-  CustomPageResponse,
-  RequestGetPageQuery,
-  UserVO,
-} from '#/types';
+import type { CustomPageResponse, RequestGetPageQuery, UserVO } from '#/types';
 
 import { requestClient } from '#/api/request';
 
@@ -13,7 +8,7 @@ import { apiPrefix } from './config';
  * 获取用户分页列表
  */
 export async function getUserPageApi(data: RequestGetPageQuery) {
-  return requestClient.post<ApiResponse<CustomPageResponse<UserVO>>>(
+  return requestClient.post<CustomPageResponse<UserVO>>(
     `${apiPrefix}/user/page`,
     data,
   );
