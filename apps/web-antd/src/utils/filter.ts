@@ -54,6 +54,12 @@ export interface RequestFilterSortOption {
   sort_order: 'asc' | 'desc'; // 排序方向 (asc/desc)
 }
 
+// 默认排序选项
+export const DEFAULT_FILTER_SORT_OPTION: RequestFilterSortOption = {
+  sort_field: 'id',
+  sort_order: 'desc',
+};
+
 // 单个筛选条件查询
 export interface RequestFilterQuery {
   field: string; // 字段名

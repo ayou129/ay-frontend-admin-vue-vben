@@ -5,8 +5,6 @@ import type {
   UserVO,
 } from '#/types';
 
-import { reactive, toRefs } from 'vue';
-
 import { defineStore } from 'pinia';
 
 import {
@@ -15,13 +13,10 @@ import {
   getUserPageApi,
   updateUserApi,
 } from '#/api/core/user';
+import { DEFAULT_FILTER_SORT_OPTION } from '#/utils/filter';
 
 export const useUserStore = defineStore('user', () => {
-  const state = reactive<{
-    loading: boolean;
-  }>({
-    loading: false,
-  });
+  // 移除loading状态，由VxeTable自动管理
 
   // 格式化方法
   const format_status = (status?: UserStatus) => {
@@ -49,9 +44,8 @@ export const useUserStore = defineStore('user', () => {
     page: number,
     pageSize: number,
     filters: RequestFilterQuery[] = [],
-    filterSortOption: RequestFilterSortOption = { sort_field: 'id', sort_order: 'desc' }
+    filterSortOption: RequestFilterSortOption = DEFAULT_FILTER_SORT_OPTION,
   ) => {
-    state.loading = true;
     try {
       const response = await getUserPageApi({
         page,
@@ -59,17 +53,13 @@ export const useUserStore = defineStore('user', () => {
         filters,
         filter_sort_option: filterSortOption,
       });
-      
+
       return response; // 直接返回数据给VxeTable
-    } catch (error) {
-      console.error('❌ API请求失败:', error);
+    } catch {
       return { items: [], total: 0 }; // 返回空数据
-    } finally {
-      state.loading = false;
     }
   };
 
-  // 创建用户
   const create = async (dto: Partial<UserVO>) => {
     try {
       await createUserApi(dto);
@@ -100,7 +90,6 @@ export const useUserStore = defineStore('user', () => {
   };
 
   return {
-    ...toRefs(state),
     format_status,
     fetchPage,
     create,
