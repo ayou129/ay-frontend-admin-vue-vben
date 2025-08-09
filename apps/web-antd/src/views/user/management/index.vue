@@ -8,10 +8,57 @@ import { Button, Popconfirm, Tag } from 'ant-design-vue';
 import { useVbenForm } from '#/adapter/form';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { useUserStore } from '#/store/user';
-import { ValueTypes } from '#/types';
+import { FilterOperators, ValueTypes } from '#/types';
 
 // Store
 const userStore = useUserStore();
+
+// 字段筛选配置
+const getFieldFilterConfig = (field: string, value: any) => {
+  switch (field) {
+    case 'email': {
+      // 邮箱：模糊搜索
+      return {
+        operator: FilterOperators.LIKE,
+        value,
+        valueType: ValueTypes.STRING,
+      };
+    }
+    case 'nick_name':
+    case 'real_name': {
+      // 姓名、昵称：模糊搜索
+      return {
+        operator: FilterOperators.LIKE,
+        value,
+        valueType: ValueTypes.STRING,
+      };
+    }
+    case 'phone': {
+      // 手机号：支持模糊搜索（部分匹配）
+      return {
+        operator: FilterOperators.LIKE,
+        value,
+        valueType: ValueTypes.STRING,
+      };
+    }
+    case 'status': {
+      // 状态：精确匹配
+      return {
+        operator: FilterOperators.EQUAL,
+        value,
+        valueType: ValueTypes.NUMBER,
+      };
+    }
+    default: {
+      // 默认：模糊搜索
+      return {
+        operator: FilterOperators.LIKE,
+        value,
+        valueType: ValueTypes.STRING,
+      };
+    }
+  }
+};
 
 // 表格配置和gridApi声明需要先定义
 const [VxeGrid, gridApi] = useVbenVxeGrid({
@@ -39,14 +86,31 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
     ],
     proxyConfig: {
       ajax: {
-        query: async ({
-          page,
-        }: {
-          page: { currentPage: number; pageSize: number };
-        }) => {
+        query: async (
+          { page }: { page: { currentPage: number; pageSize: number } },
+          formValues: Record<string, any> = {},
+        ) => {
+          // 从表单值构建筛选条件
+          const filters = Object.entries(formValues)
+            .filter(
+              ([_, value]) =>
+                value !== undefined && value !== null && value !== '',
+            )
+            .map(([field, value]) => {
+              // 根据字段类型确定筛选方式
+              const filterConfig = getFieldFilterConfig(field, value);
+              return {
+                field,
+                operator: filterConfig.operator,
+                value: filterConfig.value,
+                value_type: filterConfig.valueType,
+              };
+            });
+
           const response = await userStore.fetchPage(
             page.currentPage,
             page.pageSize,
+            filters,
           );
           return {
             items: response.items || [],
@@ -97,21 +161,9 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
     ],
     showCollapseButton: true,
     submitOnChange: true,
-    handleSubmit: (values: Record<string, any>) => {
-      const filters = Object.entries(values)
-        .filter(
-          ([_, value]) => value !== undefined && value !== null && value !== '',
-        )
-        .map(([field, value]) => ({
-          field,
-          operator: 'like',
-          value,
-          value_type: ValueTypes.STRING,
-        }));
-      userStore.setFilters(filters);
-      // 触发表格重新查询
-      gridApi.query();
-    },
+    showDefaultActions: true, // 显示默认操作按钮
+    submitButtonOptions: { show: false }, // 隐藏搜索按钮（因为是自动搜索）
+    resetButtonOptions: { content: '重置筛选' }, // 保留重置按钮
   },
 });
 

@@ -18,12 +18,8 @@ import {
 
 export const useUserStore = defineStore('user', () => {
   const state = reactive<{
-    filters: RequestFilterQuery[];
-    filter_sort_option: RequestFilterSortOption;
     loading: boolean;
   }>({
-    filters: [],
-    filter_sort_option: { sort_field: 'id', sort_order: 'desc' },
     loading: false,
   });
 
@@ -49,14 +45,19 @@ export const useUserStore = defineStore('user', () => {
   };
 
   // 获取分页数据
-  const fetchPage = async (page: number, pageSize: number) => {
+  const fetchPage = async (
+    page: number,
+    pageSize: number,
+    filters: RequestFilterQuery[] = [],
+    filterSortOption: RequestFilterSortOption = { sort_field: 'id', sort_order: 'desc' }
+  ) => {
     state.loading = true;
     try {
       const response = await getUserPageApi({
         page,
         page_size: pageSize,
-        filters: state.filters,
-        filter_sort_option: state.filter_sort_option,
+        filters,
+        filter_sort_option: filterSortOption,
       });
       
       return response; // 直接返回数据给VxeTable
@@ -98,16 +99,6 @@ export const useUserStore = defineStore('user', () => {
     }
   };
 
-  // 设置过滤条件
-  const setFilters = (filters: RequestFilterQuery[]) => {
-    state.filters = filters;
-  };
-
-  // 重置过滤条件
-  const resetFilters = () => {
-    state.filters = [];
-  };
-
   return {
     ...toRefs(state),
     format_status,
@@ -115,7 +106,5 @@ export const useUserStore = defineStore('user', () => {
     create,
     update,
     delete: deleteUser,
-    setFilters,
-    resetFilters,
   };
 });
