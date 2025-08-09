@@ -1,19 +1,234 @@
 <script setup lang="ts">
-// 用户管理页面逻辑
+import type { VbenFormProps } from '#/adapter/form';
+import type { VxeTableGridOptions } from '#/adapter/vxe-table';
+import type { UserDTO, UserVO } from '#/types/user';
+
+import { onMounted, reactive } from 'vue';
+
+import { Page, useVbenModal } from '@vben/common-ui';
+
+import { Button, Popconfirm, Tag } from 'ant-design-vue';
+
+import { useVbenForm } from '#/adapter/form';
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { useUserManagementStore } from '#/store/user-management';
+
+// Store
+const userStore = useUserManagementStore();
+
+// 搜索表单配置
+const searchFormOptions: VbenFormProps = {
+  collapsed: false,
+  schema: [
+    {
+      component: 'Input',
+      fieldName: 'username',
+      label: '用户名',
+    },
+    {
+      component: 'Input',
+      fieldName: 'email',
+      label: '邮箱',
+    },
+    {
+      component: 'Select',
+      componentProps: {
+        allowClear: true,
+        options: [
+          { label: '启用', value: 1 },
+          { label: '禁用', value: 0 },
+        ],
+        placeholder: '请选择状态',
+      },
+      fieldName: 'status',
+      label: '状态',
+    },
+  ],
+  showCollapseButton: true,
+  submitOnChange: true,
+  handleSubmit: (values: Record<string, any>) => {
+    const filters = Object.entries(values)
+      .filter(
+        ([_, value]) => value !== undefined && value !== null && value !== '',
+      )
+      .map(([field, value]) => ({
+        field,
+        operator: 'like',
+        value,
+      }));
+    userStore.setFilters(filters);
+    userStore.fetchPage();
+  },
+};
+
+// 表格配置
+const gridOptions: VxeTableGridOptions<UserVO> = reactive({
+  columns: [
+    { type: 'checkbox', width: 50 },
+    { field: 'id', title: 'ID', width: 80 },
+    { field: 'username', title: '用户名', width: 120 },
+    { field: 'email', title: '邮箱', width: 200 },
+    { field: 'phone', title: '手机号', width: 150 },
+    {
+      field: 'status',
+      title: '状态',
+      width: 100,
+      slots: { default: 'status' },
+    },
+    { field: 'created_at', title: '创建时间', width: 180 },
+    {
+      field: 'action',
+      title: '操作',
+      width: 150,
+      slots: { default: 'action' },
+    },
+  ],
+  data: userStore.items,
+  loading: userStore.loading,
+  pagerConfig: {
+    currentPage: userStore.page,
+    pageSize: userStore.page_size,
+    total: userStore.total,
+  },
+});
+
+// 用户表单配置
+const userFormSchema = [
+  {
+    component: 'Input',
+    fieldName: 'username',
+    label: '用户名',
+    rules: 'required',
+  },
+  {
+    component: 'Input',
+    fieldName: 'email',
+    label: '邮箱',
+    rules: 'required',
+  },
+  {
+    component: 'Input',
+    fieldName: 'phone',
+    label: '手机号',
+  },
+  {
+    component: 'Select',
+    componentProps: {
+      options: [
+        { label: '启用', value: 1 },
+        { label: '禁用', value: 0 },
+      ],
+    },
+    fieldName: 'status',
+    label: '状态',
+    rules: 'required',
+  },
+];
+
+// 创建用户弹窗
+const [CreateModal, createModalApi] = useVbenModal({
+  onConfirm: async () => {
+    const valid = await createFormApi.validate();
+    if (valid) {
+      const formData = (await createFormApi.getValues()) as unknown as UserDTO;
+      const success = await userStore.create(formData);
+      if (success) {
+        createModalApi.close();
+        createFormApi.resetForm();
+      }
+    }
+  },
+  title: '新增用户',
+});
+
+const [CreateForm, createFormApi] = useVbenForm({
+  schema: userFormSchema,
+  showDefaultActions: false,
+});
+
+// 编辑用户弹窗
+const [EditModal, editModalApi] = useVbenModal({
+  onConfirm: async () => {
+    const valid = await editFormApi.validate();
+    if (valid) {
+      const formData = (await editFormApi.getValues()) as unknown as UserDTO;
+      const { id } = editModalApi.getData<{ id: number }>();
+      const success = await userStore.update(id, formData);
+      if (success) {
+        editModalApi.close();
+      }
+    }
+  },
+  title: '编辑用户',
+});
+
+const [EditForm, editFormApi] = useVbenForm({
+  schema: userFormSchema,
+  showDefaultActions: false,
+});
+
+// 初始化
+onMounted(() => {
+  userStore.fetchPage();
+});
+
+// 事件处理
+const handleCreate = () => {
+  createFormApi.resetForm();
+  createModalApi.open();
+};
+
+const handleEdit = (user: UserVO) => {
+  editFormApi.setValues(user);
+  editModalApi.open({ id: user.id });
+};
+
+const handleDelete = async (id: number) => {
+  await userStore.delete(id);
+};
+
+const [VxeGrid] = useVbenVxeGrid({
+  gridOptions,
+  formOptions: searchFormOptions,
+});
 </script>
 
 <template>
-  <div class="p-4">
+  <Page description="用户信息管理和维护" title="用户管理">
     <div class="mb-4">
-      <h1 class="text-2xl font-bold">用户管理</h1>
-      <p class="text-gray-600">用户信息管理和维护</p>
+      <Button type="primary" @click="handleCreate"> 新增用户 </Button>
     </div>
 
-    <div class="rounded-lg bg-white p-6 shadow">
-      <div class="text-center text-gray-500">
-        <div class="mb-4 text-4xl">👥</div>
-        <p>用户管理页面内容开发中...</p>
-      </div>
-    </div>
-  </div>
+    <VxeGrid>
+      <template #status="{ row }">
+        <Tag :color="userStore.format_status(row.status).color">
+          {{ userStore.format_status(row.status).text }}
+        </Tag>
+      </template>
+
+      <template #action="{ row }">
+        <div class="flex gap-2">
+          <Button type="link" size="small" @click="handleEdit(row)">
+            编辑
+          </Button>
+          <Popconfirm
+            title="确定删除此用户吗？"
+            @confirm="handleDelete(row.id)"
+          >
+            <Button type="link" size="small" danger> 删除 </Button>
+          </Popconfirm>
+        </div>
+      </template>
+    </VxeGrid>
+
+    <!-- 创建用户弹窗 -->
+    <CreateModal>
+      <CreateForm />
+    </CreateModal>
+
+    <!-- 编辑用户弹窗 -->
+    <EditModal>
+      <EditForm />
+    </EditModal>
+  </Page>
 </template>
