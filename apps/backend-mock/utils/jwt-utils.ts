@@ -26,8 +26,8 @@ export function generateRefreshToken(user: UserInfo) {
 export function verifyAccessToken(
   event: H3Event<EventHandlerRequest>,
 ): null | Omit<UserInfo, 'password'> {
-  const authHeader = getHeader(event, 'Authorization');
-  if (!authHeader?.startsWith('Bearer')) {
+  const authHeader = getHeader(event, 'AccessToken');
+  if (!authHeader) {
     return null;
   }
 

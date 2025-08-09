@@ -5,6 +5,7 @@ import type { MenuRecordRaw } from '@vben-core/typings';
 import { acceptHMRUpdate, defineStore } from 'pinia';
 
 type AccessToken = null | string;
+type RefreshToken = null | string;
 
 interface AccessState {
   /**
@@ -40,9 +41,9 @@ interface AccessState {
    */
   loginExpired: boolean;
   /**
-   * 登录 accessToken
+   * 刷新 RefreshToken
    */
-  refreshToken: AccessToken;
+  refreshToken: RefreshToken;
 }
 
 /**
@@ -91,7 +92,7 @@ export const useAccessStore = defineStore('core-access', {
     setLoginExpired(loginExpired: boolean) {
       this.loginExpired = loginExpired;
     },
-    setRefreshToken(token: AccessToken) {
+    setRefreshToken(token: RefreshToken) {
       this.refreshToken = token;
     },
     unlockScreen() {

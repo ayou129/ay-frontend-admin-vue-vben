@@ -1,5 +1,7 @@
 import { baseRequestClient, requestClient } from '#/api/request';
 
+import { apiPrefix } from './config';
+
 export namespace AuthApi {
   /** 登录接口参数 */
   export interface LoginParams {
@@ -9,12 +11,13 @@ export namespace AuthApi {
 
   /** 登录接口返回值 */
   export interface LoginResult {
-    accessToken: string;
+    access_token: string;
+    refresh_token: string;
   }
 
   export interface RefreshTokenResult {
-    data: string;
-    status: number;
+    access_token: string;
+    refresh_token: string;
   }
 }
 
@@ -22,23 +25,29 @@ export namespace AuthApi {
  * 登录
  */
 export async function loginApi(data: AuthApi.LoginParams) {
-  return requestClient.post<AuthApi.LoginResult>('/auth/login', data);
+  return requestClient.post<AuthApi.LoginResult>(
+    `${apiPrefix}/auth/login`,
+    data,
+  );
 }
 
 /**
  * 刷新accessToken
  */
 export async function refreshTokenApi() {
-  return baseRequestClient.post<AuthApi.RefreshTokenResult>('/auth/refresh', {
-    withCredentials: true,
-  });
+  return baseRequestClient.post<AuthApi.RefreshTokenResult>(
+    `${apiPrefix}/auth/refresh`,
+    {
+      withCredentials: true,
+    },
+  );
 }
 
 /**
  * 退出登录
  */
 export async function logoutApi() {
-  return baseRequestClient.post('/auth/logout', {
+  return baseRequestClient.post<null>(`${apiPrefix}/auth/logout`, {
     withCredentials: true,
   });
 }
@@ -47,5 +56,5 @@ export async function logoutApi() {
  * 获取用户权限码
  */
 export async function getAccessCodesApi() {
-  return requestClient.get<string[]>('/auth/codes');
+  return requestClient.get<string[]>(`${apiPrefix}/auth/codes`);
 }
