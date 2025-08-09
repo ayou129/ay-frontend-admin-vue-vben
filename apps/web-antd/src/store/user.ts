@@ -1,9 +1,4 @@
-import type {
-  CustomPageResponse,
-  RequestFilterQuery,
-  UserStatus,
-  UserVO,
-} from '#/types';
+import type { CustomPageResponse, UserStatus, UserVO } from '#/types';
 
 import { reactive, toRefs } from 'vue';
 
@@ -20,12 +15,12 @@ import { EMPTY_CUSTOM_PAGE_RESPONSE } from '#/store/common';
 export const useUserStore = defineStore('user', () => {
   const state = reactive<
     CustomPageResponse<UserVO> & {
-      filters: RequestFilterQuery[];
       loading: boolean;
+      searchParams: Record<string, any>;
     }
   >({
     ...EMPTY_CUSTOM_PAGE_RESPONSE,
-    filters: [],
+    searchParams: {},
     loading: false,
   });
 
@@ -57,7 +52,7 @@ export const useUserStore = defineStore('user', () => {
       const response = await getUserPageApi({
         page: state.page,
         page_size: state.page_size,
-        filters: state.filters,
+        ...state.searchParams,
       });
       Object.assign(state, response);
     } catch {
@@ -105,15 +100,15 @@ export const useUserStore = defineStore('user', () => {
     }
   };
 
-  // 设置过滤条件
-  const setFilters = (filters: RequestFilterQuery[]) => {
-    state.filters = filters;
+  // 设置搜索参数
+  const setSearchParams = (params: Record<string, any>) => {
+    state.searchParams = params;
     state.page = 1;
   };
 
-  // 重置过滤条件
-  const resetFilters = () => {
-    state.filters = [];
+  // 重置搜索参数
+  const resetSearchParams = () => {
+    state.searchParams = {};
     state.page = 1;
   };
 
@@ -124,7 +119,7 @@ export const useUserStore = defineStore('user', () => {
     create,
     update,
     delete: deleteUser,
-    setFilters,
-    resetFilters,
+    setSearchParams,
+    resetSearchParams,
   };
 });

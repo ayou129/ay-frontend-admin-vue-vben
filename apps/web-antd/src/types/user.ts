@@ -28,12 +28,6 @@ export interface ChangePasswordDTO {
   confirm_password: string;
 }
 
-export interface RequestFilterQuery {
-  field: string;
-  operator: string;
-  value: any;
-}
-
 // 用户状态枚举
 export enum UserStatus {
   Active = 1, // 正常

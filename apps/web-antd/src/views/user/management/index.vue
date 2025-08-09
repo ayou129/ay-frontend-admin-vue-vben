@@ -12,7 +12,6 @@ import { Button, Popconfirm, Tag } from 'ant-design-vue';
 import { useVbenForm } from '#/adapter/form';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { useUserStore } from '#/store/user';
-import { ValueTypes } from '#/types';
 
 // Store
 const userStore = useUserStore();
@@ -60,17 +59,13 @@ const searchFormOptions: VbenFormProps = {
   showCollapseButton: true,
   submitOnChange: true,
   handleSubmit: (values: Record<string, any>) => {
-    const filters = Object.entries(values)
-      .filter(
+    // 过滤空值并直接作为查询参数
+    const searchParams = Object.fromEntries(
+      Object.entries(values).filter(
         ([_, value]) => value !== undefined && value !== null && value !== '',
-      )
-      .map(([field, value]) => ({
-        field,
-        operator: 'like',
-        value,
-        value_type: ValueTypes.STRING,
-      }));
-    userStore.setFilters(filters);
+      ),
+    );
+    userStore.setSearchParams(searchParams);
     userStore.fetchPage();
   },
 };
@@ -98,22 +93,12 @@ const gridOptions: VxeTableGridOptions<UserVO> = reactive({
       slots: { default: 'action' },
     },
   ],
-  get data() {
-    return userStore.items;
-  },
-  get loading() {
-    return userStore.loading;
-  },
+  data: userStore.items,
+  loading: userStore.loading,
   pagerConfig: {
-    get currentPage() {
-      return userStore.page;
-    },
-    get pageSize() {
-      return userStore.page_size;
-    },
-    get total() {
-      return userStore.total;
-    },
+    currentPage: userStore.page,
+    pageSize: userStore.page_size,
+    total: userStore.total,
   },
 });
 
@@ -213,8 +198,9 @@ const [EditForm, editFormApi] = useVbenForm({
 });
 
 // 初始化
-onMounted(() => {
-  userStore.fetchPage();
+onMounted(async () => {
+  await userStore.fetchPage();
+  console.warn('数据获取完成，当前items数量:', userStore.items.length);
 });
 
 // 事件处理
