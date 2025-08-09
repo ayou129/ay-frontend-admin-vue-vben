@@ -53,7 +53,7 @@ function setupAccessGuard(router: Router) {
       if (to.path === LOGIN_PATH && accessStore.accessToken) {
         return decodeURIComponent(
           (to.query?.redirect as string) ||
-            userStore.userInfo?.homePath ||
+            userStore.profile?.homePath ||
             preferences.app.defaultHomePath,
         );
       }
@@ -90,8 +90,8 @@ function setupAccessGuard(router: Router) {
 
     // 生成路由表
     // 当前登录用户拥有的角色标识列表
-    const userInfo = userStore.userInfo || (await authStore.fetchUserInfo());
-    const userRoles = userInfo.roles ?? [];
+    const profile = userStore.profile || (await authStore.fetchProfile());
+    const userRoles = profile.roles ?? [];
 
     // 生成菜单和路由
     const { accessibleMenus, accessibleRoutes } = await generateAccess({
@@ -110,8 +110,8 @@ function setupAccessGuard(router: Router) {
       redirectPath = from.query.redirect as string;
     } else if (to.path === preferences.app.defaultHomePath) {
       redirectPath = preferences.app.defaultHomePath;
-    } else if (userInfo.homePath && to.path === userInfo.homePath) {
-      redirectPath = userInfo.homePath;
+    } else if (profile.homePath && to.path === profile.homePath) {
+      redirectPath = profile.homePath;
     } else {
       redirectPath = to.fullPath;
     }

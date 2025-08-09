@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { VbenFormProps } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { UserDTO, UserVO } from '#/types/user';
+import type { UserVO } from '#/types';
 
 import { onMounted, reactive } from 'vue';
 
@@ -11,10 +11,11 @@ import { Button, Popconfirm, Tag } from 'ant-design-vue';
 
 import { useVbenForm } from '#/adapter/form';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { useUserManagementStore } from '#/store/user-management';
+import { useUserStore } from '#/store/user';
+import { ValueTypes } from '#/types';
 
 // Store
-const userStore = useUserManagementStore();
+const userStore = useUserStore();
 
 // 搜索表单配置
 const searchFormOptions: VbenFormProps = {
@@ -22,8 +23,18 @@ const searchFormOptions: VbenFormProps = {
   schema: [
     {
       component: 'Input',
-      fieldName: 'username',
-      label: '用户名',
+      fieldName: 'phone',
+      label: '手机号',
+    },
+    {
+      component: 'Input',
+      fieldName: 'real_name',
+      label: '真实姓名',
+    },
+    {
+      component: 'Input',
+      fieldName: 'nick_name',
+      label: '昵称',
     },
     {
       component: 'Input',
@@ -35,8 +46,10 @@ const searchFormOptions: VbenFormProps = {
       componentProps: {
         allowClear: true,
         options: [
-          { label: '启用', value: 1 },
-          { label: '禁用', value: 0 },
+          { label: '未激活', value: 0 },
+          { label: '正常', value: 1 },
+          { label: '冻结', value: 2 },
+          { label: '已删除', value: 3 },
         ],
         placeholder: '请选择状态',
       },
@@ -55,6 +68,7 @@ const searchFormOptions: VbenFormProps = {
         field,
         operator: 'like',
         value,
+        value_type: ValueTypes.STRING,
       }));
     userStore.setFilters(filters);
     userStore.fetchPage();
@@ -66,9 +80,10 @@ const gridOptions: VxeTableGridOptions<UserVO> = reactive({
   columns: [
     { type: 'checkbox', width: 50 },
     { field: 'id', title: 'ID', width: 80 },
-    { field: 'username', title: '用户名', width: 120 },
+    { field: 'phone', title: '手机号', width: 130 },
+    { field: 'real_name', title: '真实姓名', width: 120 },
+    { field: 'nick_name', title: '昵称', width: 120 },
     { field: 'email', title: '邮箱', width: 200 },
-    { field: 'phone', title: '手机号', width: 150 },
     {
       field: 'status',
       title: '状态',
@@ -83,12 +98,22 @@ const gridOptions: VxeTableGridOptions<UserVO> = reactive({
       slots: { default: 'action' },
     },
   ],
-  data: userStore.items,
-  loading: userStore.loading,
+  get data() {
+    return userStore.items;
+  },
+  get loading() {
+    return userStore.loading;
+  },
   pagerConfig: {
-    currentPage: userStore.page,
-    pageSize: userStore.page_size,
-    total: userStore.total,
+    get currentPage() {
+      return userStore.page;
+    },
+    get pageSize() {
+      return userStore.page_size;
+    },
+    get total() {
+      return userStore.total;
+    },
   },
 });
 
@@ -96,32 +121,50 @@ const gridOptions: VxeTableGridOptions<UserVO> = reactive({
 const userFormSchema = [
   {
     component: 'Input',
-    fieldName: 'username',
-    label: '用户名',
+    fieldName: 'phone',
+    label: '手机号',
     rules: 'required',
+  },
+  {
+    component: 'Input',
+    fieldName: 'real_name',
+    label: '真实姓名',
+  },
+  {
+    component: 'Input',
+    fieldName: 'nick_name',
+    label: '昵称',
   },
   {
     component: 'Input',
     fieldName: 'email',
     label: '邮箱',
-    rules: 'required',
-  },
-  {
-    component: 'Input',
-    fieldName: 'phone',
-    label: '手机号',
   },
   {
     component: 'Select',
     componentProps: {
       options: [
-        { label: '启用', value: 1 },
-        { label: '禁用', value: 0 },
+        { label: '未激活', value: 0 },
+        { label: '正常', value: 1 },
+        { label: '冻结', value: 2 },
+        { label: '已删除', value: 3 },
       ],
     },
     fieldName: 'status',
     label: '状态',
     rules: 'required',
+  },
+  {
+    component: 'Select',
+    componentProps: {
+      options: [
+        { label: '未知', value: 0 },
+        { label: '男性', value: 1 },
+        { label: '女性', value: 2 },
+      ],
+    },
+    fieldName: 'gender',
+    label: '性别',
   },
 ];
 
@@ -130,7 +173,8 @@ const [CreateModal, createModalApi] = useVbenModal({
   onConfirm: async () => {
     const valid = await createFormApi.validate();
     if (valid) {
-      const formData = (await createFormApi.getValues()) as unknown as UserDTO;
+      const formData =
+        (await createFormApi.getValues()) as unknown as Partial<UserVO>;
       const success = await userStore.create(formData);
       if (success) {
         createModalApi.close();
@@ -151,7 +195,8 @@ const [EditModal, editModalApi] = useVbenModal({
   onConfirm: async () => {
     const valid = await editFormApi.validate();
     if (valid) {
-      const formData = (await editFormApi.getValues()) as unknown as UserDTO;
+      const formData =
+        (await editFormApi.getValues()) as unknown as Partial<UserVO>;
       const { id } = editModalApi.getData<{ id: number }>();
       const success = await userStore.update(id, formData);
       if (success) {
@@ -180,7 +225,8 @@ const handleCreate = () => {
 
 const handleEdit = (user: UserVO) => {
   editFormApi.setValues(user);
-  editModalApi.open({ id: user.id });
+  editModalApi.setData({ id: user.id });
+  editModalApi.open();
 };
 
 const handleDelete = async (id: number) => {

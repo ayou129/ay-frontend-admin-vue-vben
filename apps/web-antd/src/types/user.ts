@@ -16,6 +16,8 @@ export interface UserVO {
   country?: string;
   status?: UserStatus;
   delete_countdown_at?: string;
+  roles?: string[];
+  homePath?: string;
   created_at: string;
   updated_at: string;
 }

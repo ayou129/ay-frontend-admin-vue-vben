@@ -1,3 +1,5 @@
+import type { UserVO } from '#/types';
+
 import { baseRequestClient, requestClient } from '#/api/request';
 
 import { apiPrefix } from './config';
@@ -29,6 +31,13 @@ export async function loginApi(data: AuthApi.LoginParams) {
     `${apiPrefix}/auth/login`,
     data,
   );
+}
+
+/**
+ * 获取用户信息
+ */
+export async function getProfileApi() {
+  return requestClient.get<UserVO>(`${apiPrefix}/auth/profile`);
 }
 
 /**

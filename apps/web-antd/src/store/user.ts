@@ -1,13 +1,12 @@
 import type {
   CustomPageResponse,
   RequestFilterQuery,
-  UserDTO,
+  UserStatus,
   UserVO,
-} from '#/types/user';
+} from '#/types';
 
 import { reactive, toRefs } from 'vue';
 
-import { message } from 'ant-design-vue';
 import { defineStore } from 'pinia';
 
 import {
@@ -15,10 +14,10 @@ import {
   deleteUserApi,
   getUserPageApi,
   updateUserApi,
-} from '#/api/core/user-management';
-import { EMPTY_CUSTOM_PAGE_RESPONSE } from '#/types/user';
+} from '#/api/core/user';
+import { EMPTY_CUSTOM_PAGE_RESPONSE } from '#/store/common';
 
-export const useUserManagementStore = defineStore('user-management', () => {
+export const useUserStore = defineStore('user', () => {
   const state = reactive<
     CustomPageResponse<UserVO> & {
       filters: RequestFilterQuery[];
@@ -31,13 +30,19 @@ export const useUserManagementStore = defineStore('user-management', () => {
   });
 
   // 格式化方法
-  const format_status = (status: number) => {
+  const format_status = (status?: UserStatus) => {
     switch (status) {
       case 0: {
-        return { text: '禁用', color: 'red' };
+        return { text: '未激活', color: 'orange' };
       }
       case 1: {
-        return { text: '启用', color: 'green' };
+        return { text: '正常', color: 'green' };
+      }
+      case 2: {
+        return { text: '冻结', color: 'red' };
+      }
+      case 3: {
+        return { text: '已删除', color: 'gray' };
       }
       default: {
         return { text: '未知', color: 'gray' };
@@ -54,55 +59,50 @@ export const useUserManagementStore = defineStore('user-management', () => {
         page_size: state.page_size,
         filters: state.filters,
       });
-      if (response.code === 0 && response.data) {
-        const pageData = response.data as unknown as CustomPageResponse<UserVO>;
-        Object.assign(state, pageData);
-      } else {
-        message.error(response.msg);
-        Object.assign(state, {
-          ...EMPTY_CUSTOM_PAGE_RESPONSE,
-          page_size: state.page_size,
-        });
-      }
+      Object.assign(state, response);
+    } catch {
+      // 失败时保留用户的分页设置，只重置数据
+      const { page_size } = state;
+      Object.assign(state, {
+        ...EMPTY_CUSTOM_PAGE_RESPONSE,
+        page_size,
+      });
     } finally {
       state.loading = false;
     }
   };
 
   // 创建用户
-  const create = async (dto: UserDTO) => {
-    const res = await createUserApi(dto);
-    if (res.code === 0) {
-      message.success(res.msg);
+  const create = async (dto: Partial<UserVO>) => {
+    try {
+      await createUserApi(dto);
       await fetchPage();
       return true;
+    } catch {
+      return false;
     }
-    if (res.msg) message.error(res.msg);
-    return false;
   };
 
   // 更新用户
-  const update = async (id: number, dto: UserDTO) => {
-    const res = await updateUserApi(id, dto);
-    if (res.code === 0) {
-      message.success(res.msg);
+  const update = async (id: number, dto: Partial<UserVO>) => {
+    try {
+      await updateUserApi(id, dto);
       await fetchPage();
       return true;
+    } catch {
+      return false;
     }
-    if (res.msg) message.error(res.msg);
-    return false;
   };
 
   // 删除用户
   const deleteUser = async (id: number) => {
-    const res = await deleteUserApi(id);
-    if (res.code === 0) {
-      message.success(res.msg);
+    try {
+      await deleteUserApi(id);
       await fetchPage();
       return true;
+    } catch {
+      return false;
     }
-    if (res.msg) message.error(res.msg);
-    return false;
   };
 
   // 设置过滤条件

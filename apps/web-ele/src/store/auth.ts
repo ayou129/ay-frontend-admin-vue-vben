@@ -42,13 +42,13 @@ export const useAuthStore = defineStore('auth', () => {
 
         // 获取用户信息并存储到 accessStore 中
         const [fetchUserInfoResult, accessCodes] = await Promise.all([
-          fetchUserInfo(),
+          fetchProfile(),
           getAccessCodesApi(),
         ]);
 
         userInfo = fetchUserInfoResult;
 
-        userStore.setUserInfo(userInfo);
+        userStore.setProfile(userInfo);
         accessStore.setAccessCodes(accessCodes);
 
         if (accessStore.loginExpired) {
@@ -57,7 +57,7 @@ export const useAuthStore = defineStore('auth', () => {
           onSuccess
             ? await onSuccess?.()
             : await router.push(
-                userInfo.homePath || preferences.app.defaultHomePath,
+                userInfo?.homePath || preferences.app.defaultHomePath,
               );
         }
 
@@ -98,10 +98,10 @@ export const useAuthStore = defineStore('auth', () => {
     });
   }
 
-  async function fetchUserInfo() {
+  async function fetchProfile() {
     let userInfo: null | UserInfo = null;
     userInfo = await getUserInfoApi();
-    userStore.setUserInfo(userInfo);
+    userStore.setProfile(userInfo);
     return userInfo;
   }
 
@@ -112,7 +112,7 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     $reset,
     authLogin,
-    fetchUserInfo,
+    fetchProfile,
     loginLoading,
     logout,
   };

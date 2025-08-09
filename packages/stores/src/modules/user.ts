@@ -1,6 +1,6 @@
 import { acceptHMRUpdate, defineStore } from 'pinia';
 
-interface BasicUserInfo {
+interface BasicSysUser {
   [key: string]: any;
   /**
    * 头像
@@ -28,11 +28,11 @@ interface AccessState {
   /**
    * 用户信息
    */
-  userInfo: BasicUserInfo | null;
+  profile: BasicSysUser | null;
   /**
    * 用户角色
    */
-  userRoles: string[];
+  roles: string[];
 }
 
 /**
@@ -40,20 +40,20 @@ interface AccessState {
  */
 export const useUserStore = defineStore('core-user', {
   actions: {
-    setUserInfo(userInfo: BasicUserInfo | null) {
+    setProfile(profile: BasicSysUser | null) {
       // 设置用户信息
-      this.userInfo = userInfo;
+      this.profile = profile;
       // 设置角色信息
-      const roles = userInfo?.roles ?? [];
-      this.setUserRoles(roles);
+      const roles = profile?.roles ?? [];
+      this.setRoles(roles);
     },
-    setUserRoles(roles: string[]) {
-      this.userRoles = roles;
+    setRoles(roles: string[]) {
+      this.roles = roles;
     },
   },
   state: (): AccessState => ({
-    userInfo: null,
-    userRoles: [],
+    profile: null,
+    roles: [],
   }),
 });
 

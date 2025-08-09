@@ -10,7 +10,7 @@ import { resetAllStores, useAccessStore, useUserStore } from '@vben/stores';
 import { notification } from 'ant-design-vue';
 import { defineStore } from 'pinia';
 
-import { getAccessCodesApi, getUserInfoApi, loginApi, logoutApi } from '#/api';
+import { getAccessCodesApi, getProfileApi, loginApi, logoutApi } from '#/api';
 import { $t } from '#/locales';
 
 export const useAuthStore = defineStore('auth', () => {
@@ -30,7 +30,7 @@ export const useAuthStore = defineStore('auth', () => {
     onSuccess?: () => Promise<void> | void,
   ) {
     // 异步处理用户登录操作并获取 accessToken
-    let userInfo: null | UserInfo = null;
+    let profile: null | UserInfo = null;
     try {
       loginLoading.value = true;
       const resp = await loginApi(params);
@@ -43,14 +43,23 @@ export const useAuthStore = defineStore('auth', () => {
         accessStore.setRefreshToken(refresh_token);
 
         // 获取用户信息并存储到 accessStore 中
-        const [fetchUserInfoResult, accessCodes] = await Promise.all([
-          fetchUserInfo(),
+        const [fetchProfileResult, accessCodes] = await Promise.all([
+          fetchProfile(),
           getAccessCodesApi(),
         ]);
 
-        userInfo = fetchUserInfoResult;
+        profile = {
+          avatar: fetchProfileResult.avatar_url ?? '',
+          realName: fetchProfileResult.real_name ?? '',
+          userId: fetchProfileResult.id.toString(),
+          username: fetchProfileResult.nick_name ?? '',
+          roles: [],
+          desc: '',
+          homePath: '',
+          token: access_token,
+        };
 
-        userStore.setUserInfo(userInfo);
+        userStore.setProfile(profile);
         accessStore.setAccessCodes(accessCodes);
 
         if (accessStore.loginExpired) {
@@ -59,13 +68,13 @@ export const useAuthStore = defineStore('auth', () => {
           onSuccess
             ? await onSuccess?.()
             : await router.push(
-                userInfo.homePath || preferences.app.defaultHomePath,
+                profile?.homePath || preferences.app.defaultHomePath,
               );
         }
 
-        if (userInfo?.realName) {
+        if (profile?.realName) {
           notification.success({
-            description: `${$t('authentication.loginSuccessDesc')}:${userInfo?.realName}`,
+            description: `${$t('authentication.loginSuccessDesc')}:${profile?.realName}`,
             duration: 3,
             message: $t('authentication.loginSuccess'),
           });
@@ -76,7 +85,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     return {
-      userInfo,
+      profile,
     };
   }
 
@@ -100,11 +109,16 @@ export const useAuthStore = defineStore('auth', () => {
     });
   }
 
-  async function fetchUserInfo() {
-    let userInfo: null | UserInfo = null;
-    userInfo = await getUserInfoApi();
-    userStore.setUserInfo(userInfo);
-    return userInfo;
+  async function fetchProfile() {
+    const profile = await getProfileApi();
+    userStore.setProfile({
+      avatar: profile.avatar_url ?? '',
+      realName: profile.real_name ?? '',
+      userId: profile.id.toString(),
+      username: profile.nick_name ?? '',
+      roles: [],
+    });
+    return profile;
   }
 
   function $reset() {
@@ -114,7 +128,7 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     $reset,
     authLogin,
-    fetchUserInfo,
+    fetchProfile,
     loginLoading,
     logout,
   };

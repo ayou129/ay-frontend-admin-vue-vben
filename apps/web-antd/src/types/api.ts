@@ -13,16 +13,3 @@ export interface CustomPageResponse<T> {
   total_pages: number;
   has_more: boolean;
 }
-
-// CustomPageResponse 的空状态常量
-export const EMPTY_CUSTOM_PAGE_RESPONSE: Omit<
-  CustomPageResponse<any>,
-  'items'
-> & { items: any[] } = {
-  items: [],
-  page: 1,
-  page_size: 10,
-  total: 0,
-  total_pages: 0,
-  has_more: false,
-};
