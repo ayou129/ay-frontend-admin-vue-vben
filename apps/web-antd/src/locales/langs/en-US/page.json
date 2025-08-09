@@ -10,5 +10,38 @@
     "title": "Dashboard",
     "analytics": "Analytics",
     "workspace": "Workspace"
+  },
+  "user": {
+    "title": "User",
+    "statistics": "User Statistics",
+    "management": "User Management",
+    "level": "User Level",
+    "config": "User Config"
+  },
+  "product": {
+    "title": "Product",
+    "category": "Product Category",
+    "management": "Product Management"
+  },
+  "order": {
+    "title": "Order",
+    "statistics": "Order Statistics",
+    "list": "Order List",
+    "config": "Order Config"
+  },
+  "marketing": {
+    "title": "Marketing",
+    "coupon": {
+      "title": "Coupon",
+      "list": "Coupon List",
+      "record": "User Claim Record"
+    },
+    "points": {
+      "title": "Points Management",
+      "statistics": "Points Statistics",
+      "products": "Points Products",
+      "record": "Points Record",
+      "config": "Points Config"
+    }
   }
 }

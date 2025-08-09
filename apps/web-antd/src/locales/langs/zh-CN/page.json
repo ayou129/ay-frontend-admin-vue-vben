@@ -10,5 +10,38 @@
     "title": "概览",
     "analytics": "分析页",
     "workspace": "工作台"
+  },
+  "user": {
+    "title": "用户",
+    "statistics": "用户统计",
+    "management": "用户管理",
+    "level": "用户等级",
+    "config": "用户配置"
+  },
+  "product": {
+    "title": "产品",
+    "category": "产品分类",
+    "management": "产品管理"
+  },
+  "order": {
+    "title": "订单",
+    "statistics": "订单统计",
+    "list": "订单列表",
+    "config": "订单配置"
+  },
+  "marketing": {
+    "title": "营销",
+    "coupon": {
+      "title": "优惠券",
+      "list": "优惠券列表",
+      "record": "用户领取记录"
+    },
+    "points": {
+      "title": "积分管理",
+      "statistics": "积分统计",
+      "products": "积分商品",
+      "record": "积分记录",
+      "config": "积分配置"
+    }
   }
 }
