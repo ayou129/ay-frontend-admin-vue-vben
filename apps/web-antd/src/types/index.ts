@@ -37,3 +37,5 @@ export type * from './sys_user';
 
 // 用户相关类型
 export type * from './user';
+// 用户相关枚举（需要作为值导出）
+export { UserGender, UserStatus } from './user';

@@ -1,7 +1,6 @@
 import type {
   RequestFilterQuery,
   RequestFilterSortOption,
-  UserStatus,
   UserVO,
 } from '#/types';
 
@@ -13,6 +12,7 @@ import {
   getUserPageApi,
   updateUserApi,
 } from '#/api/core/user';
+import { UserStatus } from '#/types';
 import { DEFAULT_FILTER_SORT_OPTION } from '#/utils/filter';
 
 export const useUserStore = defineStore('user', () => {
@@ -21,17 +21,17 @@ export const useUserStore = defineStore('user', () => {
   // 格式化方法
   const format_status = (status?: UserStatus) => {
     switch (status) {
-      case 0: {
-        return { text: '未激活', color: 'orange' };
-      }
-      case 1: {
+      case UserStatus.Active: {
         return { text: '正常', color: 'green' };
       }
-      case 2: {
+      case UserStatus.Deleted: {
+        return { text: '已删除', color: 'gray' };
+      }
+      case UserStatus.Frozen: {
         return { text: '冻结', color: 'red' };
       }
-      case 3: {
-        return { text: '已删除', color: 'gray' };
+      case UserStatus.Inactive: {
+        return { text: '未激活', color: 'orange' };
       }
       default: {
         return { text: '未知', color: 'gray' };

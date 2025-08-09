@@ -8,7 +8,7 @@ import { Button, Popconfirm, Tag } from 'ant-design-vue';
 import { useVbenForm } from '#/adapter/form';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { useUserStore } from '#/store/user';
-import { FilterOperators, ValueTypes } from '#/types';
+import { FilterOperators, UserStatus, ValueTypes } from '#/types';
 
 // Store
 const userStore = useUserStore();
@@ -148,10 +148,10 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
         componentProps: {
           allowClear: true,
           options: [
-            { label: '未激活', value: 0 },
-            { label: '正常', value: 1 },
-            { label: '冻结', value: 2 },
-            { label: '已删除', value: 3 },
+            { label: '未激活', value: UserStatus.Inactive },
+            { label: '正常', value: UserStatus.Active },
+            { label: '冻结', value: UserStatus.Frozen },
+            { label: '已删除', value: UserStatus.Deleted },
           ],
           placeholder: '请选择状态',
         },
@@ -194,10 +194,10 @@ const userFormSchema = [
     component: 'Select',
     componentProps: {
       options: [
-        { label: '未激活', value: 0 },
-        { label: '正常', value: 1 },
-        { label: '冻结', value: 2 },
-        { label: '已删除', value: 3 },
+        { label: '未激活', value: UserStatus.Inactive },
+        { label: '正常', value: UserStatus.Active },
+        { label: '冻结', value: UserStatus.Frozen },
+        { label: '已删除', value: UserStatus.Deleted },
       ],
     },
     fieldName: 'status',
