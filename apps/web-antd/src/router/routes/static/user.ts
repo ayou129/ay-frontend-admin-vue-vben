@@ -16,7 +16,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'UserStatistics',
         path: '/user/statistics',
-        component: () => import('#/views/user/statistics/index.vue'),
+        component: () => import('#/views/user/statistics.vue'),
         meta: {
           icon: 'lucide:bar-chart-3',
           title: $t('page.user.statistics'),
@@ -26,7 +26,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'UserManagement',
         path: '/user/management',
-        component: () => import('#/views/user/management/index.vue'),
+        component: () => import('#/views/user/management.vue'),
         meta: {
           icon: 'lucide:user-cog',
           title: $t('page.user.management'),
@@ -36,7 +36,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'UserLevel',
         path: '/user/level',
-        component: () => import('#/views/user/level/index.vue'),
+        component: () => import('#/views/user/level.vue'),
         meta: {
           icon: 'lucide:badge',
           title: $t('page.user.level'),
@@ -46,7 +46,7 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'UserConfig',
         path: '/user/config',
-        component: () => import('#/views/user/config/index.vue'),
+        component: () => import('#/views/user/config.vue'),
         meta: {
           icon: 'lucide:settings',
           title: $t('page.user.config'),
