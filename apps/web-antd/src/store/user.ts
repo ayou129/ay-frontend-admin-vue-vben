@@ -1,6 +1,7 @@
 import type {
   CustomPageResponse,
   RequestFilterQuery,
+  RequestFilterSortOption,
   UserStatus,
   UserVO,
 } from '#/types';
@@ -21,11 +22,11 @@ export const useUserStore = defineStore('user', () => {
   const state = reactive<
     CustomPageResponse<UserVO> & {
       filters: RequestFilterQuery[];
+      filter_sort_option: RequestFilterSortOption;
       loading: boolean;
     }
   >({
     ...EMPTY_CUSTOM_PAGE_RESPONSE,
-    filters: [],
     loading: false,
   });
 
@@ -58,15 +59,10 @@ export const useUserStore = defineStore('user', () => {
         page: state.page,
         page_size: state.page_size,
         filters: state.filters,
+        filter_sort_option: state.filter_sort_option,
       });
       Object.assign(state, response);
-    } catch {
-      // 失败时保留用户的分页设置，只重置数据
-      const { page_size } = state;
-      Object.assign(state, {
-        ...EMPTY_CUSTOM_PAGE_RESPONSE,
-        page_size,
-      });
+    } catch (error) {
     } finally {
       state.loading = false;
     }

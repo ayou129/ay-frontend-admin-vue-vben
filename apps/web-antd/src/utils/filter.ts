@@ -44,8 +44,8 @@ export const ValueTypes = {
 export interface RequestGetPageQuery {
   page: number;
   page_size: number;
-  filter_sort_option?: RequestFilterSortOption;
-  filters?: RequestFilterQuery[];
+  filters: RequestFilterQuery[];
+  filter_sort_option: RequestFilterSortOption;
 }
 
 // 排序选项
