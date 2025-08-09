@@ -10,4 +10,12 @@ export const overridesPreferences = defineOverridesPreferences({
   app: {
     name: import.meta.env.VITE_APP_TITLE,
   },
+  widget: {
+    themeToggle: false,
+  },
+  theme: {
+    builtinType: 'violet',
+    colorPrimary: 'hsl(245 82% 67%)',
+    mode: 'light',
+  },
 });
