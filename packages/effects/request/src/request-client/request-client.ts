@@ -44,7 +44,8 @@ class RequestClient {
   // 是否正在刷新token
   public isRefreshing = false;
   // 刷新token队列
-  public refreshTokenQueue: ((token: string) => void)[] = [];
+  public refreshTokenQueue: ((token: string, refreshToken: string) => void)[] =
+    [];
   public upload: FileUploader['upload'];
   private readonly instance: AxiosInstance;
 

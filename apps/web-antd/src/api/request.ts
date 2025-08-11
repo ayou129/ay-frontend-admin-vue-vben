@@ -56,7 +56,7 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
     console.warn('refresh_token', refresh_token);
     accessStore.setAccessToken(access_token);
     accessStore.setRefreshToken(refresh_token);
-    return access_token;
+    return { access_token, refresh_token };
   }
 
   function formatToken(token: null | string) {

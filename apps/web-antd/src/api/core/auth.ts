@@ -44,7 +44,7 @@ export async function getProfileApi() {
  * 刷新accessToken
  */
 export async function refreshTokenApi() {
-  return baseRequestClient.post<AuthApi.RefreshTokenResult>(
+  return requestClient.post<AuthApi.RefreshTokenResult>(
     `${apiPrefix}/auth/refresh`,
     {
       withCredentials: true,
