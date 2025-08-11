@@ -22,9 +22,7 @@ const memberLevelStore = useMemberLevelStore();
 // 字段筛选配置
 const getFieldFilterConfig = (field: string, value: any) => {
   switch (field) {
-    case 'level_no':
-    case 'point_max':
-    case 'point_min': {
+    case 'level_no': {
       return {
         operator: FilterOperators.EQUAL,
         value,
@@ -96,12 +94,11 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
     ],
     proxyConfig: {
       ajax: {
-        query: async ({
-          page,
-        }: {
-          page: { currentPage: number; pageSize: number };
-        }) => {
-          const formValues = await gridApi.formApi.getLatestSubmissionValues();
+        query: async (
+          { page }: { page: { currentPage: number; pageSize: number } },
+          formValues: Record<string, any> = {},
+        ) => {
+          // 从表单值构建筛选条件
           const filters = Object.entries(formValues)
             .filter(
               ([_, value]) =>
@@ -165,9 +162,6 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
     showDefaultActions: true,
     submitButtonOptions: { show: false },
     resetButtonOptions: { content: '重置筛选' },
-    handleSubmit: (values: Record<string, any>) => {
-      gridApi.reload(values);
-    },
   },
 });
 

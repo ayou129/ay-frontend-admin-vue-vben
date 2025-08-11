@@ -91,7 +91,7 @@ const menus = computed(() => [
 ]);
 
 const avatar = computed(() => {
-  return userStore.userInfo?.avatar ?? preferences.app.defaultAvatar;
+  return userStore.profile?.avatar ?? preferences.app.defaultAvatar;
 });
 
 async function handleLogout() {
@@ -110,7 +110,7 @@ watch(
   async (enable) => {
     if (enable) {
       await updateWatermark({
-        content: `${userStore.userInfo?.username} - ${userStore.userInfo?.realName}`,
+        content: `${userStore.profile?.username} - ${userStore.profile?.realName}`,
       });
     } else {
       destroyWatermark();
@@ -128,7 +128,7 @@ watch(
       <UserDropdown
         :avatar
         :menus
-        :text="userStore.userInfo?.realName"
+        :text="userStore.profile?.realName"
         description="ann.vben@gmail.com"
         tag-text="Pro"
         @logout="handleLogout"
