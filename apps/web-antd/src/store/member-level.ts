@@ -21,10 +21,10 @@ export const useMemberLevelStore = defineStore('memberLevel', () => {
   const format_status = (status?: MemberLevelStatus) => {
     switch (status) {
       case MemberLevelStatus.Disabled: {
-        return { text: '禁用', color: 'red' };
+        return { text: '已禁用', color: 'red' };
       }
       case MemberLevelStatus.Enabled: {
-        return { text: '启用', color: 'green' };
+        return { text: '已启用', color: 'green' };
       }
       default: {
         return { text: '未知', color: 'gray' };

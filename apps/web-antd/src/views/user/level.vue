@@ -5,7 +5,7 @@ import { reactive } from 'vue';
 
 import { Page, useVbenModal } from '@vben/common-ui';
 
-import { Button, Popconfirm, Switch, Tag } from 'ant-design-vue';
+import { Button, Popconfirm, Switch } from 'ant-design-vue';
 
 import { useVbenForm } from '#/adapter/form';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
@@ -81,7 +81,7 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
       {
         field: 'status',
         title: '状态',
-        width: 100,
+        width: 110,
         slots: { default: 'status' },
       },
       { field: 'icon', title: '图标', width: 80 },
@@ -364,25 +364,26 @@ const handleDelete = async (id: number) => {
       </template>
 
       <template #status="{ row }">
-        <Switch
-          :checked="row.status === MemberLevelStatus.Enabled"
-          :loading="statusLoadingState[row.id]"
-          @change="
-            (checked) =>
-              handleStatusChange(
-                row.id,
-                checked
-                  ? MemberLevelStatus.Enabled
-                  : MemberLevelStatus.Disabled,
-              )
-          "
-        />
-        <Tag
-          :color="memberLevelStore.format_status(row.status).color"
-          class="ml-2"
-        >
-          {{ memberLevelStore.format_status(row.status).text }}
-        </Tag>
+        <div class="flex items-center gap-2">
+          <Switch
+            :checked="row.status === MemberLevelStatus.Enabled"
+            :loading="statusLoadingState[row.id]"
+            @change="
+              (checked) =>
+                handleStatusChange(
+                  row.id,
+                  checked
+                    ? MemberLevelStatus.Enabled
+                    : MemberLevelStatus.Disabled,
+                )
+            "
+          />
+          <span
+            :style="{ color: memberLevelStore.format_status(row.status).color }"
+          >
+            {{ memberLevelStore.format_status(row.status).text }}
+          </span>
+        </div>
       </template>
 
       <template #action="{ row }">
