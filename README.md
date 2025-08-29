@@ -63,7 +63,7 @@ git clone https://github.com/vbenjs/vue-vben-admin.git
 2. Install dependencies
 
 ```bash
-cd vue-vben-admin
+cd ay-frontend-admin-vue-vben
 npm i -g corepack
 pnpm install
 ```
