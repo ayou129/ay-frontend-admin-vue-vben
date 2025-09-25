@@ -71,7 +71,7 @@ pnpm install
 3. Run
 
 ```bash
-pnpm dev
+pnpm dev:antd
 ```
 
 4. Build
