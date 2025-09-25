@@ -80,6 +80,23 @@ pnpm dev
 pnpm build
 ```
 
+5. Git Commit
+
+```bash
+# feat: 新功能
+# fix: 修复bug
+# perf: 性能优化
+# refactor: 重构代码
+# docs: 文档更新
+# style: 代码格式
+
+git commit -m 'fix: add xxxxx'
+# 忽略提交规范
+git commit -m 'xxxxx' --no-verify
+```
+
+6. Git Push
+
 ## Change Log
 
 [CHANGELOG](https://github.com/vbenjs/vue-vben-admin/releases)
