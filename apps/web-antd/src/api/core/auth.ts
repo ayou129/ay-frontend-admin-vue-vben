@@ -45,7 +45,7 @@ export async function getProfileApi() {
  */
 export async function refreshTokenApi() {
   return requestClient.post<AuthApi.RefreshTokenResult>(
-    `${apiPrefix}/auth/refresh`,
+    `${apiPrefix}/auth/refresh-token`,
     {
       withCredentials: true,
     },

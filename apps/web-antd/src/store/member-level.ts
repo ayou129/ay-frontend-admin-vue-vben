@@ -86,7 +86,7 @@ export const useMemberLevelStore = defineStore('memberLevel', () => {
 
       return response; // 直接返回数据给VxeTable
     } catch {
-      return { items: [], total: 0 }; // 返回空数据
+      return { data: [], total: 0 }; // 返回空数据
     }
   };
 

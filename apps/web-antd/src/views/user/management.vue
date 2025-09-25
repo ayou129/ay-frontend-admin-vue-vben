@@ -113,7 +113,7 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
             filters,
           );
           return {
-            items: response.items || [],
+            items: response.data || [],
             total: response.total || 0,
           };
         },

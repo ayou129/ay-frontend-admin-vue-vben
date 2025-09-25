@@ -96,12 +96,10 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
     ],
     proxyConfig: {
       ajax: {
-        query: async ({
-          page,
-        }: {
-          page: { currentPage: number; pageSize: number };
-        }) => {
-          const formValues = await gridApi.formApi.getLatestSubmissionValues();
+        query: async (
+          { page }: { page: { currentPage: number; pageSize: number } },
+          formValues: Record<string, any> = {},
+        ) => {
           const filters = Object.entries(formValues)
             .filter(
               ([_, value]) =>
@@ -129,7 +127,7 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
             filter_sort_option,
           );
           return {
-            items: response?.items || [],
+            items: response?.data || [],
             total: response?.total || 0,
           };
         },
@@ -165,9 +163,6 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
     showDefaultActions: true,
     submitButtonOptions: { show: false },
     resetButtonOptions: { content: '重置筛选' },
-    handleSubmit: (values: Record<string, any>) => {
-      gridApi.reload(values);
-    },
   },
 });
 
