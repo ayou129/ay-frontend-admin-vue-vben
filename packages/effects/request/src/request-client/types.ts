@@ -7,6 +7,10 @@ import type {
 
 type ExtendOptions<T = any> = {
   /**
+   * 跳过认证刷新拦截器处理
+   */
+  __skipAuthRefresh?: boolean;
+  /**
    * 参数序列化方式。预置的有
    * - brackets: ids[]=1&ids[]=2&ids[]=3
    * - comma: ids=1,2,3

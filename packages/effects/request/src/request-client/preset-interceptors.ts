@@ -46,7 +46,6 @@ export const defaultResponseInterceptor = ({
 
 export const authenticateResponseInterceptor = ({
   client,
-  doReAuthenticate,
   doRefreshToken,
   enableRefreshToken,
   formatToken,
@@ -68,26 +67,30 @@ export const authenticateResponseInterceptor = ({
         throw error;
       }
 
-      if (response?.data?.code !== -904) {
-        // -904 是 令牌过期的意思
-        await doReAuthenticate();
+      // 如果是刷新token请求本身失败，直接抛出异常，由doRefreshToken处理
+      if (config.__skipAuthRefresh) {
         throw error;
       }
 
       // 判断是否启用了 refreshToken 功能
       // 如果没有启用或者已经是重试请求了，直接跳转到重新登录
       if (!enableRefreshToken || config.__isRetryRequest) {
+        // await doReAuthenticate();
+        console.warn('未启用刷新token功能，直接抛出异常');
         throw error;
       }
 
       // 如果正在刷新 token，则将请求加入队列，等待刷新完成
       if (client.isRefreshing) {
+        console.warn('isRefreshing');
         return new Promise((resolve) => {
           client.refreshTokenQueue.push((newToken: string) => {
             config.headers.AccessToken = formatToken(newToken);
             resolve(client.request(config.url, { ...config }));
           });
         });
+      } else {
+        console.warn('开始刷新token');
       }
 
       // 标记开始刷新 token
@@ -98,22 +101,21 @@ export const authenticateResponseInterceptor = ({
       try {
         const newToken = await doRefreshToken();
 
+        // 如果刷新失败（返回null），清空队列，不抛出错误
+        if (!newToken) {
+          client.refreshTokenQueue.forEach((callback) => callback('', ''));
+          client.refreshTokenQueue = [];
+          // 重新认证已经处理了跳转，直接返回一个永远不会resolve的Promise 否则会弹出多余的弹窗
+          return new Promise(() => {});
+        }
+
         // 处理队列中的请求
         client.refreshTokenQueue.forEach((callback) =>
           callback(newToken.access_token, newToken.refresh_token),
         );
-        // 清空队列
         client.refreshTokenQueue = [];
 
         return client.request(error.config.url, { ...error.config });
-      } catch (refreshError) {
-        // 如果刷新 token 失败，处理错误（如强制登出或跳转登录页面）
-        client.refreshTokenQueue.forEach((callback) => callback('', ''));
-        client.refreshTokenQueue = [];
-        console.error('Refresh token failed, please login again.');
-        await doReAuthenticate();
-
-        throw refreshError;
       } finally {
         client.isRefreshing = false;
       }

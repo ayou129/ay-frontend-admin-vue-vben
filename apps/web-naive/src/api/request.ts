@@ -85,7 +85,7 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
     authenticateResponseInterceptor({
       client,
       doReAuthenticate,
-      doRefreshToken,
+      doRefreshToken: doRefreshToken as any,
       enableRefreshToken: preferences.app.enableRefreshToken,
       formatToken,
     }),

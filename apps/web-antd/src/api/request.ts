@@ -31,10 +31,11 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
    * 重新认证逻辑
    */
   async function doReAuthenticate() {
-    console.warn('Access token or refresh token is invalid or expired. ');
+    console.warn('删除token');
     const accessStore = useAccessStore();
     const authStore = useAuthStore();
     accessStore.setAccessToken(null);
+    accessStore.setRefreshToken(null);
     if (
       preferences.app.loginExpiredMode === 'modal' &&
       accessStore.isAccessChecked
@@ -49,14 +50,17 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
    * 刷新token逻辑
    */
   async function doRefreshToken() {
-    const accessStore = useAccessStore();
-    const resp = await refreshTokenApi();
-    const { access_token, refresh_token } = resp;
-    console.warn('access_token', access_token);
-    console.warn('refresh_token', refresh_token);
-    accessStore.setAccessToken(access_token);
-    accessStore.setRefreshToken(refresh_token);
-    return { access_token, refresh_token };
+    try {
+      const accessStore = useAccessStore();
+      const resp = await refreshTokenApi();
+      const { access_token, refresh_token } = resp;
+      accessStore.setAccessToken(access_token);
+      accessStore.setRefreshToken(refresh_token);
+      return { access_token, refresh_token };
+    } catch {
+      await doReAuthenticate();
+      return null;
+    }
   }
 
   function formatToken(token: null | string) {
@@ -67,9 +71,8 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
   client.addRequestInterceptor({
     fulfilled: async (config) => {
       const accessStore = useAccessStore();
-
-      config.headers.AccessToken = formatToken(accessStore.accessToken);
-      config.headers.RefreshToken = formatToken(accessStore.refreshToken);
+      config.headers['Token-Access'] = formatToken(accessStore.accessToken);
+      config.headers['Token-Refresh'] = formatToken(accessStore.refreshToken);
       config.headers['Accept-Language'] = preferences.app.locale;
       return config;
     },
@@ -89,7 +92,7 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
     authenticateResponseInterceptor({
       client,
       doReAuthenticate,
-      doRefreshToken,
+      doRefreshToken: doRefreshToken as any,
       enableRefreshToken: preferences.app.enableRefreshToken,
       formatToken,
     }),

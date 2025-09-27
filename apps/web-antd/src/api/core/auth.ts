@@ -1,6 +1,6 @@
 import type { UserVO } from '#/types';
 
-import { baseRequestClient, requestClient } from '#/api/request';
+import { requestClient } from '#/api/request';
 
 import { apiPrefix } from './config';
 
@@ -46,19 +46,19 @@ export async function getProfileApi() {
 export async function refreshTokenApi() {
   return requestClient.post<AuthApi.RefreshTokenResult>(
     `${apiPrefix}/auth/refresh-token`,
+    {},
     {
-      withCredentials: true,
+      __skipAuthRefresh: true, // 标记这个请求不需要被认证拦截器处理
     },
   );
 }
 
 /**
- * 退出登录
+ * 退出登录 - 已移除真实请求，只做本地清理
+ * 不再发送真实的logout请求到服务器
  */
 export async function logoutApi() {
-  return baseRequestClient.post<null>(`${apiPrefix}/auth/logout`, {
-    withCredentials: true,
-  });
+  // 不发送真实请求，直接返回成功
 }
 
 /**

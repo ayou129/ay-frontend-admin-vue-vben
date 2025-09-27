@@ -10,7 +10,7 @@ import { resetAllStores, useAccessStore, useUserStore } from '@vben/stores';
 import { notification } from 'ant-design-vue';
 import { defineStore } from 'pinia';
 
-import { getAccessCodesApi, getProfileApi, loginApi, logoutApi } from '#/api';
+import { getAccessCodesApi, getProfileApi, loginApi } from '#/api';
 import { $t } from '#/locales';
 
 export const useAuthStore = defineStore('auth', () => {
@@ -90,11 +90,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function logout(redirect: boolean = true) {
-    try {
-      await logoutApi();
-    } catch {
-      // 不做任何处理
-    }
+    // 直接清理本地数据，不发送真实的logout请求
     resetAllStores();
     accessStore.setLoginExpired(false);
 
