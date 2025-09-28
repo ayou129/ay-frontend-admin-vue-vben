@@ -1,5 +1,7 @@
 ## 准备阶段
+
 ### Git Commit规范
+
 ```bash
 # feat: 新功能
 # fix: 修复bug
