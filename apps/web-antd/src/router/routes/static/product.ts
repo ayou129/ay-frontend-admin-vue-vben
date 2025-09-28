@@ -14,35 +14,14 @@ const routes: RouteRecordRaw[] = [
     path: '/product',
     children: [
       {
-        meta: {
-          icon: 'lucide:bar-chart-3',
-          title: $t('page.product.statistics.title'),
-          ignoreAccess: true,
-        },
         name: 'ProductStatistics',
         path: '/product/statistics',
-        children: [
-          {
-            name: 'ProductOverview',
-            path: '/product/statistics/overview',
-            component: () => import('#/views/product/statistics/overview.vue'),
-            meta: {
-              icon: 'lucide:pie-chart',
-              title: $t('page.product.statistics.overview'),
-              ignoreAccess: true,
-            },
-          },
-          {
-            name: 'ProductRanking',
-            path: '/product/statistics/ranking',
-            component: () => import('#/views/product/statistics/ranking.vue'),
-            meta: {
-              icon: 'lucide:trending-up',
-              title: $t('page.product.statistics.ranking'),
-              ignoreAccess: true,
-            },
-          },
-        ],
+        component: () => import('#/views/product/statistics/index.vue'),
+        meta: {
+          icon: 'lucide:bar-chart-3',
+          title: $t('page.product.statistics'),
+          ignoreAccess: true,
+        },
       },
       {
         name: 'ProductManagement',

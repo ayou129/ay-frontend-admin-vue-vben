@@ -20,11 +20,7 @@
   },
   "product": {
     "title": "Product",
-    "statistics": {
-      "title": "Product Statistics",
-      "overview": "Product Overview",
-      "ranking": "Product Ranking"
-    },
+    "statistics": "Product Statistics",
     "management": "Product Management",
     "category": "Product Category"
   },

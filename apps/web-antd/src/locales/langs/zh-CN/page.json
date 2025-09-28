@@ -20,11 +20,7 @@
   },
   "product": {
     "title": "商品",
-    "statistics": {
-      "title": "商品统计",
-      "overview": "商品概况",
-      "ranking": "商品排行"
-    },
+    "statistics": "商品统计",
     "management": "商品管理",
     "category": "商品分类"
   },
