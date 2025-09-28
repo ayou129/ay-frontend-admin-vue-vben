@@ -27,17 +27,14 @@ export namespace AuthApi {
  * 登录
  */
 export async function loginApi(data: AuthApi.LoginParams) {
-  return requestClient.post<AuthApi.LoginResult>(
-    `${apiPrefix}/auth/login`,
-    data,
-  );
+  return requestClient.post<AuthApi.LoginResult>(`${apiPrefix}/login`, data);
 }
 
 /**
  * 获取用户信息
  */
 export async function getProfileApi() {
-  return requestClient.get<UserVO>(`${apiPrefix}/auth/profile`);
+  return requestClient.get<UserVO>(`${apiPrefix}/profile`);
 }
 
 /**
@@ -45,7 +42,7 @@ export async function getProfileApi() {
  */
 export async function refreshTokenApi() {
   return requestClient.post<AuthApi.RefreshTokenResult>(
-    `${apiPrefix}/auth/refresh-token`,
+    `${apiPrefix}/refresh-token`,
     {},
     {
       __skipAuthRefresh: true, // 标记这个请求不需要被认证拦截器处理
@@ -65,5 +62,5 @@ export async function logoutApi() {
  * 获取用户权限码
  */
 export async function getAccessCodesApi() {
-  return requestClient.get<string[]>(`${apiPrefix}/auth/codes`);
+  return requestClient.get<string[]>(`${apiPrefix}/codes`);
 }

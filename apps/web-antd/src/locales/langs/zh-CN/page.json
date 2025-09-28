@@ -19,9 +19,14 @@
     "config": "用户配置"
   },
   "product": {
-    "title": "产品",
-    "category": "产品分类",
-    "management": "产品管理"
+    "title": "商品",
+    "statistics": {
+      "title": "商品统计",
+      "overview": "商品概况",
+      "ranking": "商品排行"
+    },
+    "management": "商品管理",
+    "category": "商品分类"
   },
   "order": {
     "title": "订单",
