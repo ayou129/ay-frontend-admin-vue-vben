@@ -5,126 +5,195 @@ import { onMounted, ref, watch } from 'vue';
 
 import { EchartsUI, useEcharts } from '@vben/plugins/echarts';
 
-interface Props {
-  chartData: string[];
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  chartData: () => [],
-});
+const props = defineProps<{
+  chartData?: string[];
+}>();
 
 const chartRef = ref<EchartsUIType>();
 const { renderEcharts } = useEcharts(chartRef);
 
-function renderChart() {
-  if (!props.chartData || props.chartData.length === 0) {
-    return;
+// 模拟真实的商品数据趋势图表数据
+const generateMockData = () => {
+  const dates = [];
+  const pageViews = []; // 商品浏览量 (紫色线)
+  const visitors = []; // 商品访客量 (橙色线)
+  const paymentAmount = []; // 支付金额 (蓝色柱)
+  const refundAmount = []; // 退款金额 (绿色柱)
+
+  // 生成30天的数据
+  for (let i = 0; i < 30; i++) {
+    const date = new Date();
+    date.setDate(date.getDate() - (29 - i));
+    dates.push(
+      `${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`,
+    );
+
+    // 模拟数据，参考图片中的数据范围
+    pageViews.push(Math.floor(Math.random() * 300) + 150); // 150-450范围
+    visitors.push(Math.floor(Math.random() * 80) + 20); // 20-100范围
+    paymentAmount.push(Math.floor(Math.random() * 180_000) + 20_000); // 2万-20万范围
+    refundAmount.push(Math.floor(Math.random() * 80_000) + 10_000); // 1万-9万范围
   }
 
-  // 这里假设 chartData 是一个包含数值的数组
-  // 实际使用时需要根据后端返回的数据格式进行调整
-  const data = props.chartData.map((item, index) => ({
-    name: `${index + 1}月`,
-    value: typeof item === 'string' ? Number.parseFloat(item) : item,
-  }));
+  return { dates, pageViews, visitors, paymentAmount, refundAmount };
+};
+
+const updateChart = () => {
+  const { dates, pageViews, visitors, paymentAmount, refundAmount } =
+    generateMockData();
 
   renderEcharts({
-    grid: {
-      bottom: '10%',
-      containLabel: true,
-      left: '3%',
-      right: '4%',
-      top: '4%',
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'cross',
+        crossStyle: {
+          color: '#999',
+        },
+      },
     },
     legend: {
-      data: ['商品数据'],
-      top: '2%',
+      data: ['商品浏览量', '商品访客量', '支付金额', '退款金额'],
+      top: 10,
+      right: 20,
     },
-    series: [
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      top: '15%',
+      containLabel: true,
+    },
+    xAxis: [
       {
-        data: data.map((item) => item.value),
-        name: '商品数据',
-        smooth: true,
-        type: 'line',
-        itemStyle: {
-          color: '#1890ff',
+        type: 'category',
+        data: dates,
+        axisPointer: {
+          type: 'shadow',
         },
-        areaStyle: {
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              {
-                offset: 0,
-                color: 'rgba(24, 144, 255, 0.3)',
-              },
-              {
-                offset: 1,
-                color: 'rgba(24, 144, 255, 0.1)',
-              },
-            ],
-          },
+        axisLine: {
+          show: false,
+        },
+        axisTick: {
+          show: false,
+        },
+        axisLabel: {
+          color: '#666',
+          fontSize: 12,
         },
       },
     ],
-    tooltip: {
-      axisPointer: {
-        lineStyle: {
-          color: '#1890ff',
-          width: 1,
+    yAxis: [
+      {
+        type: 'value',
+        name: '金额',
+        position: 'left',
+        axisLabel: {
+          formatter: '{value}',
+          color: '#666',
+        },
+        axisLine: {
+          show: false,
+        },
+        axisTick: {
+          show: false,
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#f0f0f0',
+          },
         },
       },
-      trigger: 'axis',
-    },
-    xAxis: {
-      data: data.map((item) => item.name),
-      type: 'category',
-      axisLine: {
-        lineStyle: {
-          color: '#e8e8e8',
+      {
+        type: 'value',
+        name: '数量',
+        position: 'right',
+        axisLabel: {
+          formatter: '{value}',
+          color: '#666',
+        },
+        axisLine: {
+          show: false,
+        },
+        axisTick: {
+          show: false,
+        },
+        splitLine: {
+          show: false,
         },
       },
-      axisLabel: {
-        color: '#666',
-      },
-    },
-    yAxis: {
-      type: 'value',
-      axisLine: {
-        lineStyle: {
-          color: '#e8e8e8',
+    ],
+    series: [
+      {
+        name: '支付金额',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: paymentAmount,
+        itemStyle: {
+          color: '#5470c6',
         },
+        barWidth: '20%',
       },
-      axisLabel: {
-        color: '#666',
-      },
-      splitLine: {
-        lineStyle: {
-          color: '#f0f0f0',
+      {
+        name: '退款金额',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: refundAmount,
+        itemStyle: {
+          color: '#91cc75',
         },
+        barWidth: '20%',
       },
-    },
+      {
+        name: '商品浏览量',
+        type: 'line',
+        yAxisIndex: 1,
+        data: pageViews,
+        smooth: true,
+        lineStyle: {
+          color: '#ee6666',
+          width: 2,
+        },
+        itemStyle: {
+          color: '#ee6666',
+        },
+        symbol: 'circle',
+        symbolSize: 4,
+      },
+      {
+        name: '商品访客量',
+        type: 'line',
+        yAxisIndex: 1,
+        data: visitors,
+        smooth: true,
+        lineStyle: {
+          color: '#fac858',
+          width: 2,
+        },
+        itemStyle: {
+          color: '#fac858',
+        },
+        symbol: 'circle',
+        symbolSize: 4,
+      },
+    ],
   });
-}
+};
 
 onMounted(() => {
-  renderChart();
+  updateChart();
 });
 
 watch(
   () => props.chartData,
   () => {
-    renderChart();
+    updateChart();
   },
-  { deep: true },
 );
 </script>
 
 <template>
-  <div class="h-80 w-full">
+  <div class="h-96">
     <EchartsUI ref="chartRef" />
   </div>
 </template>

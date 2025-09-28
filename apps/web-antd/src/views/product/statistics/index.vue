@@ -7,8 +7,7 @@ import type { RequestGetPageQuery } from '#/utils/filter';
 
 import { onMounted, ref } from 'vue';
 
-import { Page } from '@vben/common-ui';
-import { VbenCountToAnimator } from '@vben-core/shadcn-ui';
+import { Page, VbenCountToAnimator } from '@vben/common-ui';
 import {
   SvgBellIcon,
   SvgCakeIcon,
@@ -22,7 +21,7 @@ import {
   getProductRanking,
 } from '#/api/product/statistics';
 
-// import ProductChart from './components/product-chart.vue';
+import ProductChart from './components/product-chart.vue';
 
 // 商品概况数据
 const overviewData = ref<ProductStatisticsApi.OverviewData>();
@@ -210,9 +209,20 @@ onMounted(() => {
             <div class="flex items-center justify-between">
               <div class="flex-1">
                 <p class="text-sm text-gray-600">{{ item.title }}</p>
-                <p class="mt-1 text-2xl font-semibold">{{ item.value }}</p>
+                <VbenCountToAnimator
+                  :end-val="item.value"
+                  :start-val="0"
+                  class="mt-1 text-2xl font-semibold"
+                  prefix=""
+                />
                 <p class="mt-1 text-xs text-gray-500">
-                  {{ item.totalTitle }}: {{ item.totalValue }}
+                  {{ item.totalTitle }}:
+                  <VbenCountToAnimator
+                    :end-val="item.totalValue"
+                    :start-val="0"
+                    class="inline"
+                    prefix=""
+                  />
                 </p>
               </div>
               <div class="ml-4 flex-shrink-0">
@@ -226,15 +236,8 @@ onMounted(() => {
       <!-- 图表区域 -->
       <div>
         <h3 class="mb-4 text-base font-medium">商品数据趋势</h3>
-        <div class="rounded-lg border bg-gray-50 p-4">
-          <div
-            class="flex h-80 w-full items-center justify-center text-gray-500"
-          >
-            <div class="text-center">
-              <div class="mb-4 text-4xl">📈</div>
-              <p>图表组件开发中...</p>
-            </div>
-          </div>
+        <div class="rounded-lg border bg-white p-4">
+          <ProductChart :chart-data="overviewData?.chart_data || []" />
         </div>
       </div>
     </div>
