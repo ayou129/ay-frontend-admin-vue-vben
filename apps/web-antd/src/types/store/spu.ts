@@ -32,7 +32,7 @@ export interface Spu {
   id: number;
   category_id?: number;
   category?: Category;
-  order_type: SpuOrderType; // 1=虚拟商品 2=实物商品 3=酒店订单
+  type: SpuOrderType; // 1=虚拟商品 2=实物商品 3=酒店订单
   name: string;
   status: SpuStatus; // 1=正常 -1=已下架
   description?: string;

@@ -23,11 +23,12 @@ git commit -m 'xxxxx' --no-verify
 2. 页面UI 模板 参考： playground/src/views 中的所有页面 以供参考
 3. 页面有关表格筛选的功能，参考 apps/web-antd/src/utils/filter.ts 文件
 4. 当需要新增/编辑页面时，优先参考 playground/src/views 文件夹下的所有页面，例如：
-    - playground/src/views/system/menu/list.vue 页面有搜索筛选Panel 和 正文Panel 等可以参考的区域
-    - playground/src/views/examples/form 文件夹下 提供了表单的参考
-4. API 参考： #/api 文件夹下的所有文件，并且有 apiPrefix 配置，要利用上
-5. 不同的数据结构要放在合理的文件夹下
+   - playground/src/views/system/menu/list.vue 页面有搜索筛选Panel 和 正文Panel 等可以参考的区域
+   - playground/src/views/examples/form 文件夹下 提供了表单的参考
+5. API 参考： #/api 文件夹下的所有文件，并且有 apiPrefix 配置，要利用上
+6. 不同的数据结构要放在合理的文件夹下，例如
 
+- apps/web-antd/src/api/store/product.ts
 
 ### 商品功能
 
