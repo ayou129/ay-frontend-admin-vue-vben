@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:localhost)",
+      "Bash(curl http://localhost:9500/http.json)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

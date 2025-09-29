@@ -12,7 +12,7 @@
 
 git commit -m 'fix: add xxxxx'
 # 忽略提交规范
-git commit -m 'xxxxx' --no-verify
+git commit -m 'feat: 商品管理页面 UI' --no-verify
 ```
 
 ## 需求
@@ -120,4 +120,34 @@ git commit -m 'xxxxx' --no-verify
 
 资源类型：1=图片 2=音频 3=视频 4=文档 5=压缩包
 
-UI要求：
+
+
+## 总结遇到的问题以及解决方案
+### 问题：使用 useVbenDrawer 时报错 drawerApi.open is not a function 和 drawerApi.setData is not a function
+
+原因：当 useVbenDrawer 配置中使用了 connectedComponent 参数时，返回的 drawerApi 可能会有方法绑定或作用域问题
+
+解决方案：
+1. 移除 connectedComponent 配置参数
+2. 直接在抽屉模板中放入组件内容
+3. 使用简单的 drawerApi.open() 调用
+
+修正前：
+const [ProductFormDrawer, drawerApi] = useVbenDrawer({
+  connectedComponent: ProductForm,  // 这个参数可能导致问题
+  // ...其他配置
+});
+
+修正后：
+const [ProductFormDrawer, drawerApi] = useVbenDrawer({
+  // 移除 connectedComponent
+  title: '标题',
+  width: '60%',
+});
+
+// 模板中直接使用
+<ProductFormDrawer>
+  <ProductForm />
+</ProductFormDrawer>
+
+这个问题可能与 VbenDrawer 的内部实现和方法绑定机制有关。
