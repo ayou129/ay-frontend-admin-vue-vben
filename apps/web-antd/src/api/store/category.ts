@@ -1,8 +1,7 @@
 import type { RequestClient } from '#/api/request';
 
+import { apiPrefix } from '#/api/core/config';
 import { requestClient } from '#/api/request';
-
-const apiPrefix = '/api/v1/admin';
 
 export interface StoreCategory {
   id: number;

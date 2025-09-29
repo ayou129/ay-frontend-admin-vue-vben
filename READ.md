@@ -25,7 +25,7 @@ git commit -m 'feat: 商品管理页面 UI' --no-verify
 4. 当需要新增/编辑页面时，优先参考 playground/src/views 文件夹下的所有页面，例如：
    - playground/src/views/system/menu/list.vue 页面有搜索筛选Panel 和 正文Panel 等可以参考的区域
    - playground/src/views/examples/form 文件夹下 提供了表单的参考
-5. API 参考： #/api 文件夹下的所有文件，并且有 apiPrefix 配置，要利用上
+5. API 参考： #/api 文件夹下的所有文件，并且有 apiPrefix 配置(从config.ts 中获取)，要利用上
 6. 不同的数据结构要放在合理的文件夹下，例如
 
 - apps/web-antd/src/api/store/product.ts
@@ -151,3 +151,66 @@ const [ProductFormDrawer, drawerApi] = useVbenDrawer({
 </ProductFormDrawer>
 
 这个问题可能与 VbenDrawer 的内部实现和方法绑定机制有关。
+
+
+### 商品管理功能实现问题总结
+
+1. VbenDrawer 按钮冲突问题
+
+问题：VbenDrawer 和 VbenForm 都有默认按钮，导致冲突
+解决方案：
+- VbenForm 设置 showDefaultActions: false 隐藏表单按钮
+- VbenDrawer 通过 onConfirm 回调控制确认按钮行为
+
+2. 选择器默认值显示0的问题
+
+问题：Select 组件初始显示 0 而不是空状态
+解决方案：
+- 字段添加 defaultValue: undefined
+- 使用内置验证规则 rules: 'selectRequired' 代替复杂的 zod 规则
+
+3. 编辑时显示ID而非中文标签
+
+问题：编辑商品时选择器显示数字ID，不显示中文
+解决方案：
+- 确保选项数据格式为 {label: '中文', value: ID}
+- 异步加载分类数据并等待加载完成再设置表单值
+- 正确的数据类型转换（String → Number）
+
+4. 表单验证失败仍执行API调用
+
+问题：点击确认按钮后，即使验证失败也会调用API并关闭抽屉
+解决方案：
+- 手动调用 productFormApi.validate() 进行验证
+- 正确检查验证结果：validateResult.valid 而不是 validateResult 本身
+- 验证失败时抛出异常阻止后续执行
+
+5. 异步数据获取时序问题
+
+问题：编辑时分类数据还未加载完成就设置表单值
+解决方案：
+- 在设置表单值前确保分类数据已加载：await loadCategoryOptions()
+- 使用 Promise 处理异步加载时序
+
+6. 表单验证逻辑理解错误
+
+问题：误以为 VbenForm 的 submitForm() 会自动处理验证
+解决方案：
+- 理解 VbenForm 的验证返回对象结构：{valid: boolean, errors: object}
+- 手动控制验证和提交流程，而不是依赖框架自动处理
+
+7. 模块化设计问题
+
+问题：单一组件过于复杂，难以维护
+解决方案：
+- 拆分为多个组件：search-form.vue, product-table.vue, product-form.vue
+- 通过 props 和 events 进行组件通信
+- 使用 defineExpose 暴露子组件方法给父组件
+
+核心经验教训：
+
+1. 阅读官方示例：遇到问题时优先参考 playground 中的标准用法
+2. 理解框架机制：不要假设框架行为，要阅读源码理解实际机制
+3. 正确的错误处理：使用 try-catch 和异常抛出来控制业务流程
+4. 数据类型一致性：确保 API 数据类型与表单组件期望类型一致
+

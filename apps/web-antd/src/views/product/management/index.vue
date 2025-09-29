@@ -16,10 +16,27 @@ const searchParams = ref({});
 const [ProductFormDrawer, drawerApi] = useVbenDrawer({
   title: computed(() => editData.value ? '编辑商品' : '添加商品'),
   width: '60%',
+  onCancel() {
+    drawerApi.close();
+  },
+  onConfirm: async () => {
+    try {
+      await productFormRef.value?.submitForm();
+      // 如果没有异常，说明提交成功，关闭抽屉并刷新列表
+      drawerApi.close();
+      productTableRef.value?.refresh();
+    } catch (error) {
+      // 验证失败或API调用失败时，不关闭抽屉
+      // 用户可以看到验证错误信息
+    }
+  },
 });
 
 // 表格引用
 const productTableRef = ref();
+
+// 表单引用
+const productFormRef = ref();
 
 // 当前编辑的商品数据
 const editData = ref<Spu | null>(null);
@@ -48,10 +65,9 @@ const handleEditProduct = (row: Spu) => {
   drawerApi.open();
 };
 
-// 表单提交成功
+// 表单提交成功（现在由 onConfirm 统一处理，这个方法保留但不再使用）
 const handleFormSuccess = () => {
-  drawerApi.close();
-  productTableRef.value?.refresh();
+  // 现在由 onConfirm 统一处理关闭抽屉和刷新列表
 };
 </script>
 
@@ -70,7 +86,11 @@ const handleFormSuccess = () => {
 
     <!-- 商品表单抽屉 -->
     <ProductFormDrawer>
-      <ProductForm :edit-data="editData" @success="handleFormSuccess" />
+      <ProductForm
+        ref="productFormRef"
+        :edit-data="editData"
+        @success="handleFormSuccess"
+      />
     </ProductFormDrawer>
   </Page>
 </template>
