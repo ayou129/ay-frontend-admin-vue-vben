@@ -3,6 +3,7 @@
 ### TypeScript 配置
 
 **moduleResolution 弃用警告修复：**
+
 - 问题：VSCode 提示 `moduleResolution=node10` 已弃用
 - 位置：`/internal/tsconfig/base.json` 第 14 行
 - 解决：将 `"moduleResolution": "node"` 改为 `"moduleResolution": "bundler"`
@@ -125,50 +126,48 @@ git commit -m 'feat: 商品管理页面 UI' --no-verify
 
 资源类型：1=图片 2=音频 3=视频 4=文档 5=压缩包
 
-
-
 ## 总结遇到的问题以及解决方案
 
 ### 1. VbenDrawer 使用规范
 
 **问题 1：drawerApi.setData/open 方法无效**
+
 - 原因：使用 `connectedComponent` 参数导致方法绑定问题
 - 方案：移除该参数，在模板中直接放入组件 `<Drawer><Form /></Drawer>`
 
 **问题 2：抽屉内表单数据传递**
+
 - 错误做法：使用 `drawerApi.setData()` + `drawerApi.getData()` 在子组件内部获取
 - 正确做法：使用 props 传递数据，父组件通过 ref 状态管理
-```vue
-// 父组件
-const editData = ref();
-const onCreate = () => {
-  editData.value = { onSuccess: async (data) => { ... } };
-  drawerApi.open();
-};
 
-// 子组件
+```vue
+// 父组件 const editData = ref(); const onCreate = () => { editData.value = {
+onSuccess: async (data) => { ... } }; drawerApi.open(); }; // 子组件
 <CategoryForm :edit-data="editData" />
 ```
 
 **问题 3：抽屉与表单按钮冲突**
+
 - 方案：VbenForm 设置 `showDefaultActions: false`，由 VbenDrawer 的 `onConfirm` 统一处理
 
 ### 2. VbenForm 使用规范
 
 **基础配置建议：**
+
 ```javascript
 useVbenForm({
-  compact: true,              // 紧凑间距（pb-2 替代 pb-4）
-  layout: 'horizontal',       // 水平布局
+  compact: true, // 紧凑间距（pb-2 替代 pb-4）
+  layout: 'horizontal', // 水平布局
   commonConfig: {
-    labelWidth: 80,           // 标签宽度统一
-    disabledOnChangeListener: false,  // 启用 change 事件（自动搜索时需要）
-    disabledOnInputListener: false,   // 启用 input 事件（自动搜索时需要）
+    labelWidth: 80, // 标签宽度统一
+    disabledOnChangeListener: false, // 启用 change 事件（自动搜索时需要）
+    disabledOnInputListener: false, // 启用 input 事件（自动搜索时需要）
   },
-})
+});
 ```
 
 **搜索表单配置：**
+
 ```javascript
 useVbenForm({
   // 按钮布局
@@ -188,6 +187,7 @@ useVbenForm({
 ```
 
 **样式规范：**
+
 ```vue
 <!-- 搜索框容器统一样式 -->
 <div class="mb-4 rounded-lg bg-white shadow">
@@ -198,14 +198,17 @@ useVbenForm({
 ```
 
 **表单验证：**
+
 - 验证返回结构：`{ valid: boolean, errors: object }`
 - 验证失败时抛出异常阻止后续流程
+
 ```javascript
 const { valid } = await formApi.validate();
 if (!valid) throw new Error('表单验证失败');
 ```
 
 **选择器配置：**
+
 - 使用 `defaultValue: undefined` 避免显示 0
 - 使用 `rules: 'selectRequired'` 而非复杂 zod 规则
 - 异步数据需等待加载完成再 setValues
@@ -213,6 +216,7 @@ if (!valid) throw new Error('表单验证失败');
 ### 3. ApiTreeSelect 使用规范
 
 **必需配置（三要素）：**
+
 ```javascript
 {
   component: 'ApiTreeSelect',
@@ -224,13 +228,16 @@ if (!valid) throw new Error('表单验证失败');
   }
 }
 ```
+
 - 即使使用默认字段名也必须显式配置，否则会出现 `TreeNode value is invalidate: undefined` 警告
 
 ### 4. VxeGrid 表格操作按钮
 
 **CellOperation 渲染器配置：**
+
 - 需在 `/apps/web-antd/src/adapter/vxe-table.ts` 中注册
 - 支持预设操作：`'edit'`, `'delete'` 和自定义操作
+
 ```javascript
 {
   cellRender: {
@@ -251,7 +258,7 @@ if (!valid) throw new Error('表单验证失败');
 ### 5. 常见问题速查
 
 | 问题 | 原因 | 解决方案 |
-|------|------|---------|
+| --- | --- | --- |
 | 搜索框上下间距不一致 | 表单字段自带 `pb-4` | 设置 `compact: true` |
 | 编辑时显示 ID 不显示文本 | 异步数据未加载完成 | await 数据加载后再 setValues |
 | 表单验证失败仍提交 | 未正确检查 valid | 检查 `validateResult.valid` |
