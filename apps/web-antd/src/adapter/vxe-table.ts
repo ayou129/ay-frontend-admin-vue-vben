@@ -6,7 +6,7 @@ import { h } from 'vue';
 import { IconifyIcon } from '@vben/icons';
 import { $t } from '@vben/locales';
 import { setupVbenVxeTable, useVbenVxeGrid } from '@vben/plugins/vxe-table';
-import { get, isFunction, isString } from '@vben/utils';
+import { isFunction, isString } from '@vben/utils';
 
 import { Button, Image, Popconfirm } from 'ant-design-vue';
 

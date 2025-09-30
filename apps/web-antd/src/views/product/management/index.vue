@@ -14,7 +14,7 @@ const searchParams = ref({});
 
 // 抽屉表单配置
 const [ProductFormDrawer, drawerApi] = useVbenDrawer({
-  title: computed(() => editData.value ? '编辑商品' : '添加商品'),
+  title: computed(() => (editData.value ? '编辑商品' : '添加商品')),
   width: '60%',
   onCancel() {
     drawerApi.close();
@@ -25,7 +25,7 @@ const [ProductFormDrawer, drawerApi] = useVbenDrawer({
       // 如果没有异常，说明提交成功，关闭抽屉并刷新列表
       drawerApi.close();
       productTableRef.value?.refresh();
-    } catch (error) {
+    } catch {
       // 验证失败或API调用失败时，不关闭抽屉
       // 用户可以看到验证错误信息
     }
@@ -39,7 +39,7 @@ const productTableRef = ref();
 const productFormRef = ref();
 
 // 当前编辑的商品数据
-const editData = ref<Spu | null>(null);
+const editData = ref<null | Spu>(null);
 
 // 搜索
 const handleSearch = (values: Record<string, any>) => {

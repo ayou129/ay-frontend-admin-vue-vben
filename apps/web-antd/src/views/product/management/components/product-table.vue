@@ -89,8 +89,6 @@ const buildFilters = () => {
         FilterOperators.GTE,
         formValues.dateRange[0],
       ),
-    );
-    filters.push(
       createStringFilter(
         'created_at',
         FilterOperators.LTE,

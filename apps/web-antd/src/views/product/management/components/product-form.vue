@@ -1,27 +1,21 @@
 <script setup lang="ts">
-import type { Spu } from '#/types/store/spu';
 import type { StoreCategory } from '#/api/store/category';
+import type { Spu } from '#/types/store/spu';
 
 import { computed, onMounted, ref, watch } from 'vue';
 
-import { useVbenDrawer } from '@vben/common-ui';
 import { message } from 'ant-design-vue';
 
 import { useVbenForm, z } from '#/adapter/form';
 import { getCategoryTree } from '#/api/store/category';
 import { createProduct, updateProduct } from '#/api/store/product';
 
-// Props和Emits定义
+// Props定义
 interface Props {
-  editData?: Spu | null;
-}
-
-interface Emits {
-  success: [];
+  editData?: null | Spu;
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<Emits>();
 
 // 是否编辑模式
 const isEdit = computed(() => !!props.editData);
@@ -52,7 +46,9 @@ const validTypeOptions = [
 const loadCategoryOptions = async () => {
   try {
     const response = await getCategoryTree();
-    const flattenCategories = (categories: StoreCategory[]): Array<{ label: string; value: number }> => {
+    const flattenCategories = (
+      categories: StoreCategory[],
+    ): Array<{ label: string; value: number }> => {
       let result: Array<{ label: string; value: number }> = [];
 
       for (const category of categories) {
@@ -60,11 +56,11 @@ const loadCategoryOptions = async () => {
         if (category.children && category.children.length > 0) {
           const childOptions = flattenCategories(category.children);
           // 为子分类添加缩进标识
-          const indentedChildren = childOptions.map(child => ({
+          const indentedChildren = childOptions.map((child) => ({
             ...child,
-            label: `　${child.label}`, // 使用全角空格缩进
+            label: `  ${child.label}`, // 使用空格缩进
           }));
-          result = result.concat(indentedChildren);
+          result = [...result, ...indentedChildren];
         }
       }
 
@@ -174,15 +170,11 @@ const [ProductForm, productFormApi] = useVbenForm({
 
 // 提交表单
 async function onSubmit(values: Record<string, any>) {
-  console.log('onSubmit 被调用了，values:', values);
-
   try {
     if (isEdit.value && props.editData) {
-      console.log('准备调用 updateProduct API');
       await updateProduct(props.editData.id, values);
       message.success('更新商品成功');
     } else {
-      console.log('准备调用 createProduct API');
       await createProduct(values);
       message.success('添加商品成功');
     }
@@ -259,31 +251,26 @@ watch(
         await loadCategoryOptions();
       }
       // 稍微延迟确保组件已更新
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
       setFormValues(newData);
     } else {
       resetForm();
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 // 手动提交表单的方法
 const submitForm = async () => {
-  console.log('submitForm 被调用');
-
   // 先手动验证表单
   const validateResult = await productFormApi.validate();
-  console.log('验证结果:', validateResult);
 
   if (!validateResult.valid) {
-    console.log('验证失败，抛出异常');
     throw new Error('表单验证失败');
   }
 
   // 验证通过，获取值并调用 onSubmit
   const values = await productFormApi.getValues();
-  console.log('获取的表单值:', values);
 
   const result = await onSubmit(values);
   if (!result) {
