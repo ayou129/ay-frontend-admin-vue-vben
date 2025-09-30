@@ -10,7 +10,7 @@ import { Plus, SvgDownloadIcon } from '@vben/icons';
 import { Button, message, TabPane, Tabs } from 'ant-design-vue';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { deleteProduct, getProductList } from '#/api/store/product';
+import { deleteSpu, getSpuList } from '#/api/store/spu';
 import {
   createNumberFilter,
   createStringFilter,
@@ -150,7 +150,7 @@ const gridOptions: VxeGridProps<Spu> = {
         };
 
         try {
-          const response = await getProductList(params);
+          const response = await getSpuList(params);
           return response;
         } catch (error) {
           console.error('获取商品列表失败:', error);
@@ -173,18 +173,18 @@ const [Grid, gridApi] = useVbenVxeGrid({
 });
 
 // Tab切换
-const handleTabChange = (key: string) => {
-  activeTab.value = key;
+const handleTabChange = (key: number | string) => {
+  activeTab.value = String(key);
   gridApi.query();
 };
 
 // 添加商品
-const handleAddProduct = () => {
+const handleAddSpu = () => {
   emit('add');
 };
 
 // 商品采集
-const handleProductCollection = () => {
+const handleSpuCollection = () => {
   message.info('商品采集功能开发中');
 };
 
@@ -201,7 +201,7 @@ const handleEdit = (row: Spu) => {
 // 删除商品
 const handleDelete = async (row: Spu) => {
   try {
-    await deleteProduct(row.id);
+    await deleteSpu(row.id);
     message.success(`删除商品: ${row.name} 成功`);
     gridApi.query();
   } catch (error) {
@@ -247,11 +247,11 @@ defineExpose({
 
     <!-- 按钮区域 -->
     <div class="mb-4 flex flex-wrap gap-2">
-      <Button type="primary" @click="handleAddProduct">
+      <Button type="primary" @click="handleAddSpu">
         <Plus class="size-4" />
         添加商品
       </Button>
-      <Button @click="handleProductCollection">
+      <Button @click="handleSpuCollection">
         <SvgDownloadIcon class="size-4" />
         商品采集
       </Button>

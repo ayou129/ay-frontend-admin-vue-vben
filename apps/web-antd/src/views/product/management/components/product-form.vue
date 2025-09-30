@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { StoreCategory } from '#/api/store/category';
+import type { Category } from '#/types/store/category';
 import type { Spu } from '#/types/store/spu';
 
 import { computed, onMounted, ref, watch } from 'vue';
@@ -8,7 +8,7 @@ import { message } from 'ant-design-vue';
 
 import { useVbenForm, z } from '#/adapter/form';
 import { getCategoryTree } from '#/api/store/category';
-import { createProduct, updateProduct } from '#/api/store/product';
+import { createSpu, updateSpu } from '#/api/store/spu';
 
 // Props定义
 interface Props {
@@ -47,7 +47,7 @@ const loadCategoryOptions = async () => {
   try {
     const response = await getCategoryTree();
     const flattenCategories = (
-      categories: StoreCategory[],
+      categories: Category[],
     ): Array<{ label: string; value: number }> => {
       let result: Array<{ label: string; value: number }> = [];
 
@@ -75,7 +75,7 @@ const loadCategoryOptions = async () => {
 };
 
 // 表单配置
-const [ProductForm, productFormApi] = useVbenForm({
+const [SpuForm, productFormApi] = useVbenForm({
   commonConfig: {
     componentProps: {
       class: 'w-full',
@@ -83,7 +83,6 @@ const [ProductForm, productFormApi] = useVbenForm({
   },
   handleSubmit: onSubmit,
   layout: 'vertical',
-  resetOnMounted: false,
   showDefaultActions: false,
   schema: [
     {
@@ -97,11 +96,11 @@ const [ProductForm, productFormApi] = useVbenForm({
     },
     {
       component: 'Select',
-      componentProps: computed(() => ({
-        placeholder: '请选择商品类型',
-        options: typeOptions,
+      componentProps: {
         allowClear: true,
-      })),
+        options: typeOptions,
+        placeholder: '请选择商品类型',
+      },
       defaultValue: undefined,
       fieldName: 'type',
       label: '商品类型',
@@ -109,27 +108,47 @@ const [ProductForm, productFormApi] = useVbenForm({
     },
     {
       component: 'Select',
-      componentProps: computed(() => ({
-        placeholder: '请选择商品状态',
-        options: statusOptions,
+      componentProps: {
         allowClear: true,
-      })),
+        options: statusOptions,
+        placeholder: '请选择商品状态',
+      },
       defaultValue: undefined,
       fieldName: 'status',
       label: '商品状态',
       rules: 'selectRequired',
     },
     {
-      component: 'Select',
-      componentProps: computed(() => ({
-        placeholder: '请选择商品分类',
-        options: categoryOptions.value,
-        showSearch: true,
+      component: 'ApiSelect',
+      componentProps: {
         allowClear: true,
+        api: async () => {
+          const response = await getCategoryTree();
+          const flattenCategories = (
+            categories: Category[],
+          ): Array<{ label: string; value: number }> => {
+            let result: Array<{ label: string; value: number }> = [];
+            for (const category of categories) {
+              result.push({ label: category.name, value: category.id });
+              if (category.children && category.children.length > 0) {
+                const childOptions = flattenCategories(category.children);
+                const indentedChildren = childOptions.map((child) => ({
+                  ...child,
+                  label: `  ${child.label}`,
+                }));
+                result = [...result, ...indentedChildren];
+              }
+            }
+            return result;
+          };
+          return flattenCategories(response.list);
+        },
         filterOption: (input: string, option: any) => {
           return option?.label?.includes(input);
         },
-      })),
+        placeholder: '请选择商品分类',
+        showSearch: true,
+      },
       defaultValue: undefined,
       fieldName: 'category_id',
       label: '商品分类',
@@ -146,11 +165,11 @@ const [ProductForm, productFormApi] = useVbenForm({
     },
     {
       component: 'Select',
-      componentProps: computed(() => ({
-        placeholder: '请选择有效期类型',
-        options: validTypeOptions,
+      componentProps: {
         allowClear: true,
-      })),
+        options: validTypeOptions,
+        placeholder: '请选择有效期类型',
+      },
       defaultValue: undefined,
       fieldName: 'valid_type',
       label: '有效期类型',
@@ -170,20 +189,12 @@ const [ProductForm, productFormApi] = useVbenForm({
 
 // 提交表单
 async function onSubmit(values: Record<string, any>) {
-  try {
-    if (isEdit.value && props.editData) {
-      await updateProduct(props.editData.id, values);
-      message.success('更新商品成功');
-    } else {
-      await createProduct(values);
-      message.success('添加商品成功');
-    }
-    // emit('success'); // 现在由父组件的 onConfirm 统一处理
-    return true;
-  } catch (error) {
-    console.error('提交商品表单失败:', error);
-    message.error(isEdit.value ? '更新商品失败' : '添加商品失败');
-    return false;
+  if (isEdit.value && props.editData) {
+    await updateSpu(props.editData.id, values);
+    message.success('更新商品成功');
+  } else {
+    await createSpu(values as any);
+    message.success('添加商品成功');
   }
 }
 
@@ -271,13 +282,7 @@ const submitForm = async () => {
 
   // 验证通过，获取值并调用 onSubmit
   const values = await productFormApi.getValues();
-
-  const result = await onSubmit(values);
-  if (!result) {
-    throw new Error('提交失败');
-  }
-
-  return result;
+  await onSubmit(values);
 };
 
 // 暴露方法给父组件
@@ -290,6 +295,6 @@ defineExpose({
 
 <template>
   <div class="p-6">
-    <ProductForm />
+    <SpuForm />
   </div>
 </template>

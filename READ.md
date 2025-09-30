@@ -37,7 +37,7 @@ git commit -m 'feat: 商品管理页面 UI' --no-verify
 5. API 参考： #/api 文件夹下的所有文件，并且有 apiPrefix 配置(从config.ts 中获取)，要利用上
 6. 不同的数据结构要放在合理的文件夹下，例如
 
-- apps/web-antd/src/api/store/product.ts
+- apps/web-antd/src/api/store/spu.ts
 
 ### 商品功能
 
@@ -124,7 +124,82 @@ git commit -m 'feat: 商品管理页面 UI' --no-verify
 
 ### 资源组件支持
 
-资源类型：1=图片 2=音频 3=视频 4=文档 5=压缩包
+资源类型：1=图片 2=音频 3=视频 4=文档 5=压缩包资源支持选择的场景
+
+- 商品编辑页面
+- 商品描述富文本编辑页面
+  - 这里如果想在富文本中如果想插入图片，必须从资源库中选择，也就是说要上传到资源的某个目录中，然后选择才可以
+
+```
+# 资源组件结构
+src/components/resource/
+├── ResourcePickerModal.vue    # 资源选择弹窗（通用）
+├── ResourceList.vue           # 资源列表（通用）
+├── ResourceFolderTree.vue     # 资源目录树（通用）
+└── ResourcePreview.vue        # 资源预览（通用）
+
+src/views/spu/management/components/
+└── SpuResourceSelector.vue  # 商品资源选择器（业务专用）
+
+## ResourcePickerModal 组件（选择弹窗）
+布局： 弹窗 = 左侧目录树 + 右侧文件列表
+左侧：
+- 目录树（ResourceFolderTree）
+- 点击目录切换右侧文件列表
+右侧：
+- 文件列表（ResourceList）
+- 支持搜索、筛选类型
+- 文件列表带复选框（单选/多选）
+- 支持直接上传到当前目录
+底部：
+- 显示已选数量
+- 取消/确认按钮
+
+
+# 完整数据流
+##  场景1：SPU 编辑 - 轮播图
+<FormItem label="轮播图">
+  <ResourceSelector v-model="carouselImageIds" :max="10" />
+</FormItem>
+
+流程：
+1. 加载编辑：
+  - 后端返回 carousel_image_ids: [31, 32, 33]
+  - ResourceSelector 根据 IDs 批量获取资源详情（需新增 API）
+  - 显示资源预览
+2. 选择资源：
+  - 点击"选择资源" → 打开 ResourcePickerModal
+  - 选择文件 → 返回 Resource[]
+  - 提取 id[] 更新 v-model
+3. 保存：
+  - 提交 carousel_image_ids: [31, 32, 33, 34] 到后端
+  - 后端处理 resource_relation 表：
+      - 删除旧关联（relation_type=1, relation_id=spu_id）
+    - 插入新关联（resource_id + sort）
+## 场景2：富文本编辑 - 插入图片
+配置：
+<RichEditor
+  v-model="description"
+  :image-handler="handleInsertImage"
+/>
+逻辑：
+async function handleInsertImage() {
+  const resources = await openResourcePicker({
+    mode: 'single',
+    acceptTypes: [ResourceType.Image]
+  });
+  return resources[0].file_path; // 返回 URL
+}
+存储：
+- 富文本直接存储 HTML：<img src="/images/xxx.jpg" />
+- 不存储 resource_relation 记录
+```
+
+1. 这个资源组件，任何地方都可以调用，选择文件列表后，组件会返回文件列表数据
+2. 假设是商品编辑窗口 有商品主图和详情图字段，右侧就是[资源组件] 显示默认的 待添加的按钮(具体样式先不定)，点击后弹出资源组件，选择文件列表后，组件会返回文件列表数据，进而展示，但是此时数据不请求后端，点击保存后请求进行信息存储
+3. 疑惑点：
+
+- 假设场景：商品编辑窗口 主图和详情图右侧的实际展示资源列表的地方 究竟是如何设计，是制作成一个 资源选择组件 还是？
 
 ## 总结遇到的问题以及解决方案
 

@@ -8,9 +8,9 @@ import { requestClient } from '#/api/request';
 /**
  * 获取商品列表
  */
-export async function getProductList(params: RequestGetPageQuery) {
+export async function getSpuList(params: RequestGetPageQuery) {
   const response = await requestClient.get<PhpPageResponse<Spu>>(
-    `${apiPrefix}/store/products`,
+    `${apiPrefix}/store/spus`,
     {
       params: {
         page: params.page,
@@ -31,14 +31,14 @@ export async function getProductList(params: RequestGetPageQuery) {
 /**
  * 获取商品详情
  */
-export async function getProductDetail(id: number) {
-  return requestClient.get<Spu>(`${apiPrefix}/store/products/${id}`);
+export async function getSpuDetail(id: number) {
+  return requestClient.get<Spu>(`${apiPrefix}/store/spus/${id}`);
 }
 
 /**
  * 创建商品
  */
-export async function createProduct(data: {
+export async function createSpu(data: {
   category_id: number;
   description?: string;
   name: string;
@@ -47,13 +47,13 @@ export async function createProduct(data: {
   valid_type?: number;
   valid_value?: string;
 }) {
-  return requestClient.post<Spu>(`${apiPrefix}/store/products`, data);
+  return requestClient.post<Spu>(`${apiPrefix}/store/spus`, data);
 }
 
 /**
  * 更新商品
  */
-export async function updateProduct(
+export async function updateSpu(
   id: number,
   data: {
     category_id?: number;
@@ -65,12 +65,12 @@ export async function updateProduct(
     valid_value?: string;
   },
 ) {
-  return requestClient.put<Spu>(`${apiPrefix}/store/products/${id}`, data);
+  return requestClient.put<Spu>(`${apiPrefix}/store/spus/${id}`, data);
 }
 
 /**
  * 删除商品
  */
-export async function deleteProduct(id: number) {
-  return requestClient.delete(`${apiPrefix}/store/products/${id}`);
+export async function deleteSpu(id: number) {
+  return requestClient.delete(`${apiPrefix}/store/spus/${id}`);
 }

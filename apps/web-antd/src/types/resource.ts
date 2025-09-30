@@ -1,24 +1,29 @@
 export enum ResourceType {
+  Archive = 5, // 压缩包
   Audio = 2, // 音频
+  Document = 4, // 文档
   Image = 1, // 图片
   Video = 3, // 视频
 }
 
 // 资源类型
 export interface Resource {
-  id: number;
-  folder_id: number;
-  type: ResourceType;
-  original_filename: string;
-  save_slug: string;
-  ext: string;
-  save_path: string;
-  size: number;
-  mime_type: string;
-  md5: string;
   created_at: string;
+  file_ext: string;
+  file_md5: string;
+  file_original_filename: string;
+  file_path: string;
+  file_size: number;
+  file_slug: string;
+  folder?: ResourceFolder;
+  folder_id: number;
+  id: number;
+  is_public: number;
+  type: ResourceType;
   updated_at: string;
-  url?: string; // 资源预览URL
+  user_id: number;
+  url: string;
+  user_visibility: number;
 }
 
 // 资源文件夹类型
