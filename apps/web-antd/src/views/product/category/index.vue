@@ -7,7 +7,7 @@ import { ref } from 'vue';
 import { Page, useVbenDrawer } from '@vben/common-ui';
 import { Plus } from '@vben/icons';
 
-import { Button, message, Modal } from 'ant-design-vue';
+import { Button, message } from 'ant-design-vue';
 
 import { useVbenForm } from '#/adapter/form';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
@@ -26,14 +26,33 @@ const searchParams = ref({
 });
 
 const [SearchForm] = useVbenForm({
+  actionLayout: 'newLine',
+  actionPosition: 'right',
   commonConfig: {
     componentProps: {
       class: 'w-full',
     },
+    disabledOnChangeListener: false,
+    disabledOnInputListener: false,
     labelWidth: 80,
   },
   compact: true,
+  handleReset: () => {
+    searchParams.value = { keyword: '' };
+    onRefresh();
+  },
+  handleSubmit: (values) => {
+    searchParams.value = { keyword: values.keyword || '' };
+    onRefresh();
+  },
+  handleValuesChange: (values) => {
+    searchParams.value = { keyword: values.keyword || '' };
+    onRefresh();
+  },
   layout: 'horizontal',
+  resetButtonOptions: {
+    content: '重置',
+  },
   schema: [
     {
       component: 'Input',
@@ -47,7 +66,7 @@ const [SearchForm] = useVbenForm({
   ],
   showDefaultActions: true,
   submitButtonOptions: {
-    content: '搜索',
+    show: false,
   },
   wrapperClass: 'grid-cols-1 md:grid-cols-2',
 });
@@ -230,38 +249,13 @@ function onAppend(row: Category) {
 }
 
 async function onDelete(row: Category) {
-  Modal.confirm({
-    cancelText: '取消',
-    content: `确定要删除分类「${row.name}」吗？`,
-    okText: '确定',
-    okType: 'danger',
-    title: '删除确认',
-    async onOk() {
-      try {
-        await deleteCategory(row.id);
-        message.success(`删除分类: ${row.name} 成功`);
-        onRefresh();
-      } catch {
-        message.error(`删除分类: ${row.name} 失败`);
-      }
-    },
-  });
-}
-
-// 搜索处理
-function handleSearch(values: any) {
-  searchParams.value = {
-    keyword: values.keyword || '',
-  };
-  onRefresh();
-}
-
-// 重置搜索
-function handleReset() {
-  searchParams.value = {
-    keyword: '',
-  };
-  onRefresh();
+  try {
+    await deleteCategory(row.id);
+    message.success(`删除分类: ${row.name} 成功`);
+    onRefresh();
+  } catch {
+    message.error(`删除分类: ${row.name} 失败`);
+  }
 }
 </script>
 
@@ -274,7 +268,7 @@ function handleReset() {
     <!-- 搜索框 Panel -->
     <div class="mb-4 rounded-lg bg-white shadow">
       <div class="p-4">
-        <SearchForm @reset="handleReset" @submit="handleSearch" />
+        <SearchForm />
       </div>
     </div>
 

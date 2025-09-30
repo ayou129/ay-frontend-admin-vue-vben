@@ -87,7 +87,7 @@ const [SearchForm, searchFormApi] = useVbenForm({
   ],
   showDefaultActions: true,
   submitButtonOptions: {
-    content: '搜索',
+    show: false,
   },
   wrapperClass: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
 });
