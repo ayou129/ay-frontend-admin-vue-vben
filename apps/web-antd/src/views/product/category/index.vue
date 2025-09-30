@@ -144,28 +144,28 @@ function filterTreeData(
   data: Category[],
   params: { keyword: string },
 ): Category[] {
-  return data
-    .map((item) => {
-      const matchKeyword =
-        !params.keyword || item.name.includes(params.keyword);
+  const result: Category[] = [];
 
-      const filteredChildren = item.children
-        ? filterTreeData(item.children, params)
-        : [];
+  for (const item of data) {
+    const matchKeyword = !params.keyword || item.name.includes(params.keyword);
 
-      // 如果当前节点匹配，则保留该节点及其所有子节点
-      if (matchKeyword) {
-        return { ...item, children: filteredChildren };
-      }
+    const filteredChildren: Category[] = item.children
+      ? filterTreeData(item.children, params)
+      : [];
 
-      // 如果子节点有匹配，保留该节点（即使当前节点不匹配）
-      if (filteredChildren.length > 0) {
-        return { ...item, children: filteredChildren };
-      }
+    // 如果当前节点匹配，则保留该节点及其所有子节点
+    if (matchKeyword) {
+      result.push({ ...item, children: filteredChildren });
+      continue;
+    }
 
-      return null;
-    })
-    .filter((item): item is Category => item !== null);
+    // 如果子节点有匹配，保留该节点（即使当前节点不匹配）
+    if (filteredChildren.length > 0) {
+      result.push({ ...item, children: filteredChildren });
+    }
+  }
+
+  return result;
 }
 
 const [Grid, gridApi] = useVbenVxeGrid({ gridOptions });

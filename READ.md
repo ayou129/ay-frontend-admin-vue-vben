@@ -1,5 +1,13 @@
 ## 准备阶段
 
+### TypeScript 配置
+
+**moduleResolution 弃用警告修复：**
+- 问题：VSCode 提示 `moduleResolution=node10` 已弃用
+- 位置：`/internal/tsconfig/base.json` 第 14 行
+- 解决：将 `"moduleResolution": "node"` 改为 `"moduleResolution": "bundler"`
+- 原因：项目使用 Vite 构建，bundler 是现代化最佳选择
+
 ### Git Commit规范
 
 ```bash
@@ -249,6 +257,7 @@ if (!valid) throw new Error('表单验证失败');
 | 表单验证失败仍提交 | 未正确检查 valid | 检查 `validateResult.valid` |
 | 按钮不靠右 | 缺少布局配置 | `actionLayout: 'newLine'`, `actionPosition: 'right'` |
 | 自动搜索不生效 | 事件监听被禁用 | `disabledOnChangeListener: false` |
+| 递归函数类型推断错误 | TypeScript 无法推断递归返回类型 | 显式声明变量类型 `const result: Type[] = ...` |
 
 ### 6. 最佳实践
 
