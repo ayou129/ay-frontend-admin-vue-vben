@@ -1,21 +1,25 @@
 <script setup lang="ts">
 import type { Spu } from '#/types/store/spu';
 
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
 import { Page, useVbenDrawer } from '@vben/common-ui';
 
-import ProductForm from './components/product-form.vue';
-import ProductTable from './components/product-table.vue';
 import SearchForm from './components/search-form.vue';
+import SpuForm from './components/spu-form.vue';
+import SpuTable from './components/spu-table.vue';
 
 // 搜索参数
 const searchParams = ref({});
 
+// 当前编辑的商品数据
+const editData = ref<null | Spu>(null);
+
+// 抽屉标题
+const drawerTitle = ref('商品信息');
+
 // 抽屉表单配置
-const [ProductFormDrawer, drawerApi] = useVbenDrawer({
-  title: computed(() => (editData.value ? '编辑商品' : '添加商品')),
-  width: '60%',
+const [SpuFormDrawer, drawerApi] = useVbenDrawer({
   onCancel() {
     drawerApi.close();
   },
@@ -38,9 +42,6 @@ const productTableRef = ref();
 // 表单引用
 const productFormRef = ref();
 
-// 当前编辑的商品数据
-const editData = ref<null | Spu>(null);
-
 // 搜索
 const handleSearch = (values: Record<string, any>) => {
   searchParams.value = values;
@@ -54,14 +55,16 @@ const handleReset = () => {
 };
 
 // 添加商品
-const handleAddProduct = () => {
+const handleAddSpu = () => {
   editData.value = null;
+  drawerTitle.value = '添加商品';
   drawerApi.open();
 };
 
 // 编辑商品
-const handleEditProduct = (row: Spu) => {
+const handleEditSpu = (row: Spu) => {
   editData.value = row;
+  drawerTitle.value = '编辑商品';
   drawerApi.open();
 };
 
@@ -77,21 +80,21 @@ const handleFormSuccess = () => {
     <SearchForm @search="handleSearch" @reset="handleReset" />
 
     <!-- 商品表格 -->
-    <ProductTable
+    <SpuTable
       ref="productTableRef"
       :search-params="searchParams"
-      @add="handleAddProduct"
-      @edit="handleEditProduct"
+      @add="handleAddSpu"
+      @edit="handleEditSpu"
     />
 
     <!-- 商品表单抽屉 -->
-    <ProductFormDrawer>
-      <ProductForm
+    <SpuFormDrawer :title="drawerTitle" width="60%">
+      <SpuForm
         ref="productFormRef"
         :edit-data="editData"
         @success="handleFormSuccess"
       />
-    </ProductFormDrawer>
+    </SpuFormDrawer>
   </Page>
 </template>
 

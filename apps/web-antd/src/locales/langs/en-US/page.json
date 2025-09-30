@@ -18,11 +18,11 @@
     "level": "User Level",
     "config": "User Config"
   },
-  "product": {
-    "title": "Product",
-    "statistics": "Product Statistics",
-    "management": "Product Management",
-    "category": "Product Category"
+  "spu": {
+    "title": "Spu",
+    "statistics": "Spu Statistics",
+    "management": "Spu Management",
+    "category": "Spu Category"
   },
   "order": {
     "title": "Order",
@@ -40,7 +40,7 @@
     "points": {
       "title": "Points Management",
       "statistics": "Points Statistics",
-      "products": "Points Products",
+      "spus": "Points Spus",
       "record": "Points Record",
       "config": "Points Config"
     }
