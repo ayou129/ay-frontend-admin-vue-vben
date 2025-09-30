@@ -98,9 +98,6 @@ git commit -m 'feat: 商品管理页面 UI' --no-verify
   - 商品分类
     - 搜索框 Panel
       - 商品分类名称 搜索
-      - 商品分类状态搜索
-        - 正常
-        - 已禁用
     - 正文
       - 添加分类按钮
       - 表格区域 根据后端字段进行展示 并且分类名称应该是 Tree 结构
@@ -214,3 +211,28 @@ const [ProductFormDrawer, drawerApi] = useVbenDrawer({
 3. 正确的错误处理：使用 try-catch 和异常抛出来控制业务流程
 4. 数据类型一致性：确保 API 数据类型与表单组件期望类型一致
 
+### 点击"添加分类"或"新增子分类"时，控制台出现警告：
+Warning: TreeNode `value` is invalidate: undefined
+Warning: Same `value` exist in the tree: undefined
+
+根本原因：
+ApiTreeSelect 组件在处理树形数据时，如果没有明确指定 childrenField 属性，TreeSelect
+无法正确识别子节点字段，导致在遍历树结构时读取到 undefined 值。
+
+解决方案：
+在 ApiTreeSelect 的 componentProps 中添加 childrenField: 'children' 配置，明确告诉组件使用 children 字段作为子节点。
+
+{
+  component: 'ApiTreeSelect',
+  componentProps: {
+    api: async () => { ... },
+    childrenField: 'children',  // ← 关键配置
+    valueField: 'id',
+    labelField: 'name',
+    ...
+  }
+}
+
+经验教训：
+使用 ApiTreeSelect 处理树形数据时，务必明确配置 childrenField、valueField、labelField
+三个字段，即使字段名是常见的默认值（如 children）。

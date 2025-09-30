@@ -1,7 +1,8 @@
 export interface Category {
+  children?: Category[];
+  created_at: string;
   id: number;
   name: string;
   parent_id: number;
-  created_at: string;
   updated_at: string;
 }

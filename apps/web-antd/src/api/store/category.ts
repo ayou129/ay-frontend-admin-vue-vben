@@ -1,49 +1,53 @@
-import type { RequestClient } from '#/api/request';
+import type { Category } from '#/types/store/category';
 
 import { apiPrefix } from '#/api/core/config';
 import { requestClient } from '#/api/request';
 
-export interface StoreCategory {
-  id: number;
-  name: string;
-  parent_id?: number;
-  children?: StoreCategory[];
+/**
+ * 获取分类树
+ */
+export async function getCategoryTree() {
+  return requestClient.get<{ list: Category[] }>(
+    `${apiPrefix}/store/categories/tree`,
+  );
 }
 
-export interface CategoryTreeResponse {
-  list: StoreCategory[];
+/**
+ * 获取分类详情
+ */
+export async function getCategoryDetail(id: number) {
+  return requestClient.get<Category>(`${apiPrefix}/store/categories/${id}`);
 }
 
-// 获取分类树
-export async function getCategoryTree(): Promise<CategoryTreeResponse> {
-  return requestClient.get(`${apiPrefix}/store/categories/tree`);
-}
-
-// 获取分类详情
-export async function getCategoryDetail(id: number): Promise<StoreCategory> {
-  return requestClient.get(`${apiPrefix}/store/categories/${id}`);
-}
-
-// 创建分类
+/**
+ * 创建分类
+ */
 export async function createCategory(data: {
   name: string;
   parent_id?: number;
-}): Promise<StoreCategory> {
-  return requestClient.post(`${apiPrefix}/store/categories`, data);
+}) {
+  return requestClient.post<Category>(`${apiPrefix}/store/categories`, data);
 }
 
-// 更新分类
+/**
+ * 更新分类
+ */
 export async function updateCategory(
   id: number,
   data: {
     name?: string;
     parent_id?: number;
   },
-): Promise<StoreCategory> {
-  return requestClient.put(`${apiPrefix}/store/categories/${id}`, data);
+) {
+  return requestClient.put<Category>(
+    `${apiPrefix}/store/categories/${id}`,
+    data,
+  );
 }
 
-// 删除分类
-export async function deleteCategory(id: number): Promise<void> {
+/**
+ * 删除分类
+ */
+export async function deleteCategory(id: number) {
   return requestClient.delete(`${apiPrefix}/store/categories/${id}`);
 }

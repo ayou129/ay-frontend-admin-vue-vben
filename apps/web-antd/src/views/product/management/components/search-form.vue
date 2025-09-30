@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { Search } from '@vben/icons';
-import { Button } from 'ant-design-vue';
 import { useVbenForm } from '#/adapter/form';
 
 // Props和Emits定义
@@ -15,12 +13,31 @@ const emit = defineEmits<Emits>();
 
 // 搜索表单配置
 const [SearchForm, searchFormApi] = useVbenForm({
+  actionLayout: 'newLine',
+  actionPosition: 'right',
   commonConfig: {
     componentProps: {
       class: 'w-full',
     },
+    disabledOnChangeListener: false,
+    disabledOnInputListener: false,
+    labelWidth: 80,
+  },
+  compact: true,
+  handleReset: async () => {
+    searchFormApi.resetFields();
+    emit('reset');
+  },
+  handleSubmit: async (values) => {
+    emit('search', values);
+  },
+  handleValuesChange: (values) => {
+    emit('search', values);
   },
   layout: 'horizontal',
+  resetButtonOptions: {
+    content: '重置',
+  },
   schema: [
     {
       component: 'Input',
@@ -68,20 +85,12 @@ const [SearchForm, searchFormApi] = useVbenForm({
       label: '创建时间',
     },
   ],
+  showDefaultActions: true,
+  submitButtonOptions: {
+    content: '搜索',
+  },
   wrapperClass: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
 });
-
-// 搜索
-const handleSearch = () => {
-  const values = searchFormApi.getValues();
-  emit('search', values);
-};
-
-// 重置
-const handleReset = () => {
-  searchFormApi.resetFields();
-  emit('reset');
-};
 
 // 暴露API给父组件
 defineExpose({
@@ -91,17 +100,9 @@ defineExpose({
 </script>
 
 <template>
-  <div class="mb-4 rounded-lg bg-white p-6 shadow">
-    <SearchForm />
-    <!-- 搜索按钮 -->
-    <div class="mt-4 flex space-x-2">
-      <Button type="primary" @click="handleSearch">
-        <Search class="size-4" />
-        搜索
-      </Button>
-      <Button @click="handleReset">
-        重置
-      </Button>
+  <div class="mb-4 rounded-lg bg-white shadow">
+    <div class="p-4">
+      <SearchForm />
     </div>
   </div>
 </template>
