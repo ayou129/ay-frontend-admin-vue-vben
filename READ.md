@@ -120,119 +120,139 @@ git commit -m 'feat: 商品管理页面 UI' --no-verify
 
 
 ## 总结遇到的问题以及解决方案
-### 问题：使用 useVbenDrawer 时报错 drawerApi.open is not a function 和 drawerApi.setData is not a function
 
-原因：当 useVbenDrawer 配置中使用了 connectedComponent 参数时，返回的 drawerApi 可能会有方法绑定或作用域问题
+### 1. VbenDrawer 使用规范
 
-解决方案：
-1. 移除 connectedComponent 配置参数
-2. 直接在抽屉模板中放入组件内容
-3. 使用简单的 drawerApi.open() 调用
+**问题 1：drawerApi.setData/open 方法无效**
+- 原因：使用 `connectedComponent` 参数导致方法绑定问题
+- 方案：移除该参数，在模板中直接放入组件 `<Drawer><Form /></Drawer>`
 
-修正前：
-const [ProductFormDrawer, drawerApi] = useVbenDrawer({
-  connectedComponent: ProductForm,  // 这个参数可能导致问题
-  // ...其他配置
-});
+**问题 2：抽屉内表单数据传递**
+- 错误做法：使用 `drawerApi.setData()` + `drawerApi.getData()` 在子组件内部获取
+- 正确做法：使用 props 传递数据，父组件通过 ref 状态管理
+```vue
+// 父组件
+const editData = ref();
+const onCreate = () => {
+  editData.value = { onSuccess: async (data) => { ... } };
+  drawerApi.open();
+};
 
-修正后：
-const [ProductFormDrawer, drawerApi] = useVbenDrawer({
-  // 移除 connectedComponent
-  title: '标题',
-  width: '60%',
-});
+// 子组件
+<CategoryForm :edit-data="editData" />
+```
 
-// 模板中直接使用
-<ProductFormDrawer>
-  <ProductForm />
-</ProductFormDrawer>
+**问题 3：抽屉与表单按钮冲突**
+- 方案：VbenForm 设置 `showDefaultActions: false`，由 VbenDrawer 的 `onConfirm` 统一处理
 
-这个问题可能与 VbenDrawer 的内部实现和方法绑定机制有关。
+### 2. VbenForm 使用规范
 
+**基础配置建议：**
+```javascript
+useVbenForm({
+  compact: true,              // 紧凑间距（pb-2 替代 pb-4）
+  layout: 'horizontal',       // 水平布局
+  commonConfig: {
+    labelWidth: 80,           // 标签宽度统一
+    disabledOnChangeListener: false,  // 启用 change 事件（自动搜索时需要）
+    disabledOnInputListener: false,   // 启用 input 事件（自动搜索时需要）
+  },
+})
+```
 
-### 商品管理功能实现问题总结
+**搜索表单配置：**
+```javascript
+useVbenForm({
+  // 按钮布局
+  actionLayout: 'newLine',    // 按钮新起一行占满整行
+  actionPosition: 'right',    // 按钮靠右对齐
+  showDefaultActions: true,   // 显示内置按钮
 
-1. VbenDrawer 按钮冲突问题
+  // 自动搜索（任意字段值改变即触发）
+  handleValuesChange: (values) => {
+    emit('search', values);
+  },
 
-问题：VbenDrawer 和 VbenForm 都有默认按钮，导致冲突
-解决方案：
-- VbenForm 设置 showDefaultActions: false 隐藏表单按钮
-- VbenDrawer 通过 onConfirm 回调控制确认按钮行为
+  // 按钮回调
+  handleSubmit: async (values) => { ... },
+  handleReset: async () => { ... },
+})
+```
 
-2. 选择器默认值显示0的问题
+**样式规范：**
+```vue
+<!-- 搜索框容器统一样式 -->
+<div class="mb-4 rounded-lg bg-white shadow">
+  <div class="p-4">
+    <SearchForm />
+  </div>
+</div>
+```
 
-问题：Select 组件初始显示 0 而不是空状态
-解决方案：
-- 字段添加 defaultValue: undefined
-- 使用内置验证规则 rules: 'selectRequired' 代替复杂的 zod 规则
+**表单验证：**
+- 验证返回结构：`{ valid: boolean, errors: object }`
+- 验证失败时抛出异常阻止后续流程
+```javascript
+const { valid } = await formApi.validate();
+if (!valid) throw new Error('表单验证失败');
+```
 
-3. 编辑时显示ID而非中文标签
+**选择器配置：**
+- 使用 `defaultValue: undefined` 避免显示 0
+- 使用 `rules: 'selectRequired'` 而非复杂 zod 规则
+- 异步数据需等待加载完成再 setValues
 
-问题：编辑商品时选择器显示数字ID，不显示中文
-解决方案：
-- 确保选项数据格式为 {label: '中文', value: ID}
-- 异步加载分类数据并等待加载完成再设置表单值
-- 正确的数据类型转换（String → Number）
+### 3. ApiTreeSelect 使用规范
 
-4. 表单验证失败仍执行API调用
-
-问题：点击确认按钮后，即使验证失败也会调用API并关闭抽屉
-解决方案：
-- 手动调用 productFormApi.validate() 进行验证
-- 正确检查验证结果：validateResult.valid 而不是 validateResult 本身
-- 验证失败时抛出异常阻止后续执行
-
-5. 异步数据获取时序问题
-
-问题：编辑时分类数据还未加载完成就设置表单值
-解决方案：
-- 在设置表单值前确保分类数据已加载：await loadCategoryOptions()
-- 使用 Promise 处理异步加载时序
-
-6. 表单验证逻辑理解错误
-
-问题：误以为 VbenForm 的 submitForm() 会自动处理验证
-解决方案：
-- 理解 VbenForm 的验证返回对象结构：{valid: boolean, errors: object}
-- 手动控制验证和提交流程，而不是依赖框架自动处理
-
-7. 模块化设计问题
-
-问题：单一组件过于复杂，难以维护
-解决方案：
-- 拆分为多个组件：search-form.vue, product-table.vue, product-form.vue
-- 通过 props 和 events 进行组件通信
-- 使用 defineExpose 暴露子组件方法给父组件
-
-核心经验教训：
-
-1. 阅读官方示例：遇到问题时优先参考 playground 中的标准用法
-2. 理解框架机制：不要假设框架行为，要阅读源码理解实际机制
-3. 正确的错误处理：使用 try-catch 和异常抛出来控制业务流程
-4. 数据类型一致性：确保 API 数据类型与表单组件期望类型一致
-
-### 点击"添加分类"或"新增子分类"时，控制台出现警告：
-Warning: TreeNode `value` is invalidate: undefined
-Warning: Same `value` exist in the tree: undefined
-
-根本原因：
-ApiTreeSelect 组件在处理树形数据时，如果没有明确指定 childrenField 属性，TreeSelect
-无法正确识别子节点字段，导致在遍历树结构时读取到 undefined 值。
-
-解决方案：
-在 ApiTreeSelect 的 componentProps 中添加 childrenField: 'children' 配置，明确告诉组件使用 children 字段作为子节点。
-
+**必需配置（三要素）：**
+```javascript
 {
   component: 'ApiTreeSelect',
   componentProps: {
+    childrenField: 'children',  // 子节点字段（必须显式指定）
+    valueField: 'id',           // 值字段
+    labelField: 'name',         // 标签字段
     api: async () => { ... },
-    childrenField: 'children',  // ← 关键配置
-    valueField: 'id',
-    labelField: 'name',
-    ...
   }
 }
+```
+- 即使使用默认字段名也必须显式配置，否则会出现 `TreeNode value is invalidate: undefined` 警告
 
-经验教训：
-使用 ApiTreeSelect 处理树形数据时，务必明确配置 childrenField、valueField、labelField
-三个字段，即使字段名是常见的默认值（如 children）。
+### 4. VxeGrid 表格操作按钮
+
+**CellOperation 渲染器配置：**
+- 需在 `/apps/web-antd/src/adapter/vxe-table.ts` 中注册
+- 支持预设操作：`'edit'`, `'delete'` 和自定义操作
+```javascript
+{
+  cellRender: {
+    name: 'CellOperation',
+    attrs: {
+      nameField: 'name',
+      onClick: onActionClick,
+    },
+    options: [
+      { code: 'append', text: '新增子分类' },
+      'edit',
+      'delete',
+    ],
+  },
+}
+```
+
+### 5. 常见问题速查
+
+| 问题 | 原因 | 解决方案 |
+|------|------|---------|
+| 搜索框上下间距不一致 | 表单字段自带 `pb-4` | 设置 `compact: true` |
+| 编辑时显示 ID 不显示文本 | 异步数据未加载完成 | await 数据加载后再 setValues |
+| 表单验证失败仍提交 | 未正确检查 valid | 检查 `validateResult.valid` |
+| 按钮不靠右 | 缺少布局配置 | `actionLayout: 'newLine'`, `actionPosition: 'right'` |
+| 自动搜索不生效 | 事件监听被禁用 | `disabledOnChangeListener: false` |
+
+### 6. 最佳实践
+
+1. **优先参考 playground 示例**：遇到问题先查看 `playground/src/views` 标准用法
+2. **组件模块化**：复杂页面拆分为 search-form.vue、table.vue、form.vue
+3. **数据类型一致**：确保 API 数据类型与组件期望类型一致
+4. **统一配置**：labelWidth、compact、样式等在项目中保持一致
