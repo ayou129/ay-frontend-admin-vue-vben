@@ -156,10 +156,8 @@ const gridOptions: VxeGridProps<Spu> = {
         } catch (error) {
           console.error('获取商品列表失败:', error);
           return {
-            result: [],
-            page: {
-              total: 0,
-            },
+            items: [],
+            total: 0,
           };
         }
       },

@@ -1,3 +1,4 @@
+import type { PhpPageResponse } from '#/types';
 import type { Spu } from '#/types/store/spu';
 import type { RequestGetPageQuery } from '#/utils/filter';
 
@@ -8,19 +9,23 @@ import { requestClient } from '#/api/request';
  * 获取商品列表
  */
 export async function getProductList(params: RequestGetPageQuery) {
-  return requestClient.get<{
-    page: {
-      total: number;
-    };
-    result: Spu[];
-  }>(`${apiPrefix}/store/products`, {
-    params: {
-      page: params.page,
-      page_size: params.page_size,
-      filters: params.filters,
-      filter_sort_option: params.filter_sort_option,
+  const response = await requestClient.get<PhpPageResponse<Spu>>(
+    `${apiPrefix}/store/products`,
+    {
+      params: {
+        page: params.page,
+        page_size: params.page_size,
+        filters: params.filters,
+        filter_sort_option: params.filter_sort_option,
+      },
     },
-  });
+  );
+
+  // 转换为 VxeGrid 期望的格式 {items: [], total: 0}
+  return {
+    items: response.data,
+    total: response.total,
+  };
 }
 
 /**

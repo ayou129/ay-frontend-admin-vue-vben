@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "WebFetch(domain:localhost)",
-      "Bash(curl http://localhost:9500/http.json)"
+      "Bash(curl http://localhost:9500/http.json)",
+      "Bash(curl:*)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []
