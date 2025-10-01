@@ -4,17 +4,28 @@ import type { Resource } from '#/types/resource';
 import { computed, ref, watch } from 'vue';
 
 import { createIconifyIcon } from '@vben/icons';
+
 import { Button, Input, message, Modal, Select, Upload } from 'ant-design-vue';
 
 import { getResourceFiles, uploadResourceFiles } from '#/api/resource/resource';
 import { ResourceType } from '#/types/resource';
 
-// 创建上传图标
-const UploadIcon = createIconifyIcon('carbon:upload');
-
 import ResourceFolderTree from './ResourceFolderTree.vue';
 import ResourceList from './ResourceList.vue';
 import ResourcePreview from './ResourcePreview.vue';
+
+const props = withDefaults(defineProps<Props>(), {
+  open: false,
+  mode: 'multiple',
+  acceptTypes: () => [],
+  selectedIds: () => [],
+  maxSelection: 30,
+});
+
+const emit = defineEmits<Emits>();
+
+// 创建上传图标
+const UploadIcon = createIconifyIcon('carbon:upload');
 
 interface Props {
   open: boolean;
@@ -28,16 +39,6 @@ interface Emits {
   (e: 'update:open', value: boolean): void;
   (e: 'confirm', resources: Resource[]): void;
 }
-
-const props = withDefaults(defineProps<Props>(), {
-  open: false,
-  mode: 'multiple',
-  acceptTypes: () => [],
-  selectedIds: () => [],
-  maxSelection: 30,
-});
-
-const emit = defineEmits<Emits>();
 
 // 当前选中的目录ID
 const currentFolderId = ref<number>();

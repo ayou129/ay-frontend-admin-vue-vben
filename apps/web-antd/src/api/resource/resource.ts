@@ -90,9 +90,9 @@ export async function moveResourceFile(id: number, folderId: number) {
  * 创建资源目录
  */
 export async function createResourceFolder(data: {
+  description?: string;
   name: string;
   parent_id?: number;
-  description?: string;
 }) {
   return requestClient.post<ResourceFolder>(
     `${apiPrefix}/resource/folders`,
@@ -106,8 +106,8 @@ export async function createResourceFolder(data: {
 export async function updateResourceFolder(
   id: number,
   data: {
-    name?: string;
     description?: string;
+    name?: string;
   },
 ) {
   return requestClient.put<ResourceFolder>(

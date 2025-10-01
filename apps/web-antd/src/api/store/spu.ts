@@ -40,8 +40,8 @@ export async function getSpuDetail(id: number) {
  * 创建商品
  */
 export async function createSpu(data: {
-  category_id: number;
   carousels?: Resource[];
+  category_id: number;
   detail?: string;
   name: string;
   status: number;
