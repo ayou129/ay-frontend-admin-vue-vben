@@ -1,7 +1,18 @@
-import type { Resource } from '#/types/resource';
+import type { PhpPageResponse } from '#/types';
+import type { Resource, ResourceFolder } from '#/types/resource';
+import type { RequestGetPageQuery } from '#/utils/filter';
 
 import { apiPrefix } from '#/api/core/config';
 import { requestClient } from '#/api/request';
+
+/**
+ * 获取资源目录树
+ */
+export async function getResourceFolderTree() {
+  return requestClient.get<{ list: ResourceFolder[] }>(
+    `${apiPrefix}/resource/folders/tree`,
+  );
+}
 
 /**
  * 获取目录下的资源文件列表
@@ -10,6 +21,28 @@ export async function getResourceFiles(folderId: number) {
   return requestClient.get<{ list: Resource[] }>(
     `${apiPrefix}/resource/folders/${folderId}/files`,
   );
+}
+
+/**
+ * 获取资源列表（分页）
+ */
+export async function getResourceList(params: RequestGetPageQuery) {
+  const response = await requestClient.get<PhpPageResponse<Resource>>(
+    `${apiPrefix}/resource/list/page`,
+    {
+      params: {
+        page: params.page,
+        page_size: params.page_size,
+        filters: params.filters,
+        filter_sort_option: params.filter_sort_option,
+      },
+    },
+  );
+
+  return {
+    items: response.data,
+    total: response.total,
+  };
 }
 
 /**
@@ -51,4 +84,41 @@ export async function moveResourceFile(id: number, folderId: number) {
     `${apiPrefix}/resource/files/${id}/folder`,
     { folder_id: folderId },
   );
+}
+
+/**
+ * 创建资源目录
+ */
+export async function createResourceFolder(data: {
+  name: string;
+  parent_id?: number;
+  description?: string;
+}) {
+  return requestClient.post<ResourceFolder>(
+    `${apiPrefix}/resource/folders`,
+    data,
+  );
+}
+
+/**
+ * 更新资源目录
+ */
+export async function updateResourceFolder(
+  id: number,
+  data: {
+    name?: string;
+    description?: string;
+  },
+) {
+  return requestClient.put<ResourceFolder>(
+    `${apiPrefix}/resource/folders/${id}`,
+    data,
+  );
+}
+
+/**
+ * 删除资源目录
+ */
+export async function deleteResourceFolder(id: number) {
+  return requestClient.delete(`${apiPrefix}/resource/folders/${id}`);
 }

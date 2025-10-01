@@ -123,6 +123,7 @@ git commit -m 'feat: 商品管理页面 UI' --no-verify
   - 商品评论(暂不实现)
 
 ### 资源组件支持
+
 - 商品编辑页面
 - 商品描述富文本编辑页面
   - 这里如果想在富文本中如果想插入图片，必须从资源库中选择，也就是说要上传到资源的某个目录中，然后选择才可以
@@ -232,11 +233,13 @@ async function handleInsertImage() {
 - 假设场景：商品编辑窗口 轮播图右侧的实际展示资源列表的地方 究竟是如何设计，是制作成一个 资源选择组件 还是？
 
 实现前的流程思考：
+
 1. 思考 当前的设计是否合理，是否需要优化
 2. 实现所有相关的 API 和 组件 大纲
 3. 按照功能 分成若干个小功能 逐个实现
 
 实现流程细节：
+
 1. Resource API + 类型定义
 2. 基础组件：ResourceFolderTree → ResourceList → ResourcePickerModal
 3. 业务组件：SpuResourceSelector

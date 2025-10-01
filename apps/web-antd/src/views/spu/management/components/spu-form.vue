@@ -2,13 +2,16 @@
 import type { Category } from '#/types/store/category';
 import type { Spu } from '#/types/store/spu';
 
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, markRaw, onMounted, ref, watch } from 'vue';
 
 import { message } from 'ant-design-vue';
 
 import { useVbenForm, z } from '#/adapter/form';
 import { getCategoryTree } from '#/api/store/category';
 import { createSpu, updateSpu } from '#/api/store/spu';
+import { ResourceType } from '#/types/resource';
+
+import SpuResourceSelector from './SpuResourceSelector.vue';
 
 // Props定义
 interface Props {
@@ -164,6 +167,17 @@ const [SpuForm, spuFormApi] = useVbenForm({
       label: '商品描述',
     },
     {
+      component: markRaw(SpuResourceSelector),
+      componentProps: {
+        max: 10,
+        acceptTypes: [ResourceType.Image],
+      },
+      defaultValue: [],
+      fieldName: 'carousels',
+      label: '商品轮播图',
+      help: '最多上传10张图片，支持拖拽排序',
+    },
+    {
       component: 'Select',
       componentProps: {
         allowClear: true,
@@ -225,6 +239,11 @@ const setFormValues = (data: Spu) => {
 
   if (data.detail) formValues.detail = data.detail;
 
+  // 商品轮播图
+  if (data.carousels && Array.isArray(data.carousels)) {
+    formValues.carousels = data.carousels;
+  }
+
   // 有效期类型
   if (data.valid_type !== undefined && data.valid_type !== null) {
     const validTypeNum = Number(data.valid_type);
@@ -244,6 +263,7 @@ const resetForm = () => {
     type: undefined,
     status: undefined,
     category_id: undefined,
+    carousels: [],
   });
 };
 

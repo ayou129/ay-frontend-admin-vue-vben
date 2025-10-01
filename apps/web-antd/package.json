@@ -45,6 +45,7 @@
     "dayjs": "catalog:",
     "pinia": "catalog:",
     "vue": "catalog:",
+    "vue-draggable-plus": "^0.6.0",
     "vue-router": "catalog:"
   }
 }

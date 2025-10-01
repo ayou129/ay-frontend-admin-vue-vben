@@ -1,4 +1,5 @@
 import type { PhpPageResponse } from '#/types';
+import type { Resource } from '#/types/resource';
 import type { Spu } from '#/types/store/spu';
 import type { RequestGetPageQuery } from '#/utils/filter';
 
@@ -40,6 +41,7 @@ export async function getSpuDetail(id: number) {
  */
 export async function createSpu(data: {
   category_id: number;
+  carousels?: Resource[];
   detail?: string;
   name: string;
   status: number;
@@ -56,6 +58,7 @@ export async function createSpu(data: {
 export async function updateSpu(
   id: number,
   data: {
+    carousels?: Resource[];
     category_id?: number;
     detail?: string;
     name?: string;

@@ -7,7 +7,17 @@
       "Bash(python3:*)",
       "Read(//tmp/**)",
       "Bash(git log:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(pnpm run:*)",
+      "Bash(pnpm add:*)",
+      "Read(//Users/liguoxin/Desktop/**)",
+      "Bash(pnpm --filter @vben/web-antd run typecheck)",
+      "Bash(pnpm exec vue-tsc:*)",
+      "Bash(pnpm install:*)",
+      "Bash(xargs cat:*)",
+      "Bash(find:*)",
+      "Bash(xargs:*)",
+      "Bash(pnpm remove:*)"
     ],
     "deny": [],
     "ask": []
