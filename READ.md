@@ -384,6 +384,10 @@ if (!valid) throw new Error('表单验证失败');
 | 按钮不靠右 | 缺少布局配置 | `actionLayout: 'newLine'`, `actionPosition: 'right'` |
 | 自动搜索不生效 | 事件监听被禁用 | `disabledOnChangeListener: false` |
 | 递归函数类型推断错误 | TypeScript 无法推断递归返回类型 | 显式声明变量类型 `const result: Type[] = ...` |
+| 表单窗口不居中 | 使用 Drawer 默认靠右 | 使用 `useVbenModal` 替代 `useVbenDrawer` |
+| 资源目录树无顶级节点 | 未添加"全部资源"选项 | 在 treeData 添加顶级节点，未选时加载全部 |
+| 图片显示非正方形 | 使用固定高度 `h-24` | 改用 `aspect-square` 实现响应式正方形 |
+| Tree 迭代器类型错误 | `DataNode[] \| undefined` 不可展开 | 先存变量再展开或使用 `any[]` 类型 |
 
 ### 6. 最佳实践
 
