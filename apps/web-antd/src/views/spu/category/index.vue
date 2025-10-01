@@ -4,7 +4,7 @@ import type { Category } from '#/types/store/category';
 
 import { ref } from 'vue';
 
-import { Page, useVbenDrawer } from '@vben/common-ui';
+import { Page, useVbenModal } from '@vben/common-ui';
 import { Plus } from '@vben/icons';
 
 import { Button, message } from 'ant-design-vue';
@@ -74,7 +74,7 @@ const [SearchForm] = useVbenForm({
 const categoryFormRef = ref();
 const editData = ref();
 
-const [FormDrawer, drawerApi] = useVbenDrawer({
+const [FormModal, modalApi] = useVbenModal({
   destroyOnClose: true,
   onConfirm: async () => {
     await categoryFormRef.value?.submit();
@@ -216,10 +216,10 @@ function onCreate() {
       await createCategory(data);
       message.success('创建分类成功');
       onRefresh();
-      drawerApi.close();
+      modalApi.close();
     },
   };
-  drawerApi.open();
+  modalApi.open();
 }
 
 function onEdit(row: Category) {
@@ -229,10 +229,10 @@ function onEdit(row: Category) {
       await updateCategory(row.id, data);
       message.success('更新分类成功');
       onRefresh();
-      drawerApi.close();
+      modalApi.close();
     },
   };
-  drawerApi.open();
+  modalApi.open();
 }
 
 function onAppend(row: Category) {
@@ -242,10 +242,10 @@ function onAppend(row: Category) {
       await createCategory(data);
       message.success('创建子分类成功');
       onRefresh();
-      drawerApi.close();
+      modalApi.close();
     },
   };
-  drawerApi.open();
+  modalApi.open();
 }
 
 async function onDelete(row: Category) {
@@ -261,9 +261,9 @@ async function onDelete(row: Category) {
 
 <template>
   <Page auto-content-height>
-    <FormDrawer @success="onRefresh">
+    <FormModal @success="onRefresh">
       <CategoryForm ref="categoryFormRef" :edit-data="editData" />
-    </FormDrawer>
+    </FormModal>
 
     <!-- 搜索框 Panel -->
     <div class="mb-4 rounded-lg bg-white shadow">

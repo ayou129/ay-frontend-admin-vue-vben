@@ -3,7 +3,7 @@ import type { Spu } from '#/types/store/spu';
 
 import { ref } from 'vue';
 
-import { Page, useVbenDrawer } from '@vben/common-ui';
+import { Page, useVbenModal } from '@vben/common-ui';
 
 import SearchForm from './components/search-form.vue';
 import SpuForm from './components/spu-form.vue';
@@ -18,19 +18,19 @@ const editData = ref<null | Spu>(null);
 // 抽屉标题
 const drawerTitle = ref('商品信息');
 
-// 抽屉表单配置
-const [SpuFormDrawer, drawerApi] = useVbenDrawer({
+// 弹窗表单配置
+const [SpuFormModal, modalApi] = useVbenModal({
   onCancel() {
-    drawerApi.close();
+    modalApi.close();
   },
   onConfirm: async () => {
     try {
       await spuFormRef.value?.submitForm();
-      // 如果没有异常，说明提交成功，关闭抽屉并刷新列表
-      drawerApi.close();
+      // 如果没有异常，说明提交成功，关闭弹窗并刷新列表
+      modalApi.close();
       spuTableRef.value?.refresh();
     } catch {
-      // 验证失败或API调用失败时，不关闭抽屉
+      // 验证失败或API调用失败时，不关闭弹窗
       // 用户可以看到验证错误信息
     }
   },
@@ -58,14 +58,14 @@ const handleReset = () => {
 const handleAddSpu = () => {
   editData.value = null;
   drawerTitle.value = '添加商品';
-  drawerApi.open();
+  modalApi.open();
 };
 
 // 编辑商品
 const handleEditSpu = (row: Spu) => {
   editData.value = row;
   drawerTitle.value = '编辑商品';
-  drawerApi.open();
+  modalApi.open();
 };
 
 // 表单提交成功（现在由 onConfirm 统一处理，这个方法保留但不再使用）
@@ -87,14 +87,14 @@ const handleFormSuccess = () => {
       @edit="handleEditSpu"
     />
 
-    <!-- 商品表单抽屉 -->
-    <SpuFormDrawer :title="drawerTitle" width="60%">
+    <!-- 商品表单弹窗 -->
+    <SpuFormModal :title="drawerTitle" width="60%">
       <SpuForm
         ref="spuFormRef"
         :edit-data="editData"
         @success="handleFormSuccess"
       />
-    </SpuFormDrawer>
+    </SpuFormModal>
   </Page>
 </template>
 

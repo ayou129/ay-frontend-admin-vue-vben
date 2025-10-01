@@ -103,11 +103,23 @@ const selectedResources = computed(() => {
 });
 
 // 加载资源列表
-const loadResources = async (folderId: number) => {
+const loadResources = async (folderId?: number) => {
   try {
     loading.value = true;
-    const response = await getResourceFiles(folderId);
-    resources.value = response.list;
+    // 如果没有指定 folderId，使用资源列表分页 API 加载所有资源
+    if (folderId === undefined) {
+      const { getResourceList } = await import('#/api/resource/resource');
+      const response = await getResourceList({
+        page: 1,
+        page_size: 1000,
+        filters: [],
+        filter_sort_option: { sort_field: 'id', sort_order: 'desc' },
+      });
+      resources.value = response.items;
+    } else {
+      const response = await getResourceFiles(folderId);
+      resources.value = response.list;
+    }
   } catch (error) {
     console.error('加载资源列表失败:', error);
     message.error('加载资源列表失败');
@@ -117,7 +129,7 @@ const loadResources = async (folderId: number) => {
 };
 
 // 选择目录
-const handleFolderSelect = (folderId: number) => {
+const handleFolderSelect = (folderId?: number) => {
   currentFolderId.value = folderId;
   loadResources(folderId);
 };
@@ -198,12 +210,16 @@ const handleCancel = () => {
   emit('update:open', false);
 };
 
-// 监听弹窗打开，初始化选中状态
+// 监听弹窗打开，初始化选中状态并加载默认资源
 watch(
   () => props.open,
   (isOpen) => {
     if (isOpen) {
       selectedResourceIds.value = [...props.selectedIds];
+      // 默认加载所有资源
+      if (!currentFolderId.value) {
+        loadResources();
+      }
     }
   },
 );

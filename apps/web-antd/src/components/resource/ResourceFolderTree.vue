@@ -26,18 +26,26 @@ const loading = ref(false);
 
 // 转换为 Tree 组件所需的格式
 const treeData = computed<TreeProps['treeData']>(() => {
-  const transform = (folders: ResourceFolder[]): TreeProps['treeData'] => {
+  const transform = (folders: ResourceFolder[]): any[] => {
     return folders.map((folder) => ({
       key: folder.id,
       title: folder.name,
       children: folder.children ? transform(folder.children) : undefined,
     }));
   };
-  return transform(folderTree.value);
+
+  // 添加"全部资源"顶级节点
+  const allNode = {
+    key: 'all',
+    title: '全部资源',
+  };
+
+  const transformedData = transform(folderTree.value);
+  return [allNode, ...transformedData];
 });
 
-// 选中的节点
-const selectedKeys = ref<number[]>([]);
+// 选中的节点（支持 string 类型以兼容 'all' 节点）
+const selectedKeys = ref<Array<number | string>>([]);
 
 // 加载目录树
 const loadFolderTree = async () => {
@@ -55,15 +63,22 @@ const loadFolderTree = async () => {
 // 选择节点
 const onSelect: TreeProps['onSelect'] = (keys) => {
   if (keys.length > 0) {
-    const folderId = keys[0] as number;
-    selectedKeys.value = [folderId];
-    emit('select', folderId);
+    const key = keys[0];
+    selectedKeys.value = [key as number | string];
+
+    // 如果选择的是"全部资源"，emit undefined；否则 emit folderId
+    if (key === 'all') {
+      emit('select', undefined as any);
+    } else {
+      emit('select', key as number);
+    }
   }
 };
 
 // 监听外部选中的目录
 const updateSelectedKeys = (folderId?: number) => {
-  selectedKeys.value = folderId === undefined ? [] : [folderId];
+  // undefined 时选中"全部资源"
+  selectedKeys.value = folderId === undefined ? ['all'] : [folderId];
 };
 
 // 组件挂载时加载数据

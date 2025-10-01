@@ -96,7 +96,7 @@ watch(
 
         <!-- 图片预览 -->
         <div
-          class="flex h-24 items-center justify-center overflow-hidden rounded bg-gray-100"
+          class="flex aspect-square items-center justify-center overflow-hidden rounded bg-gray-100"
         >
           <Image
             :src="resource.url"
@@ -118,7 +118,7 @@ watch(
       <!-- 添加按钮 -->
       <div
         v-if="!max || selectedResources.length < max"
-        class="resource-add-btn hover:border-primary flex h-32 cursor-pointer flex-col items-center justify-center rounded border border-dashed border-gray-300"
+        class="resource-add-btn hover:border-primary flex aspect-square cursor-pointer flex-col items-center justify-center rounded border border-dashed border-gray-300"
         @click="openPicker"
       >
         <PlusIcon class="size-8 text-gray-400" />
