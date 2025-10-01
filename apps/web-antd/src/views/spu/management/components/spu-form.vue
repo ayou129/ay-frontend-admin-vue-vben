@@ -75,7 +75,7 @@ const loadCategoryOptions = async () => {
 };
 
 // 表单配置
-const [SpuForm, productFormApi] = useVbenForm({
+const [SpuForm, spuFormApi] = useVbenForm({
   commonConfig: {
     componentProps: {
       class: 'w-full',
@@ -233,14 +233,14 @@ const setFormValues = (data: Spu) => {
 
   if (data.valid_value) formValues.valid_value = data.valid_value;
 
-  productFormApi.setValues(formValues);
+  spuFormApi.setValues(formValues);
 };
 
 // 重置表单
 const resetForm = () => {
-  productFormApi.resetForm();
+  spuFormApi.resetForm();
   // 确保重置后选择器没有默认值
-  productFormApi.setValues({
+  spuFormApi.setValues({
     type: undefined,
     status: undefined,
     category_id: undefined,
@@ -274,14 +274,14 @@ watch(
 // 手动提交表单的方法
 const submitForm = async () => {
   // 先手动验证表单
-  const validateResult = await productFormApi.validate();
+  const validateResult = await spuFormApi.validate();
 
   if (!validateResult.valid) {
     throw new Error('表单验证失败');
   }
 
   // 验证通过，获取值并调用 onSubmit
-  const values = await productFormApi.getValues();
+  const values = await spuFormApi.getValues();
   await onSubmit(values);
 };
 

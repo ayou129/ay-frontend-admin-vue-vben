@@ -25,10 +25,10 @@ const [SpuFormDrawer, drawerApi] = useVbenDrawer({
   },
   onConfirm: async () => {
     try {
-      await productFormRef.value?.submitForm();
+      await spuFormRef.value?.submitForm();
       // 如果没有异常，说明提交成功，关闭抽屉并刷新列表
       drawerApi.close();
-      productTableRef.value?.refresh();
+      spuTableRef.value?.refresh();
     } catch {
       // 验证失败或API调用失败时，不关闭抽屉
       // 用户可以看到验证错误信息
@@ -37,21 +37,21 @@ const [SpuFormDrawer, drawerApi] = useVbenDrawer({
 });
 
 // 表格引用
-const productTableRef = ref();
+const spuTableRef = ref();
 
 // 表单引用
-const productFormRef = ref();
+const spuFormRef = ref();
 
 // 搜索
 const handleSearch = (values: Record<string, any>) => {
   searchParams.value = values;
-  productTableRef.value?.refresh();
+  spuTableRef.value?.refresh();
 };
 
 // 重置搜索
 const handleReset = () => {
   searchParams.value = {};
-  productTableRef.value?.refresh();
+  spuTableRef.value?.refresh();
 };
 
 // 添加商品
@@ -81,7 +81,7 @@ const handleFormSuccess = () => {
 
     <!-- 商品表格 -->
     <SpuTable
-      ref="productTableRef"
+      ref="spuTableRef"
       :search-params="searchParams"
       @add="handleAddSpu"
       @edit="handleEditSpu"
@@ -90,7 +90,7 @@ const handleFormSuccess = () => {
     <!-- 商品表单抽屉 -->
     <SpuFormDrawer :title="drawerTitle" width="60%">
       <SpuForm
-        ref="productFormRef"
+        ref="spuFormRef"
         :edit-data="editData"
         @success="handleFormSuccess"
       />

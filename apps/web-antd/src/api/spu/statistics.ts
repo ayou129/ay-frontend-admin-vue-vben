@@ -5,7 +5,7 @@ import { requestClient } from '#/api/request';
 
 import { apiPrefix } from '../core/config';
 
-export namespace ProductStatisticsApi {
+export namespace SpuStatisticsApi {
   /** 商品概况统计数据 */
   export interface OverviewData {
     /** 商品浏览量 */
@@ -68,8 +68,8 @@ export namespace ProductStatisticsApi {
 /**
  * 获取商品概况统计
  */
-export async function getProductOverview() {
-  return requestClient.get<ProductStatisticsApi.OverviewData>(
+export async function getSpuOverview() {
+  return requestClient.get<SpuStatisticsApi.OverviewData>(
     `${apiPrefix}/store/statistics/overview`,
   );
 }
@@ -77,8 +77,8 @@ export async function getProductOverview() {
 /**
  * 获取商品排行榜
  */
-export async function getProductRanking(data: RequestGetPageQuery) {
-  return requestClient.post<PhpPageResponse<ProductStatisticsApi.RankingItem>>(
+export async function getSpuRanking(data: RequestGetPageQuery) {
+  return requestClient.post<PhpPageResponse<SpuStatisticsApi.RankingItem>>(
     `${apiPrefix}/store/statistics/ranking`,
     data,
   );

@@ -4,7 +4,8 @@
       "WebFetch(domain:localhost)",
       "Bash(curl http://localhost:9500/http.json)",
       "Bash(curl:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Read(//tmp/**)"
     ],
     "deny": [],
     "ask": []

@@ -66,13 +66,12 @@ const routes: RouteRecordRaw[] = [
             },
           },
           {
-            name: 'PointsProducts',
-            path: '/marketing/points/products',
-            component: () =>
-              import('#/views/marketing/points/products/index.vue'),
+            name: 'PointsSpus',
+            path: '/marketing/points/spus',
+            component: () => import('#/views/marketing/points/spus/index.vue'),
             meta: {
               icon: 'lucide:gift',
-              title: $t('page.marketing.points.products'),
+              title: $t('page.marketing.points.spus'),
               ignoreAccess: true,
             },
           },

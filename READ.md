@@ -28,7 +28,7 @@ git commit -m 'feat: 商品管理页面 UI' --no-verify
 
 > 当前项目针对的是 apps/web-antd 应用
 
-1. 所有的表和 API 直接访问本地的 http://localhost:9500/http.json 获取即可
+1. 所有的表和 API 直接访问本地的 http://localhost:9500/http.json 获取 Swagger JSON 即可
 2. 页面UI 模板 参考： playground/src/views 中的所有页面 以供参考
 3. 页面有关表格筛选的功能，参考 apps/web-antd/src/utils/filter.ts 文件
 4. 当需要新增/编辑页面时，优先参考 playground/src/views 文件夹下的所有页面，例如：

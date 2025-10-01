@@ -2,7 +2,7 @@
 import type { AnalysisOverviewItem } from '@vben/common-ui';
 
 import type { VxeGridProps } from '#/adapter/vxe-table';
-import type { ProductStatisticsApi } from '#/api/product/statistics';
+import type { SpuStatisticsApi } from '#/api/spu/statistics';
 import type { RequestGetPageQuery } from '#/utils/filter';
 
 import { onMounted, ref } from 'vue';
@@ -16,21 +16,18 @@ import {
 } from '@vben/icons';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import {
-  getProductOverview,
-  getProductRanking,
-} from '#/api/product/statistics';
+import { getSpuOverview, getSpuRanking } from '#/api/spu/statistics';
 
-import ProductChart from './components/product-chart.vue';
+import SpuChart from './components/spu-chart.vue';
 
 // 商品概况数据
-const overviewData = ref<ProductStatisticsApi.OverviewData>();
+const overviewData = ref<SpuStatisticsApi.OverviewData>();
 const overviewItems = ref<AnalysisOverviewItem[]>([]);
 
 // 加载商品概况数据
 async function loadOverviewData() {
   try {
-    const response = await getProductOverview();
+    const response = await getSpuOverview();
     overviewData.value = response;
 
     // 转换为 AnalysisOverview 组件需要的格式
@@ -114,7 +111,7 @@ const formSchema = [
   },
 ];
 
-const gridOptions: VxeGridProps<ProductStatisticsApi.RankingItem> = {
+const gridOptions: VxeGridProps<SpuStatisticsApi.RankingItem> = {
   columns: [
     { title: '序号', type: 'seq', width: 60 },
     { field: 'id', title: 'ID', width: 80 },
@@ -167,7 +164,7 @@ const gridOptions: VxeGridProps<ProductStatisticsApi.RankingItem> = {
           ];
         }
 
-        return await getProductRanking(params);
+        return await getSpuRanking(params);
       },
     },
   },
@@ -237,7 +234,7 @@ onMounted(() => {
       <div>
         <h3 class="mb-4 text-base font-medium">商品数据趋势</h3>
         <div class="rounded-lg border bg-white p-4">
-          <ProductChart :chart-data="overviewData?.chart_data || []" />
+          <SpuChart :chart-data="overviewData?.chart_data || []" />
         </div>
       </div>
     </div>
