@@ -40,7 +40,7 @@ export async function getSpuDetail(id: number) {
  */
 export async function createSpu(data: {
   category_id: number;
-  description?: string;
+  detail?: string;
   name: string;
   status: number;
   type: number;
@@ -57,7 +57,7 @@ export async function updateSpu(
   id: number,
   data: {
     category_id?: number;
-    description?: string;
+    detail?: string;
     name?: string;
     status?: number;
     type?: number;

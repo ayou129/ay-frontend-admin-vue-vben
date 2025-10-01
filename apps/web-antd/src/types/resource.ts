@@ -6,6 +6,12 @@ export enum ResourceType {
   Video = 3, // 视频
 }
 
+export enum ResourceUserVisibility {
+  Private = 0, // 仅自己
+  Friends = 1, // 好友可见
+  Public = 2, // 公开
+}
+
 // 资源类型
 export interface Resource {
   created_at: string;
@@ -17,13 +23,14 @@ export interface Resource {
   file_slug: string;
   folder?: ResourceFolder;
   folder_id: number;
+  formatted_size?: string; // 格式化后的文件大小
   id: number;
   is_public: number;
   type: ResourceType;
   updated_at: string;
   user_id: number;
   url: string;
-  user_visibility: number;
+  user_visibility: ResourceUserVisibility;
 }
 
 // 资源文件夹类型
@@ -50,9 +57,8 @@ export interface ResourceCreateParams {
 }
 
 export enum ResourceRelationType {
-  Sku = 3, // SKU相关
-  SpuDetailImage = 2, // SPU详情图
-  SpuMainImage = 1, // SPU主图
+  SpuCarousel = 1, // SPU轮播图
+  SkuMainImage = 2, // SKU主图
 }
 
 export interface ResourceRelation {

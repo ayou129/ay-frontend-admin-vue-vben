@@ -160,7 +160,7 @@ const [SpuForm, spuFormApi] = useVbenForm({
         placeholder: '请输入商品描述',
         rows: 4,
       },
-      fieldName: 'description',
+      fieldName: 'detail',
       label: '商品描述',
     },
     {
@@ -223,7 +223,7 @@ const setFormValues = (data: Spu) => {
     if (categoryNum > 0) formValues.category_id = categoryNum;
   }
 
-  if (data.description) formValues.description = data.description;
+  if (data.detail) formValues.detail = data.detail;
 
   // 有效期类型
   if (data.valid_type !== undefined && data.valid_type !== null) {

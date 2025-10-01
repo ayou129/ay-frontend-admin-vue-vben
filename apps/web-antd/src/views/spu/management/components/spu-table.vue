@@ -106,7 +106,7 @@ const gridOptions: VxeGridProps<Spu> = {
     { type: 'checkbox', width: 50 },
     { field: 'id', title: 'ID', width: 80 },
     {
-      field: 'main_images',
+      field: 'carousels',
       title: '商品图片',
       width: 100,
       slots: { default: 'image' },
@@ -125,7 +125,7 @@ const gridOptions: VxeGridProps<Spu> = {
       slots: { default: 'status' },
     },
     { field: 'category.name', title: '分类', width: 120 },
-    { field: 'description', title: '描述', minWidth: 150 },
+    { field: 'detail', title: '描述', minWidth: 150 },
     { field: 'created_at', title: '创建时间', width: 180 },
     {
       title: '操作',
@@ -265,8 +265,8 @@ defineExpose({
     <Grid>
       <template #image="{ row }">
         <img
-          v-if="row.main_images && row.main_images[0]?.resource?.url"
-          :src="row.main_images[0].resource.url"
+          v-if="row.carousels && row.carousels[0]?.url"
+          :src="row.carousels[0].url"
           :alt="row.name"
           class="h-12 w-12 rounded object-cover"
         />
