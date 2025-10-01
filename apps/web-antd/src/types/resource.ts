@@ -7,8 +7,8 @@ export enum ResourceType {
 }
 
 export enum ResourceUserVisibility {
-  Private = 0, // 仅自己
   Friends = 1, // 好友可见
+  Private = 0, // 仅自己
   Public = 2, // 公开
 }
 
@@ -57,8 +57,8 @@ export interface ResourceCreateParams {
 }
 
 export enum ResourceRelationType {
-  SpuCarousel = 1, // SPU轮播图
   SkuMainImage = 2, // SKU主图
+  SpuCarousel = 1, // SPU轮播图
 }
 
 export interface ResourceRelation {

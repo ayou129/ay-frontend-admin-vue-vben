@@ -10,7 +10,7 @@ import { requestClient } from '#/api/request';
  */
 export async function getSpuList(params: RequestGetPageQuery) {
   const response = await requestClient.get<PhpPageResponse<Spu>>(
-    `${apiPrefix}/store/spus`,
+    `${apiPrefix}/store/spu/list/page`,
     {
       params: {
         page: params.page,

@@ -123,14 +123,11 @@ git commit -m 'feat: 商品管理页面 UI' --no-verify
   - 商品评论(暂不实现)
 
 ### 资源组件支持
-
-资源类型：1=图片 2=音频 3=视频 4=文档 5=压缩包资源支持选择的场景
-
 - 商品编辑页面
 - 商品描述富文本编辑页面
   - 这里如果想在富文本中如果想插入图片，必须从资源库中选择，也就是说要上传到资源的某个目录中，然后选择才可以
 
-```
+```text
 # 资源组件结构
 src/components/resource/
 ├── ResourcePickerModal.vue    # 资源选择弹窗（通用）
@@ -141,8 +138,14 @@ src/components/resource/
 src/views/spu/management/components/
 └── SpuResourceSelector.vue  # 商品资源选择器（业务专用）
 
+## ResourcePreview 组件
+- 显示资源缩略图，点击后可以查看大图，并且如果是视频，点击后视频播放
+
+## ResourceList 组件
+- 只负责渲染列表 + 发出点击事件，选择逻辑由父组件控制
+
 ## ResourcePickerModal 组件（选择弹窗）
-布局： 弹窗 = 左侧目录树 + 右侧文件列表
+### 布局： 弹窗 = 左侧目录树 + 右侧文件列表
 左侧：
 - 目录树（ResourceFolderTree）
 - 点击目录切换右侧文件列表
@@ -154,6 +157,34 @@ src/views/spu/management/components/
 底部：
 - 显示已选数量
 - 取消/确认按钮
+### 需支持：
+- 初始选中状态（传入已选IDs进行回显）
+- 单选/多选模式切换
+- 类型过滤（image/video/file）
+- 上传后自动选中
+- 上传限制最大 30个文件
+
+## SpuResourceSelector
+## 组件职责
+<SpuResourceSelector
+  v-model="carousels"
+  :max="10"
+  accept-types="image"
+/>
+
+包含：
+- 预览区域：显示已选资源缩略图网格
+- 拖拽排序：支持调整顺序（影响保存到后端的sort）
+- 删除功能：单个移除
+- 数量提示：已选 3/10
+- 选择按钮：打开 ResourcePickerModal
+
+数据绑定方式建议：
+- v-model 绑定 Resource[]（完整对象，包含id、url、name等）
+- 编辑回显：后端返回 carousels: Resource[] 直接赋值
+- 提交时：提取 carousels.map(r => r.id) 或直接传完整对象
+
+ResourcePickerModal 需支持：
 
 
 # 完整数据流
@@ -164,15 +195,14 @@ src/views/spu/management/components/
 
 流程：
 1. 加载编辑：
-  - 后端返回 carousel_image_ids: [31, 32, 33]
-  - ResourceSelector 根据 IDs 批量获取资源详情（需新增 API）
+  - 后端返回 carousels: [{...}] 资源详情
   - 显示资源预览
 2. 选择资源：
-  - 点击"选择资源" → 打开 ResourcePickerModal
-  - 选择文件 → 返回 Resource[]
-  - 提取 id[] 更新 v-model
+  - 点击"选择资源" → 打开 ResourcePickerModal 时 交互 IDs 进行数据回显
+  - 对文件进行操作 → 返回 Resource[]
+  - 更新 v-model
 3. 保存：
-  - 提交 carousel_image_ids: [31, 32, 33, 34] 到后端
+  - 提交 carousels: [{...}] 到后端，注意顺序，前端传入的顺序就是后端保存的顺序
   - 后端处理 resource_relation 表：
       - 删除旧关联（relation_type=1, relation_id=spu_id）
     - 插入新关联（resource_id + sort）
@@ -191,15 +221,26 @@ async function handleInsertImage() {
   return resources[0].file_path; // 返回 URL
 }
 存储：
-- 富文本直接存储 HTML：<img src="/images/xxx.jpg" />
+- 富文本直接存储 HTML：<img src="完整 URL" />
 - 不存储 resource_relation 记录
 ```
 
 1. 这个资源组件，任何地方都可以调用，选择文件列表后，组件会返回文件列表数据
-2. 假设是商品编辑窗口 有商品主图和详情图字段，右侧就是[资源组件] 显示默认的 待添加的按钮(具体样式先不定)，点击后弹出资源组件，选择文件列表后，组件会返回文件列表数据，进而展示，但是此时数据不请求后端，点击保存后请求进行信息存储
+2. 假设是商品编辑窗口 有商品轮播图字段，右侧就是[资源组件] 显示默认的 待添加的按钮(具体样式先不定)，点击后弹出资源组件，选择文件列表后，组件会返回文件列表数据，进而展示，但是此时数据不请求后端，点击保存后请求进行信息存储
 3. 疑惑点：
 
-- 假设场景：商品编辑窗口 主图和详情图右侧的实际展示资源列表的地方 究竟是如何设计，是制作成一个 资源选择组件 还是？
+- 假设场景：商品编辑窗口 轮播图右侧的实际展示资源列表的地方 究竟是如何设计，是制作成一个 资源选择组件 还是？
+
+实现前的流程思考：
+1. 思考 当前的设计是否合理，是否需要优化
+2. 实现所有相关的 API 和 组件 大纲
+3. 按照功能 分成若干个小功能 逐个实现
+
+实现流程细节：
+1. Resource API + 类型定义
+2. 基础组件：ResourceFolderTree → ResourceList → ResourcePickerModal
+3. 业务组件：SpuResourceSelector
+4. 集成测试：在SPU编辑表单中使用
 
 ## 总结遇到的问题以及解决方案
 
