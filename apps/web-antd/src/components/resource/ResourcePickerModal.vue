@@ -7,11 +7,16 @@ import { createIconifyIcon } from '@vben/icons';
 
 import { Button, Input, message, Modal, Select, Upload } from 'ant-design-vue';
 
-import { getResourceFiles, uploadResourceFiles } from '#/api/resource/resource';
+import {
+  deleteResourceFiles,
+  getResourceFiles,
+  uploadResourceFiles,
+} from '#/api/resource/resource';
 import { ResourceType } from '#/types/resource';
 
 import ResourceFolderTree from './ResourceFolderTree.vue';
 import ResourceList from './ResourceList.vue';
+import ResourceMoveModal from './ResourceMoveModal.vue';
 import ResourcePreview from './ResourcePreview.vue';
 
 const props = withDefaults(defineProps<Props>(), {
@@ -28,7 +33,7 @@ const emit = defineEmits<Emits>();
 const UploadIcon = createIconifyIcon('carbon:upload');
 
 interface Props {
-  open: boolean;
+  open?: boolean;
   mode?: 'multiple' | 'single';
   acceptTypes?: ResourceType[];
   selectedIds?: number[];
@@ -60,9 +65,12 @@ const typeFilter = ref<ResourceType>();
 const previewVisible = ref(false);
 const previewResource = ref<Resource>();
 
+// 移动相关
+const moveModalVisible = ref(false);
+const moveResource = ref<Resource>();
+
 // 类型选项
 const typeOptions = [
-  { label: '全部', value: undefined },
   { label: '图片', value: ResourceType.Image },
   { label: '视频', value: ResourceType.Video },
   { label: '音频', value: ResourceType.Audio },
@@ -164,16 +172,25 @@ const handleResourcePreview = (resource: Resource) => {
   previewVisible.value = true;
 };
 
+// 上传文件前的校验
+const beforeUpload = (_file: File, fileList: File[]) => {
+  const maxCount = 30;
+  if (fileList.length > maxCount) {
+    message.error(`最多只能上传 ${maxCount} 个文件`);
+    return false;
+  }
+  return true;
+};
+
 // 上传文件
 const handleUpload = async (options: any) => {
-  if (!currentFolderId.value) {
-    message.error('请先选择目录');
-    return;
-  }
-
   const formData = new FormData();
   formData.append('files[]', options.file);
-  formData.append('folder_id', currentFolderId.value.toString());
+
+  // 如果有选中目录，则上传到指定目录；否则上传到根目录（传 folder_id = 0 或不传）
+  if (currentFolderId.value !== undefined) {
+    formData.append('folder_id', currentFolderId.value.toString());
+  }
 
   try {
     const response = await uploadResourceFiles(formData);
@@ -208,6 +225,48 @@ const handleConfirm = () => {
 // 取消
 const handleCancel = () => {
   emit('update:open', false);
+};
+
+// 删除资源
+const handleDeleteResource = (resource: Resource) => {
+  Modal.confirm({
+    title: '确认删除',
+    content: `确定要删除文件"${resource.file_original_filename}"吗？`,
+    onOk: async () => {
+      try {
+        await deleteResourceFiles([resource.id]);
+        message.success('删除文件成功');
+        // 重新加载资源列表
+        await loadResources(currentFolderId.value);
+        // 从选中列表中移除
+        const index = selectedResourceIds.value.indexOf(resource.id);
+        if (index !== -1) {
+          selectedResourceIds.value.splice(index, 1);
+        }
+      } catch (error) {
+        console.error('删除文件失败:', error);
+        message.error('删除文件失败');
+      }
+    },
+  });
+};
+
+// 移动资源
+const handleMoveResource = (resource: Resource) => {
+  moveResource.value = resource;
+  moveModalVisible.value = true;
+};
+
+// 移动成功后刷新列表
+const handleMoveSuccess = () => {
+  moveModalVisible.value = false;
+  loadResources(currentFolderId.value);
+};
+
+// 重置筛选条件（不重置目录树选择）
+const handleResetFilter = () => {
+  searchKeyword.value = '';
+  typeFilter.value = undefined;
 };
 
 // 监听弹窗打开，初始化选中状态并加载默认资源
@@ -256,8 +315,11 @@ watch(
               :options="typeOptions"
               placeholder="筛选类型"
               class="w-32"
+              allow-clear
             />
+            <Button @click="handleResetFilter">重置筛选</Button>
             <Upload
+              :before-upload="beforeUpload"
               :custom-request="handleUpload"
               :show-upload-list="false"
               :multiple="true"
@@ -281,6 +343,8 @@ watch(
               :max-selection="maxSelection"
               @select="handleResourceSelect"
               @preview="handleResourcePreview"
+              @delete="handleDeleteResource"
+              @move="handleMoveResource"
             />
           </div>
 
@@ -309,6 +373,13 @@ watch(
     <ResourcePreview
       v-model:open="previewVisible"
       :resource="previewResource"
+    />
+
+    <!-- 移动弹窗 -->
+    <ResourceMoveModal
+      v-model:open="moveModalVisible"
+      :resource="moveResource"
+      @success="handleMoveSuccess"
     />
   </Modal>
 </template>

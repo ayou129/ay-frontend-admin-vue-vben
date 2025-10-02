@@ -135,6 +135,7 @@ src/components/resource/
 ├── ResourceList.vue           # 资源列表（通用）
 ├── ResourceFolderTree.vue     # 资源目录树（通用）
 └── ResourcePreview.vue        # 资源预览（通用）
+└── index.ts                   # 资源组件入口
 
 src/views/spu/management/components/
 └── SpuResourceSelector.vue  # 商品资源选择器（业务专用）
@@ -144,6 +145,12 @@ src/views/spu/management/components/
 
 ## ResourceList 组件
 - 只负责渲染列表 + 发出点击事件，选择逻辑由父组件控制
+
+## ResourceFolderTree 组件
+- 左侧目录树，点击后右侧文件列表切换
+  - 目录树 要显示顶级节点 全部资源
+  - 存在子节点的节点左侧显示展开/折叠图标，不存在则不显示 svg 或图标
+  - 每个节点右侧显示 ... 图标，点击后弹出菜单，菜单内容为：新建子目录、编辑、删除，目前已经有了但是三个点和左侧的节点文字间隔有点小，再略微增加一点点
 
 ## ResourcePickerModal 组件（选择弹窗）
 ### 布局： 弹窗 = 左侧目录树 + 右侧文件列表
@@ -162,6 +169,7 @@ src/views/spu/management/components/
 - 初始选中状态（传入已选IDs进行回显）
 - 单选/多选模式切换
 - 类型过滤（image/video/file）
+  - 选择栏组件应该支持 allow-clear
 - 上传后自动选中
 - 上传限制最大 30个文件
 
@@ -244,6 +252,8 @@ async function handleInsertImage() {
 2. 基础组件：ResourceFolderTree → ResourceList → ResourcePickerModal
 3. 业务组件：SpuResourceSelector
 4. 集成测试：在SPU编辑表单中使用
+
+<!-- 好 将我们本次的 UI 遇到的问题 结合 @READ.md 尾部的问题备注 帮我略微的丰富一下 简约一点哈 弄完回复 1 即可 -->
 
 ## 总结遇到的问题以及解决方案
 

@@ -5,9 +5,30 @@ import type { ResourceFolder } from '#/types/resource';
 
 import { computed, onMounted, ref } from 'vue';
 
-import { Tree } from 'ant-design-vue';
+import { createIconifyIcon } from '@vben/icons';
 
-import { getResourceFolderTree } from '#/api/resource/resource';
+import {
+  Button,
+  Dropdown,
+  Menu,
+  MenuItem,
+  message,
+  Modal,
+  Tree,
+} from 'ant-design-vue';
+
+import {
+  deleteResourceFolder,
+  getResourceFolderTree,
+} from '#/api/resource/resource';
+
+import ResourceFolderFormModal from './ResourceFolderFormModal.vue';
+
+const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
+// 创建图标
+const FolderIcon = createIconifyIcon('carbon:folder');
+const MoreIcon = createIconifyIcon('carbon:overflow-menu-horizontal');
 
 interface Props {
   selectedFolderId?: number;
@@ -16,9 +37,6 @@ interface Props {
 interface Emits {
   (e: 'select', folderId: number): void;
 }
-
-const props = defineProps<Props>();
-const emit = defineEmits<Emits>();
 
 // 目录树数据
 const folderTree = ref<ResourceFolder[]>([]);
@@ -87,6 +105,70 @@ onMounted(() => {
   updateSelectedKeys(props.selectedFolderId);
 });
 
+// 目录表单弹窗
+const folderFormVisible = ref(false);
+const editingFolder = ref<ResourceFolder>();
+const parentFolderId = ref<number>();
+
+// 在树形结构中查找目录
+const findFolder = (
+  folders: ResourceFolder[],
+  id: number | string,
+): ResourceFolder | undefined => {
+  for (const folder of folders) {
+    if (folder.id === id) return folder;
+    if (folder.children) {
+      const found = findFolder(folder.children, id);
+      if (found) return found;
+    }
+  }
+  return undefined;
+};
+
+// 创建目录
+const handleCreate = (parentId?: number) => {
+  editingFolder.value = undefined;
+  parentFolderId.value = parentId;
+  folderFormVisible.value = true;
+};
+
+// 编辑目录
+const handleEdit = (folderId: number) => {
+  const folder = findFolder(folderTree.value, folderId);
+  if (folder) {
+    editingFolder.value = folder;
+    parentFolderId.value = undefined;
+    folderFormVisible.value = true;
+  }
+};
+
+// 删除目录
+const handleDelete = (folderId: number) => {
+  const folder = findFolder(folderTree.value, folderId);
+  if (!folder) return;
+
+  Modal.confirm({
+    title: '确认删除',
+    content: `确定要删除目录"${folder.name}"吗？`,
+    onOk: async () => {
+      try {
+        await deleteResourceFolder(folder.id);
+        message.success('删除目录成功');
+        await loadFolderTree();
+      } catch (error) {
+        console.error('删除目录失败:', error);
+        message.error('删除目录失败');
+      }
+    },
+  });
+};
+
+// 表单提交成功
+const handleFormSuccess = () => {
+  folderFormVisible.value = false;
+  loadFolderTree();
+};
+
 // 暴露方法给父组件
 defineExpose({
   loadFolderTree,
@@ -96,14 +178,61 @@ defineExpose({
 
 <template>
   <div class="resource-folder-tree">
+    <!-- 创建根目录按钮 -->
+    <div class="mb-2">
+      <Button type="link" size="small" @click="handleCreate()">
+        + 创建根目录
+      </Button>
+    </div>
+
     <div v-if="loading" class="p-4 text-center text-gray-500">加载中...</div>
     <Tree
       v-else
       v-model:selected-keys="selectedKeys"
       :tree-data="treeData"
-      :show-line="true"
+      :show-line="{ showLeafIcon: false }"
       default-expand-all
       @select="onSelect"
+    >
+      <template #title="{ title, key }">
+        <div class="folder-node group flex items-center justify-between">
+          <div class="flex items-center gap-1">
+            <FolderIcon v-if="key !== 'all'" class="size-4 text-gray-500" />
+            <span>{{ title }}</span>
+          </div>
+          <Dropdown v-if="key !== 'all'" :trigger="['click']" class="ml-4">
+            <MoreIcon
+              class="size-4 cursor-pointer text-gray-400 opacity-0 transition-opacity hover:text-gray-600 group-hover:opacity-100"
+              @click.stop
+            />
+            <template #overlay>
+              <Menu>
+                <MenuItem key="create" @click="handleCreate(key as number)">
+                  新建子目录
+                </MenuItem>
+                <MenuItem key="edit" @click="handleEdit(key as number)">
+                  编辑
+                </MenuItem>
+                <MenuItem
+                  key="delete"
+                  danger
+                  @click="handleDelete(key as number)"
+                >
+                  删除
+                </MenuItem>
+              </Menu>
+            </template>
+          </Dropdown>
+        </div>
+      </template>
+    </Tree>
+
+    <!-- 目录表单弹窗 -->
+    <ResourceFolderFormModal
+      v-model:open="folderFormVisible"
+      :edit-data="editingFolder"
+      :parent-id="parentFolderId"
+      @success="handleFormSuccess"
     />
   </div>
 </template>

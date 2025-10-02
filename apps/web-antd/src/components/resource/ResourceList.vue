@@ -3,7 +3,15 @@ import type { Resource } from '#/types/resource';
 
 import { createIconifyIcon } from '@vben/icons';
 
-import { Checkbox, Empty, Image, Spin } from 'ant-design-vue';
+import {
+  Checkbox,
+  Dropdown,
+  Empty,
+  Image,
+  Menu,
+  MenuItem,
+  Spin,
+} from 'ant-design-vue';
 
 import { ResourceType } from '#/types/resource';
 
@@ -14,12 +22,14 @@ const props = withDefaults(defineProps<Props>(), {
   mode: 'multiple',
 });
 const emit = defineEmits<Emits>();
+
 // 创建图标组件
 const FileIcon = createIconifyIcon('carbon:document');
 const MusicIcon = createIconifyIcon('carbon:music');
 const VideoIcon = createIconifyIcon('carbon:video');
 const ArchiveIcon = createIconifyIcon('carbon:folder-off');
 const CircleIcon = createIconifyIcon('carbon:circle-dash');
+const MoreIcon = createIconifyIcon('carbon:overflow-menu-horizontal');
 
 interface Props {
   loading?: boolean;
@@ -32,6 +42,8 @@ interface Props {
 interface Emits {
   (e: 'select', resource: Resource): void;
   (e: 'preview', resource: Resource): void;
+  (e: 'delete', resource: Resource): void;
+  (e: 'move', resource: Resource): void;
 }
 
 // 是否选中
@@ -87,6 +99,16 @@ const getFileIcon = (resource: Resource) => {
 const isImage = (resource: Resource) => {
   return resource.type === ResourceType.Image;
 };
+
+// 删除资源
+const handleDelete = (resource: Resource) => {
+  emit('delete', resource);
+};
+
+// 移动资源
+const handleMove = (resource: Resource) => {
+  emit('move', resource);
+};
 </script>
 
 <template>
@@ -99,7 +121,7 @@ const isImage = (resource: Resource) => {
         <div
           v-for="resource in resources"
           :key="resource.id"
-          class="resource-item hover:border-primary relative cursor-pointer rounded-lg border p-2 transition-all hover:shadow-md"
+          class="resource-item hover:border-primary group relative cursor-pointer rounded-lg border p-2 transition-all hover:shadow-md"
           :class="{
             'border-primary bg-primary/5': isSelected(resource),
             'cursor-not-allowed opacity-50': !canSelect(resource),
@@ -113,6 +135,30 @@ const isImage = (resource: Resource) => {
               :disabled="!canSelect(resource)"
               @click.stop="handleSelect(resource)"
             />
+          </div>
+
+          <!-- 操作按钮 -->
+          <div class="absolute right-2 top-2 z-10">
+            <Dropdown :trigger="['click']">
+              <MoreIcon
+                class="size-4 cursor-pointer text-gray-400 opacity-0 transition-opacity hover:text-gray-600 group-hover:opacity-100"
+                @click.stop
+              />
+              <template #overlay>
+                <Menu>
+                  <MenuItem key="move" @click.stop="handleMove(resource)">
+                    移动到
+                  </MenuItem>
+                  <MenuItem
+                    key="delete"
+                    danger
+                    @click.stop="handleDelete(resource)"
+                  >
+                    删除
+                  </MenuItem>
+                </Menu>
+              </template>
+            </Dropdown>
           </div>
 
           <!-- 文件预览 -->
