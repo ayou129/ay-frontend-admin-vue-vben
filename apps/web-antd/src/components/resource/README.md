@@ -3,12 +3,14 @@
 ## 组件列表
 
 ### 基础组件
+
 - `ResourcePickerModal` - 资源选择弹窗（通用）
 - `ResourceList` - 资源列表（通用）
 - `ResourceFolderTree` - 资源目录树（通用）
 - `ResourcePreview` - 资源预览（通用）
 
 ### 业务组件
+
 - `SpuResourceSelector` - 商品资源选择器（业务专用）
 
 ## 使用方式
@@ -55,10 +57,7 @@ async function handleInsertImage() {
 </script>
 
 <template>
-  <RichEditor
-    v-model="description"
-    :image-handler="handleInsertImage"
-  />
+  <RichEditor v-model="description" :image-handler="handleInsertImage" />
 </template>
 ```
 
@@ -90,7 +89,7 @@ async function selectImages() {
 #### Options
 
 | 参数 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
+| --- | --- | --- | --- |
 | mode | `'single' \| 'multiple'` | `'multiple'` | 选择模式 |
 | acceptTypes | `ResourceType[]` | `[]` | 接受的资源类型 |
 | selectedIds | `number[]` | `[]` | 已选中的资源 IDs（用于回显） |
@@ -102,21 +101,22 @@ async function selectImages() {
 
 ### SpuResourceSelector Props
 
-| 参数 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| modelValue | `Resource[]` | `[]` | 已选择的资源列表 |
-| max | `number` | `10` | 最大选择数量 |
-| acceptTypes | `ResourceType[]` | `[ResourceType.Image]` | 接受的资源类型 |
+| 参数        | 类型             | 默认值                 | 说明             |
+| ----------- | ---------------- | ---------------------- | ---------------- |
+| modelValue  | `Resource[]`     | `[]`                   | 已选择的资源列表 |
+| max         | `number`         | `10`                   | 最大选择数量     |
+| acceptTypes | `ResourceType[]` | `[ResourceType.Image]` | 接受的资源类型   |
 
 ### SpuResourceSelector Events
 
-| 事件 | 参数 | 说明 |
-|------|------|------|
+| 事件              | 参数         | 说明               |
+| ----------------- | ------------ | ------------------ |
 | update:modelValue | `Resource[]` | 选择的资源发生变化 |
 
 ## 功能特性
 
 ### 资源选择器 (ResourcePickerModal)
+
 - ✅ 左侧目录树 + 右侧文件列表布局
 - ✅ 支持搜索文件名
 - ✅ 支持按类型筛选
@@ -128,6 +128,7 @@ async function selectImages() {
 - ✅ 上传后自动选中
 
 ### 目录管理 (ResourceFolderTree)
+
 - ✅ 创建根目录
 - ✅ 创建子目录
 - ✅ 编辑目录
@@ -135,6 +136,7 @@ async function selectImages() {
 - ✅ 目录树操作菜单（hover 显示）
 
 ### 资源预览 (ResourcePreview)
+
 - ✅ 图片预览（高清大图）
 - ✅ 视频播放
 - ✅ 音频播放
@@ -142,6 +144,7 @@ async function selectImages() {
 - ✅ 不支持预览的文件提供下载链接
 
 ### 商品资源选择器 (SpuResourceSelector)
+
 - ✅ 网格展示已选资源
 - ✅ 拖拽排序（影响保存顺序）
 - ✅ 单个删除
