@@ -20,6 +20,9 @@ const drawerTitle = ref('商品信息');
 
 // 弹窗表单配置
 const [SpuFormModal, modalApi] = useVbenModal({
+  modalProps: {
+    width: '90%',
+  },
   onCancel() {
     modalApi.close();
   },
@@ -88,7 +91,7 @@ const handleFormSuccess = () => {
     />
 
     <!-- 商品表单弹窗 -->
-    <SpuFormModal :title="drawerTitle" width="60%">
+    <SpuFormModal :title="drawerTitle">
       <SpuForm
         ref="spuFormRef"
         :edit-data="editData"

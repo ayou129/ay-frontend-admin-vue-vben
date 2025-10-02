@@ -4,13 +4,15 @@ import type { Spu } from '#/types/store/spu';
 
 import { computed, markRaw, onMounted, ref, watch } from 'vue';
 
-import { message } from 'ant-design-vue';
+import { message, Tabs } from 'ant-design-vue';
 
 import { useVbenForm, z } from '#/adapter/form';
 import { getCategoryTree } from '#/api/store/category';
 import { createSpu, updateSpu } from '#/api/store/spu';
 import { ResourceType } from '#/types/resource';
+import { SpuOrderType } from '#/types/store/spu';
 
+import SkuManagement from './SkuManagement.vue';
 import SpuResourceSelector from './SpuResourceSelector.vue';
 
 // Props定义
@@ -23,68 +25,37 @@ const props = defineProps<Props>();
 // 是否编辑模式
 const isEdit = computed(() => !!props.editData);
 
-// 分类选项
-const categoryOptions = ref<Array<{ label: string; value: number }>>([]);
+// 当前激活的 Tab
+const activeTab = ref('basic');
 
-// 商品类型选项 (写死)
+// 商品类型选项
 const typeOptions = [
-  { label: '虚拟商品', value: 1 },
-  { label: '实物商品', value: 2 },
-  { label: '酒店订单', value: 3 },
+  { label: '虚拟商品', value: SpuOrderType.Virtual },
+  { label: '实物商品', value: SpuOrderType.Physical },
+  { label: '酒店订单', value: SpuOrderType.Hotel },
 ];
 
-// 商品状态选项 (写死)
+// 商品状态选项
 const statusOptions = [
   { label: '正常', value: 1 },
   { label: '已下架', value: -1 },
 ];
 
-// 有效期类型选项 (写死)
+// 有效期类型选项
 const validTypeOptions = [
   { label: '固定有效期', value: 1 },
   { label: '动态有效期(天数)', value: 2 },
 ];
 
-// 获取分类数据
-const loadCategoryOptions = async () => {
-  try {
-    const response = await getCategoryTree();
-    const flattenCategories = (
-      categories: Category[],
-    ): Array<{ label: string; value: number }> => {
-      let result: Array<{ label: string; value: number }> = [];
-
-      for (const category of categories) {
-        result.push({ label: category.name, value: category.id });
-        if (category.children && category.children.length > 0) {
-          const childOptions = flattenCategories(category.children);
-          // 为子分类添加缩进标识
-          const indentedChildren = childOptions.map((child) => ({
-            ...child,
-            label: `  ${child.label}`, // 使用空格缩进
-          }));
-          result = [...result, ...indentedChildren];
-        }
-      }
-
-      return result;
-    };
-
-    categoryOptions.value = flattenCategories(response.list);
-  } catch (error) {
-    console.error('获取分类数据失败:', error);
-    message.error('获取分类数据失败');
-  }
-};
-
-// 表单配置
-const [SpuForm, spuFormApi] = useVbenForm({
+// ===================
+// Tab 1: 基础信息表单
+// ===================
+const [BasicInfoForm, basicInfoFormApi] = useVbenForm({
   commonConfig: {
     componentProps: {
       class: 'w-full',
     },
   },
-  handleSubmit: onSubmit,
   layout: 'vertical',
   showDefaultActions: false,
   schema: [
@@ -158,24 +129,15 @@ const [SpuForm, spuFormApi] = useVbenForm({
       rules: 'selectRequired',
     },
     {
-      component: 'Textarea',
-      componentProps: {
-        placeholder: '请输入商品描述',
-        rows: 4,
-      },
-      fieldName: 'detail',
-      label: '商品描述',
-    },
-    {
       component: markRaw(SpuResourceSelector),
       componentProps: {
-        max: 10,
         acceptTypes: [ResourceType.Image],
+        max: 10,
       },
       defaultValue: [],
       fieldName: 'carousels',
-      label: '商品轮播图',
       help: '最多上传10张图片，支持拖拽排序',
+      label: '商品轮播图',
     },
     {
       component: 'Select',
@@ -194,82 +156,143 @@ const [SpuForm, spuFormApi] = useVbenForm({
         placeholder: '请输入有效期值（如：2025-5-14 22:49:53 或 7）',
       },
       fieldName: 'valid_value',
-      label: '有效期值',
       help: '固定有效期格式：2025-5-14 22:49:53 或 2025-5-14，动态有效期输入天数：如 7',
+      label: '有效期值',
     },
   ],
   wrapperClass: 'grid-cols-1',
 });
 
-// 提交表单
-async function onSubmit(values: Record<string, any>) {
-  if (isEdit.value && props.editData) {
-    await updateSpu(props.editData.id, values);
-    message.success('更新商品成功');
-  } else {
-    await createSpu(values as any);
-    message.success('添加商品成功');
-  }
-}
+// ===================
+// Tab 2: 库存管理
+// ===================
+const skuManagementRef = ref();
+
+// ===================
+// Tab 3: 商品详情
+// ===================
+const detailContent = ref('');
+
+// ===================
+// 数据处理
+// ===================
 
 // 设置表单值（编辑时）
 const setFormValues = (data: Spu) => {
-  const formValues: any = {};
+  // Tab 1: 基础信息
+  const basicFormValues: any = {};
 
-  // 只设置有值的字段
-  if (data.name) formValues.name = data.name;
+  if (data.name) basicFormValues.name = data.name;
 
-  // 商品类型：1=虚拟商品, 2=实物商品, 3=酒店订单
+  // 商品类型
   if (data.type !== undefined && data.type !== null) {
     const typeNum = Number(data.type);
-    if (typeNum > 0) formValues.type = typeNum;
+    if (typeNum > 0) basicFormValues.type = typeNum;
   }
 
-  // 商品状态：1=正常, -1=已下架 (-1是有效值)
+  // 商品状态
   if (data.status !== undefined && data.status !== null) {
     const statusNum = Number(data.status);
-    if (statusNum === 1 || statusNum === -1) formValues.status = statusNum;
+    if (statusNum === 1 || statusNum === -1) basicFormValues.status = statusNum;
   }
 
   // 分类ID
   if (data.category_id !== undefined && data.category_id !== null) {
     const categoryNum = Number(data.category_id);
-    if (categoryNum > 0) formValues.category_id = categoryNum;
+    if (categoryNum > 0) basicFormValues.category_id = categoryNum;
   }
-
-  if (data.detail) formValues.detail = data.detail;
 
   // 商品轮播图
   if (data.carousels && Array.isArray(data.carousels)) {
-    formValues.carousels = data.carousels;
+    basicFormValues.carousels = data.carousels;
   }
 
   // 有效期类型
   if (data.valid_type !== undefined && data.valid_type !== null) {
     const validTypeNum = Number(data.valid_type);
-    if (validTypeNum > 0) formValues.valid_type = validTypeNum;
+    if (validTypeNum > 0) basicFormValues.valid_type = validTypeNum;
   }
 
-  if (data.valid_value) formValues.valid_value = data.valid_value;
+  if (data.valid_value) basicFormValues.valid_value = data.valid_value;
 
-  spuFormApi.setValues(formValues);
+  basicInfoFormApi.setValues(basicFormValues);
+
+  // Tab 2: 库存管理 - 设置 SKU 列表
+  if (data.skus && skuManagementRef.value) {
+    skuManagementRef.value.setSkuList(data.skus);
+  }
+
+  // Tab 3: 商品详情
+  detailContent.value = data.detail || '';
 };
 
 // 重置表单
 const resetForm = () => {
-  spuFormApi.resetForm();
-  // 确保重置后选择器没有默认值
-  spuFormApi.setValues({
-    type: undefined,
-    status: undefined,
-    category_id: undefined,
+  basicInfoFormApi.resetForm();
+  basicInfoFormApi.setValues({
     carousels: [],
+    category_id: undefined,
+    status: undefined,
+    type: undefined,
   });
+  // 重置 SKU 列表
+  if (skuManagementRef.value) {
+    skuManagementRef.value.setSkuList([]);
+  }
+  detailContent.value = '';
+  activeTab.value = 'basic';
 };
 
-// 组件加载时获取分类数据
+// 收集所有 Tab 的数据
+const collectFormData = async () => {
+  // 验证基础信息表单
+  const basicValidateResult = await basicInfoFormApi.validate();
+  if (!basicValidateResult.valid) {
+    activeTab.value = 'basic';
+    throw new Error('基础信息表单验证失败');
+  }
+
+  // 获取基础信息数据
+  const basicValues = await basicInfoFormApi.getValues();
+
+  // 获取 SKU 列表数据
+  const skuList = skuManagementRef.value
+    ? skuManagementRef.value.getSkuList()
+    : [];
+
+  // 组合所有数据
+  const formData: any = {
+    ...basicValues,
+    detail: detailContent.value,
+    skus: skuList,
+  };
+
+  return formData;
+};
+
+// 提交表单
+const submitForm = async () => {
+  try {
+    const formData = await collectFormData();
+
+    if (isEdit.value && props.editData) {
+      await updateSpu(props.editData.id, formData);
+      message.success('更新商品成功');
+    } else {
+      await createSpu(formData as any);
+      message.success('添加商品成功');
+    }
+  } catch (error: any) {
+    if (error.message !== '基础信息表单验证失败') {
+      message.error(error.message || '提交失败');
+    }
+    throw error;
+  }
+};
+
+// 组件加载时获取分类数据（如果需要的话可以预加载）
 onMounted(() => {
-  loadCategoryOptions();
+  // 可以在这里预加载一些数据
 });
 
 // 监听编辑数据变化
@@ -277,10 +300,6 @@ watch(
   () => props.editData,
   async (newData) => {
     if (newData) {
-      // 确保分类数据已加载
-      if (categoryOptions.value.length === 0) {
-        await loadCategoryOptions();
-      }
       // 稍微延迟确保组件已更新
       await new Promise((resolve) => setTimeout(resolve, 100));
       setFormValues(newData);
@@ -291,30 +310,67 @@ watch(
   { immediate: true },
 );
 
-// 手动提交表单的方法
-const submitForm = async () => {
-  // 先手动验证表单
-  const validateResult = await spuFormApi.validate();
-
-  if (!validateResult.valid) {
-    throw new Error('表单验证失败');
-  }
-
-  // 验证通过，获取值并调用 onSubmit
-  const values = await spuFormApi.getValues();
-  await onSubmit(values);
-};
-
 // 暴露方法给父组件
 defineExpose({
-  setFormValues,
   resetForm,
+  setFormValues,
   submitForm,
 });
 </script>
 
 <template>
-  <div class="p-6">
-    <SpuForm />
+  <div class="spu-form-tabs">
+    <Tabs v-model:activeKey="activeTab">
+      <!-- Tab 1: 基础信息 -->
+      <Tabs.TabPane key="basic" tab="基础信息">
+        <BasicInfoForm />
+      </Tabs.TabPane>
+
+      <!-- Tab 2: 库存管理 -->
+      <Tabs.TabPane key="stock" tab="库存管理">
+        <SkuManagement ref="skuManagementRef" />
+      </Tabs.TabPane>
+
+      <!-- Tab 3: 商品详情 -->
+      <Tabs.TabPane key="detail" tab="商品详情">
+        <div class="detail-editor">
+          <div class="mb-2 text-sm font-medium">商品详情</div>
+          <a-textarea
+            v-model:value="detailContent"
+            :rows="10"
+            placeholder="请输入商品详情描述"
+          />
+        </div>
+      </Tabs.TabPane>
+
+      <!-- Tab 4: 物流设置 (暂时注释，等待确认字段) -->
+      <!-- <Tabs.TabPane
+        v-if="basicInfoFormApi.getValues().type === SpuOrderType.Physical"
+        key="logistics"
+        tab="物流设置"
+      >
+        <div class="logistics-settings">
+          物流设置内容待实现
+        </div>
+      </Tabs.TabPane> -->
+    </Tabs>
   </div>
 </template>
+
+<style scoped>
+.spu-form-tabs {
+  min-height: 400px;
+}
+
+.spu-form-tabs :deep(.ant-tabs) {
+  margin-top: -8px;
+}
+
+.spu-form-tabs :deep(.ant-tabs-content) {
+  padding: 16px;
+}
+
+.detail-editor {
+  padding: 0;
+}
+</style>
