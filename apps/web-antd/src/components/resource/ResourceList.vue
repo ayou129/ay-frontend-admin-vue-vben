@@ -30,6 +30,7 @@ const VideoIcon = createIconifyIcon('carbon:video');
 const ArchiveIcon = createIconifyIcon('carbon:folder-off');
 const CircleIcon = createIconifyIcon('carbon:circle-dash');
 const MoreIcon = createIconifyIcon('carbon:overflow-menu-horizontal');
+const EyeIcon = createIconifyIcon('carbon:view');
 
 interface Props {
   loading?: boolean;
@@ -163,8 +164,7 @@ const handleMove = (resource: Resource) => {
 
           <!-- 文件预览 -->
           <div
-            class="resource-preview mb-2 flex h-32 items-center justify-center overflow-hidden rounded bg-gray-100"
-            @click.stop="handlePreview(resource)"
+            class="resource-preview group/preview relative mb-2 flex h-32 items-center justify-center overflow-hidden rounded bg-gray-100"
           >
             <!-- 图片预览 -->
             <Image
@@ -180,6 +180,19 @@ const handleMove = (resource: Resource) => {
               v-else
               class="text-4xl text-gray-400"
             />
+
+            <!-- 预览按钮（图片中间） -->
+            <div
+              v-if="isImage(resource)"
+              class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all group-hover/preview:bg-black/20 group-hover/preview:opacity-100"
+            >
+              <div
+                class="pointer-events-auto flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/90 shadow-lg transition-transform hover:scale-110"
+                @click.stop="handlePreview(resource)"
+              >
+                <EyeIcon class="size-5 text-gray-700" />
+              </div>
+            </div>
           </div>
 
           <!-- 文件信息 -->

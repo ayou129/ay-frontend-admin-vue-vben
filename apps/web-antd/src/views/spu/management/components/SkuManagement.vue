@@ -122,8 +122,7 @@ defineExpose({
 
 <template>
   <div class="sku-management">
-    <div class="mb-4 flex items-center justify-between">
-      <div class="text-base font-medium">SKU 库存管理</div>
+    <div class="mb-4 flex justify-end">
       <Button type="primary" @click="handleAddSku">
         <template #icon>
           <PlusIcon class="size-4" />

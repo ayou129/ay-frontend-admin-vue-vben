@@ -261,12 +261,20 @@ const collectFormData = async () => {
     ? skuManagementRef.value.getSkuList()
     : [];
 
+  // 将轮播图 Resource[] 转换为 carousel_ids (number[])
+  const carousels = basicValues.carousels || [];
+  const carousel_ids = carousels.map((resource: any) => resource.id);
+
   // 组合所有数据
   const formData: any = {
     ...basicValues,
+    carousel_ids, // 使用 carousel_ids 替代 carousels
     detail: detailContent.value,
     skus: skuList,
   };
+
+  // 删除 carousels 字段（避免发送给后端）
+  delete formData.carousels;
 
   return formData;
 };

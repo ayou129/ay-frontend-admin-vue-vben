@@ -1,5 +1,4 @@
 import type { PhpPageResponse } from '#/types';
-import type { Resource } from '#/types/resource';
 import type { Spu } from '#/types/store/spu';
 import type { RequestGetPageQuery } from '#/utils/filter';
 
@@ -33,14 +32,14 @@ export async function getSpuList(params: RequestGetPageQuery) {
  * 获取商品详情
  */
 export async function getSpuDetail(id: number) {
-  return requestClient.get<Spu>(`${apiPrefix}/store/spus/${id}`);
+  return requestClient.get<Spu>(`${apiPrefix}/store/spu/${id}`);
 }
 
 /**
  * 创建商品
  */
 export async function createSpu(data: {
-  carousels?: Resource[];
+  carousel_ids?: number[];
   category_id: number;
   detail?: string;
   name: string;
@@ -49,7 +48,7 @@ export async function createSpu(data: {
   valid_type?: number;
   valid_value?: string;
 }) {
-  return requestClient.post<Spu>(`${apiPrefix}/store/spus`, data);
+  return requestClient.post<Spu>(`${apiPrefix}/store/spu`, data);
 }
 
 /**
@@ -58,7 +57,7 @@ export async function createSpu(data: {
 export async function updateSpu(
   id: number,
   data: {
-    carousels?: Resource[];
+    carousel_ids?: number[];
     category_id?: number;
     detail?: string;
     name?: string;
@@ -68,12 +67,12 @@ export async function updateSpu(
     valid_value?: string;
   },
 ) {
-  return requestClient.put<Spu>(`${apiPrefix}/store/spus/${id}`, data);
+  return requestClient.put<Spu>(`${apiPrefix}/store/spu/${id}`, data);
 }
 
 /**
  * 删除商品
  */
 export async function deleteSpu(id: number) {
-  return requestClient.delete(`${apiPrefix}/store/spus/${id}`);
+  return requestClient.delete(`${apiPrefix}/store/spu/${id}`);
 }

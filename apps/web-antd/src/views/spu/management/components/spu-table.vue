@@ -7,7 +7,7 @@ import { ref } from 'vue';
 
 import { Plus, SvgDownloadIcon } from '@vben/icons';
 
-import { Button, message, TabPane, Tabs } from 'ant-design-vue';
+import { Button, Image, message, TabPane, Tabs } from 'ant-design-vue';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { deleteSpu, getSpuList } from '#/api/store/spu';
@@ -264,10 +264,11 @@ defineExpose({
     <!-- 表格区域 -->
     <Grid>
       <template #image="{ row }">
-        <img
+        <Image
           v-if="row.carousels && row.carousels[0]?.url"
           :src="row.carousels[0].url"
           :alt="row.name"
+          :preview="true"
           class="h-12 w-12 rounded object-cover"
         />
         <div
