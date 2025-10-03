@@ -9,6 +9,7 @@ import { message, Tabs } from 'ant-design-vue';
 import { useVbenForm, z } from '#/adapter/form';
 import { getCategoryTree } from '#/api/store/category';
 import { createSpu, updateSpu } from '#/api/store/spu';
+import { RichEditor } from '#/components/editor';
 import { ResourceType } from '#/types/resource';
 import { SpuOrderType } from '#/types/store/spu';
 
@@ -320,25 +321,28 @@ defineExpose({
 
 <template>
   <div class="spu-form-tabs">
-    <Tabs v-model:activeKey="activeTab">
+    <Tabs v-model:active-key="activeTab">
       <!-- Tab 1: 基础信息 -->
       <Tabs.TabPane key="basic" tab="基础信息">
-        <BasicInfoForm />
+        <div class="tab-content-wrapper">
+          <BasicInfoForm />
+        </div>
       </Tabs.TabPane>
 
       <!-- Tab 2: 库存管理 -->
       <Tabs.TabPane key="stock" tab="库存管理">
-        <SkuManagement ref="skuManagementRef" />
+        <div class="tab-content-wrapper">
+          <SkuManagement ref="skuManagementRef" />
+        </div>
       </Tabs.TabPane>
 
       <!-- Tab 3: 商品详情 -->
       <Tabs.TabPane key="detail" tab="商品详情">
-        <div class="detail-editor">
-          <div class="mb-2 text-sm font-medium">商品详情</div>
-          <a-textarea
-            v-model:value="detailContent"
-            :rows="10"
-            placeholder="请输入商品详情描述"
+        <div class="tab-content-wrapper">
+          <RichEditor
+            v-model="detailContent"
+            :height="400"
+            placeholder="请输入商品详情，支持富文本格式和插入图片"
           />
         </div>
       </Tabs.TabPane>
@@ -349,8 +353,10 @@ defineExpose({
         key="logistics"
         tab="物流设置"
       >
-        <div class="logistics-settings">
-          物流设置内容待实现
+        <div class="tab-content-wrapper">
+          <div class="logistics-settings">
+            物流设置内容待实现
+          </div>
         </div>
       </Tabs.TabPane> -->
     </Tabs>
@@ -359,18 +365,37 @@ defineExpose({
 
 <style scoped>
 .spu-form-tabs {
-  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  height: 600px;
 }
 
 .spu-form-tabs :deep(.ant-tabs) {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   margin-top: -8px;
+  overflow: hidden;
+}
+
+.spu-form-tabs :deep(.ant-tabs-nav) {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  margin-bottom: 0;
+  background-color: white;
+}
+
+.spu-form-tabs :deep(.ant-tabs-content-holder) {
+  flex: 1;
+  overflow-y: auto;
 }
 
 .spu-form-tabs :deep(.ant-tabs-content) {
-  padding: 16px;
+  height: 100%;
 }
 
-.detail-editor {
-  padding: 0;
+.tab-content-wrapper {
+  padding: 16px;
 }
 </style>

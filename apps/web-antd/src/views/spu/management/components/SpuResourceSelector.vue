@@ -78,7 +78,7 @@ watch(
     <!-- 资源网格 -->
     <VueDraggable
       v-model="selectedResources"
-      class="grid grid-cols-5 gap-4"
+      class="grid grid-cols-6 gap-4"
       @end="handleDragEnd"
     >
       <div

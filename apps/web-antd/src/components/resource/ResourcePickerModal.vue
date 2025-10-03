@@ -269,18 +269,20 @@ const handleResetFilter = () => {
   typeFilter.value = undefined;
 };
 
-// 监听弹窗打开，初始化选中状态并加载默认资源
+// 监听弹窗打开，初始化选中状态并加载资源
 watch(
   () => props.open,
   (isOpen) => {
     if (isOpen) {
       selectedResourceIds.value = [...props.selectedIds];
-      // 默认加载所有资源
-      if (!currentFolderId.value) {
-        loadResources();
-      }
+      // 每次打开都重新加载当前目录的资源（如果没有选中目录，则加载所有资源）
+      loadResources(currentFolderId.value);
+    } else {
+      // 关闭时重置状态
+      handleResetFilter();
     }
   },
+  { immediate: true }, // 立即执行，支持动态创建的组件
 );
 </script>
 
