@@ -2,7 +2,7 @@
 import type { OnActionClickParams, VxeGridProps } from '#/adapter/vxe-table';
 import type { Category } from '#/types/store/category';
 
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 
 import { Page, useVbenModal } from '@vben/common-ui';
 import { Plus } from '@vben/icons';
@@ -26,12 +26,8 @@ const searchParams = ref({
 });
 
 const [SearchForm] = useVbenForm({
-  actionLayout: 'newLine',
-  actionPosition: 'right',
+  actionLayout: 'inline',
   commonConfig: {
-    componentProps: {
-      class: 'w-full',
-    },
     disabledOnChangeListener: false,
     disabledOnInputListener: false,
     labelWidth: 80,
@@ -50,9 +46,6 @@ const [SearchForm] = useVbenForm({
     onRefresh();
   },
   layout: 'horizontal',
-  resetButtonOptions: {
-    content: '重置',
-  },
   schema: [
     {
       component: 'Input',
@@ -68,7 +61,7 @@ const [SearchForm] = useVbenForm({
   submitButtonOptions: {
     show: false,
   },
-  wrapperClass: 'grid-cols-1 md:grid-cols-2',
+  wrapperClass: 'grid-cols-[auto_1fr]',
 });
 
 const categoryFormRef = ref();
@@ -119,7 +112,6 @@ const gridOptions: VxeGridProps<Category> = {
       width: 200,
     },
   ],
-  height: 'auto',
   keepSource: true,
   pagerConfig: {
     enabled: false,
@@ -149,6 +141,9 @@ const gridOptions: VxeGridProps<Category> = {
     custom: true,
     export: false,
     refresh: true,
+    slots: {
+      buttons: 'toolbar-buttons',
+    },
     zoom: true,
   },
   treeConfig: {
@@ -188,6 +183,23 @@ function filterTreeData(
 }
 
 const [Grid, gridApi] = useVbenVxeGrid({ gridOptions });
+
+// 展开/收起状态
+const isExpandAll = ref(false);
+
+// 展开/收起所有分类
+async function toggleExpandAll() {
+  await nextTick();
+  const $grid = gridApi.grid;
+  if ($grid) {
+    isExpandAll.value = !isExpandAll.value;
+    if (isExpandAll.value) {
+      await $grid.setAllTreeExpand(true);
+    } else {
+      $grid.clearTreeExpand();
+    }
+  }
+}
 
 function onActionClick({ code, row }: OnActionClickParams<Category>) {
   switch (code) {
@@ -273,13 +285,20 @@ async function onDelete(row: Category) {
     </div>
 
     <!-- 表格 Panel -->
-    <Grid>
-      <template #toolbar-tools>
-        <Button type="primary" @click="onCreate">
-          <Plus class="size-5" />
-          添加分类
-        </Button>
-      </template>
-    </Grid>
+    <div class="rounded-lg bg-white p-6 shadow">
+      <Grid>
+        <template #toolbar-buttons>
+          <div class="flex gap-2">
+            <Button type="primary" @click="onCreate">
+              <Plus class="size-4" />
+              添加分类
+            </Button>
+            <Button @click="toggleExpandAll">
+              {{ isExpandAll ? '收起全部' : '展开全部' }}
+            </Button>
+          </div>
+        </template>
+      </Grid>
+    </div>
   </Page>
 </template>

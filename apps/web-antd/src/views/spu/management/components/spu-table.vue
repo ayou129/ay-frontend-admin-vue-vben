@@ -246,7 +246,7 @@ defineExpose({
     </Tabs>
 
     <!-- 按钮区域 -->
-    <div class="mb-4 flex flex-wrap gap-2">
+    <div class="mb-2 flex flex-wrap gap-2">
       <Button type="primary" @click="handleAddSpu">
         <Plus class="size-4" />
         添加商品

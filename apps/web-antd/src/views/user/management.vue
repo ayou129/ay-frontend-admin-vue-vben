@@ -84,6 +84,11 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
         slots: { default: 'action' },
       },
     ],
+    toolbarConfig: {
+      slots: {
+        buttons: 'toolbar-buttons',
+      },
+    },
     proxyConfig: {
       ajax: {
         query: async (
@@ -121,7 +126,7 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
     },
   },
   formOptions: {
-    collapsed: false,
+    showCollapseButton: false,
     schema: [
       {
         component: 'Input',
@@ -159,11 +164,9 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
         label: '状态',
       },
     ],
-    showCollapseButton: true,
     submitOnChange: true,
-    showDefaultActions: true, // 显示默认操作按钮
-    submitButtonOptions: { show: false }, // 隐藏搜索按钮（因为是自动搜索）
-    resetButtonOptions: { content: '重置筛选' }, // 保留重置按钮
+    showDefaultActions: true,
+    submitButtonOptions: { show: false },
   },
 });
 
@@ -290,12 +293,12 @@ const handleDelete = async (id: number) => {
 </script>
 
 <template>
-  <Page description="用户信息管理和维护" title="用户管理">
-    <div class="mb-4">
-      <Button type="primary" @click="handleCreate"> 新增用户 </Button>
-    </div>
-
+  <Page auto-content-height>
     <VxeGrid>
+      <template #toolbar-buttons>
+        <Button type="primary" @click="handleCreate"> 新增用户 </Button>
+      </template>
+
       <template #status="{ row }">
         <Tag :color="userStore.format_status(row.status).color">
           {{ userStore.format_status(row.status).text }}

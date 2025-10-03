@@ -25,7 +25,7 @@ const [SearchForm, searchFormApi] = useVbenForm({
   },
   compact: true,
   handleReset: async () => {
-    searchFormApi.resetFields();
+    searchFormApi.resetForm();
     emit('reset');
   },
   handleSubmit: async (values) => {
@@ -35,9 +35,6 @@ const [SearchForm, searchFormApi] = useVbenForm({
     emit('search', values);
   },
   layout: 'horizontal',
-  resetButtonOptions: {
-    content: '重置',
-  },
   schema: [
     {
       component: 'Input',
@@ -95,7 +92,7 @@ const [SearchForm, searchFormApi] = useVbenForm({
 // 暴露API给父组件
 defineExpose({
   getValues: () => searchFormApi.getValues(),
-  resetFields: () => searchFormApi.resetFields(),
+  resetFields: () => searchFormApi.resetForm(),
 });
 </script>
 

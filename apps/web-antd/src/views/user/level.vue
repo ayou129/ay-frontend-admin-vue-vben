@@ -94,6 +94,11 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
         slots: { default: 'action' },
       },
     ],
+    toolbarConfig: {
+      slots: {
+        buttons: 'toolbar-buttons',
+      },
+    },
     proxyConfig: {
       ajax: {
         query: async (
@@ -135,7 +140,7 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
     },
   },
   formOptions: {
-    collapsed: false,
+    showCollapseButton: false,
     schema: [
       { component: 'Input', fieldName: 'name', label: '等级名称' },
       {
@@ -158,11 +163,9 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
         label: '状态',
       },
     ],
-    showCollapseButton: true,
     submitOnChange: true,
     showDefaultActions: true,
     submitButtonOptions: { show: false },
-    resetButtonOptions: { content: '重置筛选' },
   },
 });
 
@@ -344,12 +347,12 @@ const handleDelete = async (id: number) => {
 </script>
 
 <template>
-  <Page description="会员等级配置和管理" title="会员等级">
-    <div class="mb-4">
-      <Button type="primary" @click="handleCreate"> 新增等级 </Button>
-    </div>
-
+  <Page auto-content-height>
     <VxeGrid>
+      <template #toolbar-buttons>
+        <Button type="primary" @click="handleCreate"> 新增等级 </Button>
+      </template>
+
       <template #point_range="{ row }">
         {{ memberLevelStore.format_point_range(row.point_min, row.point_max) }}
       </template>
