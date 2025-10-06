@@ -27,16 +27,9 @@ export async function getResourceFiles(folderId: number) {
  * 获取资源列表（分页）
  */
 export async function getResourceList(params: RequestGetPageQuery) {
-  const response = await requestClient.get<PhpPageResponse<Resource>>(
+  const response = await requestClient.post<PhpPageResponse<Resource>>(
     `${apiPrefix}/resource/list/page`,
-    {
-      params: {
-        page: params.page,
-        page_size: params.page_size,
-        filters: params.filters,
-        filter_sort_option: params.filter_sort_option,
-      },
-    },
+    params,
   );
 
   return {

@@ -9,16 +9,9 @@ import { requestClient } from '#/api/request';
  * 获取商品列表
  */
 export async function getSpuList(params: RequestGetPageQuery) {
-  const response = await requestClient.get<PhpPageResponse<Spu>>(
+  const response = await requestClient.post<PhpPageResponse<Spu>>(
     `${apiPrefix}/store/spu/list/page`,
-    {
-      params: {
-        page: params.page,
-        page_size: params.page_size,
-        filters: params.filters,
-        filter_sort_option: params.filter_sort_option,
-      },
-    },
+    params,
   );
 
   // 转换为 VxeGrid 期望的格式 {items: [], total: 0}

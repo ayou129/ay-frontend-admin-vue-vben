@@ -25,7 +25,8 @@ git commit -m 'feat: 商品管理页面 UI' --no-verify
    - playground/src/views/examples/form 文件夹下 提供了表单的参考
 5. API 参考： #/api 文件夹下的所有文件，并且有 apiPrefix 配置(从config.ts 中获取)，要利用上
 6. 不同的数据结构要放在合理的文件夹下，例如
-  - apps/web-antd/src/api/store/spu.ts
+
+- apps/web-antd/src/api/store/spu.ts
 
 ### 商品功能
 
@@ -151,9 +152,12 @@ SpuFormModal (Modal 60% 宽度)
 ```
 
 ⚠️ 需要确认的问题：
+
 1. SKU 管理 API：目前 Swagger 中 SPU 的创建/更新 API 不接受 skus 字段。请确认：
-  - SKU 是否需要单独的 API 管理？
-  - 还是后端会在后续版本中支持在 SPU 表单中一起提交 SKU 数据？
+
+- SKU 是否需要单独的 API 管理？
+- 还是后端会在后续版本中支持在 SPU 表单中一起提交 SKU 数据？
+
 2. 物流设置 Tab：READ.md 中提到了"物流设置"（仅实物商品显示），但 Swagger 中没有相关字段。请提供物流设置需要的字段列表。
 
 ### 资源组件支持
@@ -193,7 +197,7 @@ src/views/spu/management/components/
 - 点击目录切换右侧文件列表
 右侧：
 - 文件列表（ResourceList）
-- 支持搜索、筛选类型
+- 支持搜索、筛选类型（实时搜索，300ms防抖）
 - 文件列表带复选框（单选/多选）
 - 支持直接上传到当前目录
 底部：

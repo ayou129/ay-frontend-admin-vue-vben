@@ -12,6 +12,7 @@ import {
   getResourceFiles,
   uploadResourceFiles,
 } from '#/api/resource/resource';
+import { useResourceFilter } from '#/composables/useResourceFilter';
 import { ResourceType } from '#/types/resource';
 
 import ResourceFolderTree from './ResourceFolderTree.vue';
@@ -48,18 +49,18 @@ interface Emits {
 // 当前选中的目录ID
 const currentFolderId = ref<number>();
 
-// 资源列表
-const resources = ref<Resource[]>([]);
-const loading = ref(false);
+const {
+  state: filterState,
+  data: filterResult,
+  hasActiveFilters,
+  loadResources: loadFilteredResources,
+  resetFilters,
+  updateSearchKeyword,
+  updateTypeFilter,
+} = useResourceFilter();
 
 // 当前选中的资源IDs
 const selectedResourceIds = ref<number[]>([]);
-
-// 搜索关键词
-const searchKeyword = ref('');
-
-// 类型筛选
-const typeFilter = ref<ResourceType>();
 
 // 预览相关
 const previewVisible = ref(false);
@@ -78,26 +79,13 @@ const typeOptions = [
   { label: '压缩包', value: ResourceType.Archive },
 ];
 
-// 过滤后的资源列表
+// 过滤后的资源列表（结合服务端筛选和客户端筛选）
 const filteredResources = computed(() => {
-  let result = resources.value;
+  let result = filterResult.value.resources;
 
-  // 类型筛选
-  if (typeFilter.value !== undefined) {
-    result = result.filter((r) => r.type === typeFilter.value);
-  }
-
-  // 接受类型筛选
+  // 接受类型筛选（客户端筛选）
   if (props.acceptTypes.length > 0) {
-    result = result.filter((r) => props.acceptTypes.includes(r.type));
-  }
-
-  // 搜索筛选
-  if (searchKeyword.value) {
-    const keyword = searchKeyword.value.toLowerCase();
-    result = result.filter((r) =>
-      r.file_original_filename.toLowerCase().includes(keyword),
-    );
+    result = result.filter((r: Resource) => props.acceptTypes.includes(r.type));
   }
 
   return result;
@@ -105,7 +93,7 @@ const filteredResources = computed(() => {
 
 // 已选中的资源
 const selectedResources = computed(() => {
-  return resources.value.filter((r) =>
+  return filterResult.value.resources.filter((r: Resource) =>
     selectedResourceIds.value.includes(r.id),
   );
 });
@@ -113,26 +101,21 @@ const selectedResources = computed(() => {
 // 加载资源列表
 const loadResources = async (folderId?: number) => {
   try {
-    loading.value = true;
-    // 如果没有指定 folderId，使用资源列表分页 API 加载所有资源
+    // 如果选中了目录，使用目录文件 API
     if (folderId === undefined) {
-      const { getResourceList } = await import('#/api/resource/resource');
-      const response = await getResourceList({
-        page: 1,
-        page_size: 1000,
-        filters: [],
-        filter_sort_option: { sort_field: 'id', sort_order: 'desc' },
-      });
-      resources.value = response.items;
+      // 使用筛选逻辑加载所有资源
+      await loadFilteredResources();
     } else {
       const response = await getResourceFiles(folderId);
-      resources.value = response.list;
+      filterResult.value = {
+        resources: response.list,
+        total: response.list.length,
+        loading: false,
+      };
     }
   } catch (error) {
     console.error('加载资源列表失败:', error);
     message.error('加载资源列表失败');
-  } finally {
-    loading.value = false;
   }
 };
 
@@ -263,12 +246,6 @@ const handleMoveSuccess = () => {
   loadResources(currentFolderId.value);
 };
 
-// 重置筛选条件（不重置目录树选择）
-const handleResetFilter = () => {
-  searchKeyword.value = '';
-  typeFilter.value = undefined;
-};
-
 // 监听弹窗打开，初始化选中状态并加载资源
 watch(
   () => props.open,
@@ -278,8 +255,8 @@ watch(
       // 每次打开都重新加载当前目录的资源（如果没有选中目录，则加载所有资源）
       loadResources(currentFolderId.value);
     } else {
-      // 关闭时重置状态
-      handleResetFilter();
+      // 关闭时重置筛选状态
+      resetFilters();
     }
   },
   { immediate: true }, // 立即执行，支持动态创建的组件
@@ -307,19 +284,27 @@ watch(
           <!-- 工具栏 -->
           <div class="mb-4 flex gap-2">
             <Input
-              v-model:value="searchKeyword"
+              :value="filterState.searchKeyword"
               placeholder="搜索文件名"
               class="w-64"
               allow-clear
+              @input="
+                (e) => updateSearchKeyword((e.target as HTMLInputElement).value)
+              "
             />
             <Select
-              v-model:value="typeFilter"
+              :value="filterState.typeFilter"
               :options="typeOptions"
               placeholder="筛选类型"
               class="w-32"
               allow-clear
+              @change="
+                (value) => updateTypeFilter(value as ResourceType | undefined)
+              "
             />
-            <Button @click="handleResetFilter">重置筛选</Button>
+            <Button @click="resetFilters" :disabled="!hasActiveFilters">
+              重置筛选
+            </Button>
             <Upload
               :before-upload="beforeUpload"
               :custom-request="handleUpload"
@@ -338,7 +323,7 @@ watch(
           <!-- 资源列表 -->
           <div class="flex-1 overflow-y-auto">
             <ResourceList
-              :loading="loading"
+              :loading="filterResult.loading"
               :resources="filteredResources"
               :selected-ids="selectedResourceIds"
               :mode="mode"
