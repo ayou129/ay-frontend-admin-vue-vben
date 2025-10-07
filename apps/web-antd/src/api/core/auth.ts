@@ -32,7 +32,7 @@ export async function loginApi(data: AuthApi.LoginParams) {
  * 获取用户信息
  */
 export async function getProfileApi() {
-  return http.get<UserVO>(`${apiPrefix}/profile`);
+  return http.get<UserModel>(`${apiPrefix}/profile`);
 }
 
 /**

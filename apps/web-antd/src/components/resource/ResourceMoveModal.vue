@@ -8,7 +8,7 @@ import { ref, watch } from 'vue';
 import { message, Modal, Tree } from 'ant-design-vue';
 
 import {
-  getResourceFolderModelTree,
+  getResourceFolderTree,
   moveResourceFile,
 } from '#/api/resource/resource';
 
@@ -37,7 +37,7 @@ const treeData = ref<any[]>([]);
 const loadFolderTree = async () => {
   try {
     loading.value = true;
-    const response = await getResourceFolderModelTree();
+    const response = await getResourceFolderTree();
     folderTree.value = response.list;
 
     // 转换为树形数据

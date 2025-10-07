@@ -7,8 +7,8 @@ import { message, Modal } from 'ant-design-vue';
 
 import { useVbenForm, z } from '#/adapter/form';
 import {
-  createResourceFolderModel,
-  updateResourceFolderModel,
+  createResourceFolder,
+  updateResourceFolder,
 } from '#/api/resource/resource';
 
 interface Props {
@@ -68,14 +68,14 @@ const handleConfirm = async () => {
 
   try {
     if (isEdit.value && props.editData) {
-      await updateResourceFolderModel(props.editData.id, values);
+      await updateResourceFolder(props.editData.id, values);
       message.success('更新目录成功');
     } else {
       const data: any = { ...values };
       if (props.parentId !== undefined) {
         data.parent_id = props.parentId;
       }
-      await createResourceFolderModel(data);
+      await createResourceFolder(data);
       message.success('创建目录成功');
     }
     emit('success');

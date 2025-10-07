@@ -6,7 +6,7 @@ import { apiPrefix } from '../config';
  * 获取用户分页列表
  */
 export async function getUserPageApi(data: RequestGetPageQuery) {
-  return http.post<PhpPageResponse<UserVO>>(
+  return http.post<PhpPageResponse<UserModel>>(
     `${apiPrefix}/user/list/page`,
     data,
   );
@@ -15,15 +15,15 @@ export async function getUserPageApi(data: RequestGetPageQuery) {
 /**
  * 创建用户
  */
-export async function createUserApi(data: Partial<UserVO>) {
-  return http.post<UserVO>(`${apiPrefix}/user`, data);
+export async function createUserApi(data: Partial<UserModel>) {
+  return http.post<UserModel>(`${apiPrefix}/user`, data);
 }
 
 /**
  * 更新用户
  */
-export async function updateUserApi(id: number, data: Partial<UserVO>) {
-  return http.put<UserVO>(`${apiPrefix}/user/${id}`, data);
+export async function updateUserApi(id: number, data: Partial<UserModel>) {
+  return http.put<UserModel>(`${apiPrefix}/user/${id}`, data);
 }
 
 /**

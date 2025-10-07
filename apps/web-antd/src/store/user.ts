@@ -56,7 +56,7 @@ export const useUserStore = defineStore('user', () => {
     }
   };
 
-  const create = async (dto: Partial<UserVO>) => {
+  const create = async (dto: Partial<UserModel>) => {
     try {
       await createUserApi(dto);
       return true;
@@ -66,7 +66,7 @@ export const useUserStore = defineStore('user', () => {
   };
 
   // 更新用户
-  const update = async (id: number, dto: Partial<UserVO>) => {
+  const update = async (id: number, dto: Partial<UserModel>) => {
     try {
       await updateUserApi(id, dto);
       return true;
