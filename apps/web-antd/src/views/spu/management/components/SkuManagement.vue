@@ -10,8 +10,10 @@ import {
   Button,
   Dropdown,
   Image,
+  Input,
   InputNumber,
   Menu,
+  Switch,
   Table,
 } from 'ant-design-vue';
 
@@ -248,23 +250,25 @@ defineExpose({
     <!-- 当前分类的属性展示 -->
     <div
       v-if="attrList.length > 0"
-      class="mb-4 rounded border border-gray-200 bg-gray-50 p-3"
+      class="mb-3 rounded border border-gray-200 bg-gray-50 p-2"
     >
-      <div class="mb-2 font-medium text-gray-700">当前分类规格属性：</div>
-      <div class="space-y-2">
+      <div class="mb-1.5 text-xs font-medium text-gray-600">
+        当前分类规格属性：
+      </div>
+      <div class="space-y-1.5">
         <div
           v-for="attr in attrList"
           :key="attr.id"
           class="flex items-start gap-2"
         >
-          <span class="min-w-20 font-medium text-gray-600">
+          <span class="min-w-16 text-xs font-medium text-gray-500">
             {{ attr.name }}:
           </span>
-          <div class="flex flex-wrap gap-2">
+          <div class="flex flex-wrap gap-1.5">
             <span
               v-for="value in attr.values"
               :key="value.id"
-              class="rounded bg-blue-100 px-2 py-1 text-sm text-blue-700"
+              class="rounded bg-blue-50 px-1.5 py-0.5 text-xs text-blue-600"
             >
               {{ value.value }}
             </span>
@@ -285,16 +289,12 @@ defineExpose({
       <!-- SKU 名称 -->
       <template #bodyCell="{ column, record, index }">
         <template v-if="column.key === 'name'">
-          <a-input
-            v-model:value="record.name"
-            placeholder="请输入SKU名称"
-            size="small"
-          />
+          <span class="text-gray-700">{{ record.name }}</span>
         </template>
 
         <!-- SKU 编码 -->
         <template v-else-if="column.key === 'code'">
-          <a-input
+          <Input
             v-model:value="record.code"
             placeholder="请输入SKU编码"
             size="small"
@@ -327,7 +327,7 @@ defineExpose({
 
         <!-- 会员折扣 -->
         <template v-else-if="column.key === 'allow_member_discount'">
-          <a-switch
+          <Switch
             v-model:checked="record.allow_member_discount"
             :checked-value="1"
             :un-checked-value="0"

@@ -289,3 +289,104 @@ async function handleInsertImage() {
 2. 基础组件：ResourceFolderTree → ResourceList → ResourcePickerModal
 3. 业务组件：SpuResourceSelector
 4. 集成测试：在SPU编辑表单中使用
+
+## VbenModal + Tabs 滚动布局解决方案
+
+### 问题：VbenModal 中使用 Tabs 时的滚动问题
+
+当在 VbenModal 中嵌套 Tabs 组件时，常见问题：
+
+- Tab 标签无法固定在顶部（滚动时消失）
+- 出现双滚动条（Modal body + TabPane）
+- TabPane 内容无法滚动
+- 全屏时高度不正确
+
+### 解决方案
+
+**核心原理：单一滚动容器 + 完整 Flex 布局链**
+
+```
+VbenModal (固定高度)
+├── Modal Body (flex:1, overflow:hidden)
+│   └── 内容组件 (flex:1)
+│       └── Tabs (flex:1)
+│           ├── TabNav (flex-shrink:0) ← 固定
+│           └── TabPane (flex:1, overflow-y:auto) ← 唯一滚动点
+```
+
+**代码示例：**
+
+```vue
+<!-- Modal 配置 -->
+<VbenModal
+  content-class="!overflow-hidden !p-4 !flex-1 !flex !flex-col !min-h-0"
+>
+  <YourTabsComponent />
+</VbenModal>
+
+<!-- 非 scoped 样式 - 修改 Modal 宽高 -->
+<style>
+[role='dialog']:not(.size-full) {
+  width: 75vw !important;
+  height: 80vh !important;
+}
+[role='dialog'].size-full {
+  width: 100vw !important;
+  height: 100vh !important;
+}
+</style>
+
+<!-- Tabs 组件样式 -->
+<style scoped>
+.tabs-wrapper {
+  flex: 1; /* 使用 flex:1 而非 height:100% */
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* 允许正确收缩 */
+}
+
+.tabs-wrapper :deep(.ant-tabs-tabpane) {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto; /* 唯一滚动点 */
+}
+</style>
+```
+
+**关键点：**
+
+1. `contentClass` 必须包含 `!overflow-hidden` 禁用 VbenModal 默认滚动
+2. 使用 `flex: 1` 而非 `height: 100%` 进行高度传递
+3. 每层都要添加 `min-height: 0` 允许 flex 子元素收缩
+4. 修改 Modal 宽度必须用非 scoped 样式 + `!important`
+5. 只在 TabPane 层设置 `overflow-y: auto`
+
+## 表单提示文本样式
+
+在表单字段下方显示提示信息时，使用统一的样式类：
+
+```vue
+<Form.Item label="字段名">
+  <Input v-model:value="formState.field" />
+  <div class="form-item-tip">
+    这里是提示文本，说明字段的格式或使用说明
+  </div>
+</Form.Item>
+```
+
+**样式定义：**
+
+```css
+.form-item-tip {
+  margin-top: 6px;
+  margin-left: 4px;
+  font-size: 12px;
+  color: #6b7280;
+}
+```
+
+**适用场景：**
+
+- 字段格式说明（如：日期格式、数值范围）
+- 操作提示（如：最多上传 10 张图片）
+- 补充说明（如：动态有效期输入天数）
