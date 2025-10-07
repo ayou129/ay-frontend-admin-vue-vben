@@ -89,7 +89,7 @@ const handleFormSuccess = () => {
 
     <!-- 商品表单弹窗 -->
     <SpuFormModal
-      class="spu-edit-modal"
+      class="!h-[80vh] !max-h-[80vh] !w-[65vw] !max-w-[65vw]"
       content-class="!overflow-hidden !p-4 !flex-1 !flex !flex-col !min-h-0"
       :title="drawerTitle"
     >
@@ -109,22 +109,5 @@ const handleFormSuccess = () => {
 
 .ant-tabs-tab.ant-tabs-tab-active {
   color: #1890ff;
-}
-</style>
-
-<style>
-/* Modal 默认宽度和高度约束 - 非 scoped 样式 */
-[role='dialog']:not(.size-full) {
-  width: 65vw !important;
-  min-width: 65vw !important;
-  max-width: 65vw !important;
-  height: 80vh !important;
-  max-height: 80vh !important;
-}
-
-[role='dialog'].size-full {
-  width: 100vw !important;
-  height: 100vh !important;
-  max-height: 100vh !important;
 }
 </style>

@@ -107,6 +107,9 @@ loadCategoryTree();
 // ===================
 const skuManagementRef = ref();
 
+// 临时保存待设置的 SKU 数据（用于编辑时）
+const pendingSkuData = ref<any>(null);
+
 // 当前选中的分类 ID
 const currentCategoryId = computed(() => basicFormState.value.category_id);
 
@@ -120,7 +123,7 @@ const detailContent = ref('');
 // ===================
 
 // 设置表单值（编辑时）
-const setFormValues = (data: Spu) => {
+const setFormValues = async (data: Spu) => {
   basicFormState.value = {
     name: data.name || '',
     type: data.type === undefined ? undefined : Number(data.type),
@@ -133,13 +136,15 @@ const setFormValues = (data: Spu) => {
     valid_value: data.valid_value || '',
   };
 
-  // Tab 2: 库存管理 - 设置 SKU 列表
-  if (data.skus && skuManagementRef.value) {
-    skuManagementRef.value.setSkuList(data.skus);
-  }
-
   // Tab 3: 商品详情
   detailContent.value = data.detail || '';
+
+  // Tab 2: 库存管理 - 设置 SKU 列表
+  // 由于 SkuManagement 组件在另一个 Tab 中，可能还未挂载
+  // 先保存数据，等组件挂载后再设置
+  if (data.skus) {
+    pendingSkuData.value = data.skus;
+  }
 };
 
 // 重置表单
@@ -158,6 +163,8 @@ const resetForm = () => {
   if (skuManagementRef.value) {
     skuManagementRef.value.setSkuList([]);
   }
+  // 清除待处理的 SKU 数据
+  pendingSkuData.value = null;
   detailContent.value = '';
   activeTab.value = 'basic';
 };
@@ -182,6 +189,19 @@ const collectFormData = async () => {
     (resource) => resource.id,
   );
 
+  // 转换 SKU 数据：将 main_image Resource 对象转换为 main_image_id
+  const skusData = skuList.map((sku: any) => ({
+    id: sku.id,
+    spu_id: sku.spu_id,
+    name: sku.name,
+    code: sku.code,
+    price: sku.price,
+    stock_count: sku.stock_count,
+    attr_value: sku.attr_value,
+    allow_member_discount: sku.allow_member_discount,
+    main_image_id: sku.main_image?.id,
+  }));
+
   // 组合所有数据
   const formData: any = {
     name: basicFormState.value.name,
@@ -192,7 +212,7 @@ const collectFormData = async () => {
     valid_type: basicFormState.value.valid_type,
     valid_value: basicFormState.value.valid_value,
     detail: detailContent.value,
-    skus: skuList,
+    skus: skusData,
   };
 
   return formData;
@@ -227,6 +247,18 @@ watch(
       setFormValues(newData);
     } else {
       resetForm();
+    }
+  },
+  { immediate: true },
+);
+
+// 监听 skuManagementRef 挂载，自动设置待处理的 SKU 数据
+watch(
+  skuManagementRef,
+  (ref) => {
+    if (ref && pendingSkuData.value) {
+      ref.setSkuList(pendingSkuData.value);
+      pendingSkuData.value = null; // 清除待处理数据
     }
   },
   { immediate: true },

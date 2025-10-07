@@ -30,6 +30,21 @@ export async function getSpuDetail(id: number) {
 }
 
 /**
+ * SKU 提交数据类型（用于创建和更新）
+ */
+export interface SkuSubmitData {
+  id?: number; // 编辑时需要传递
+  spu_id?: number; // 编辑时需要传递
+  name: string;
+  code: string;
+  price: number | string;
+  stock_count: number;
+  attr_value?: Record<string, string>;
+  allow_member_discount: number;
+  main_image_id?: number;
+}
+
+/**
  * 创建商品
  */
 export async function createSpu(data: {
@@ -37,6 +52,7 @@ export async function createSpu(data: {
   category_id: number;
   detail?: string;
   name: string;
+  skus?: SkuSubmitData[];
   status: number;
   type: number;
   valid_type?: number;
@@ -55,6 +71,7 @@ export async function updateSpu(
     category_id?: number;
     detail?: string;
     name?: string;
+    skus?: SkuSubmitData[];
     status?: number;
     type?: number;
     valid_type?: number;

@@ -317,24 +317,13 @@ VbenModal (固定高度)
 **代码示例：**
 
 ```vue
-<!-- Modal 配置 -->
+<!-- Modal 配置 - 使用 Tailwind class 直接设置宽高 -->
 <VbenModal
+  class="!h-[80vh] !max-h-[80vh] !w-[65vw] !max-w-[65vw]"
   content-class="!overflow-hidden !p-4 !flex-1 !flex !flex-col !min-h-0"
 >
   <YourTabsComponent />
 </VbenModal>
-
-<!-- 非 scoped 样式 - 修改 Modal 宽高 -->
-<style>
-[role='dialog']:not(.size-full) {
-  width: 75vw !important;
-  height: 80vh !important;
-}
-[role='dialog'].size-full {
-  width: 100vw !important;
-  height: 100vh !important;
-}
-</style>
 
 <!-- Tabs 组件样式 -->
 <style scoped>
@@ -355,10 +344,10 @@ VbenModal (固定高度)
 
 **关键点：**
 
-1. `contentClass` 必须包含 `!overflow-hidden` 禁用 VbenModal 默认滚动
-2. 使用 `flex: 1` 而非 `height: 100%` 进行高度传递
-3. 每层都要添加 `min-height: 0` 允许 flex 子元素收缩
-4. 修改 Modal 宽度必须用非 scoped 样式 + `!important`
+1. **修改 Modal 宽高**：直接在 `class` 属性中使用 Tailwind，如 `!w-[65vw] !h-[80vh]`
+2. `contentClass` 必须包含 `!overflow-hidden` 禁用 VbenModal 默认滚动
+3. 使用 `flex: 1` 而非 `height: 100%` 进行高度传递
+4. 每层都要添加 `min-height: 0` 允许 flex 子元素收缩
 5. 只在 TabPane 层设置 `overflow-y: auto`
 
 ## 表单提示文本样式
@@ -390,3 +379,56 @@ VbenModal (固定高度)
 - 字段格式说明（如：日期格式、数值范围）
 - 操作提示（如：最多上传 10 张图片）
 - 补充说明（如：动态有效期输入天数）
+
+## Tabs 中子组件延迟挂载问题
+
+**问题：** 在 Modal 中使用 Tabs 时，非激活 Tab 中的子组件不会立即挂载，导致无法通过 ref 访问子组件方法。
+
+**场景：** 编辑表单打开时在"基础信息" Tab，需要设置"库存管理" Tab 中 SkuManagement 组件的数据。
+
+**解决方案：** 使用待处理数据 + watch ref 的模式
+
+```vue
+<script setup>
+// 1. 创建待处理数据的 ref
+const pendingSkuData = ref(null);
+const skuManagementRef = ref();
+
+// 2. 设置表单值时，先保存到待处理数据
+const setFormValues = async (data) => {
+  // ... 其他表单字段设置
+
+  // 由于子组件可能还未挂载，先保存数据
+  if (data.skus) {
+    pendingSkuData.value = data.skus;
+  }
+};
+
+// 3. 监听子组件 ref，挂载后自动设置数据
+watch(
+  skuManagementRef,
+  (ref) => {
+    if (ref && pendingSkuData.value) {
+      ref.setSkuList(pendingSkuData.value);
+      pendingSkuData.value = null; // 清除待处理数据
+    }
+  },
+  { immediate: true },
+);
+
+// 4. 重置时也要清除待处理数据
+const resetForm = () => {
+  pendingSkuData.value = null;
+  // ... 其他重置逻辑
+};
+</script>
+```
+
+**核心要点：**
+
+- Tabs 默认只挂载激活的 TabPane 中的组件（性能优化）
+- 不要在 `setFormValues` 中直接访问子组件 ref
+- 使用 watch 监听 ref 变化，在组件挂载后自动设置数据
+- 确保在重置表单时清除待处理数据
+
+待解决问题：
