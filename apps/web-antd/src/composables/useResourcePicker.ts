@@ -43,7 +43,7 @@ export function openResourcePicker(
     };
 
     // 处理确认
-    const handleConfirm = (resources: Resource[]) => {
+    const handleConfirm = (resources: ResourceModel[]) => {
       cleanup();
       resolve(resources);
     };

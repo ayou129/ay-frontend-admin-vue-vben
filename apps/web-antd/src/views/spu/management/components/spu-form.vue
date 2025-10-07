@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { FormInstance, Rule } from 'ant-design-vue/es/form';
 
-import type { Resource } from '#/types/resource';
-import type { Category } from '#/types/store/category';
-import type { Spu } from '#/types/store/spu';
+import type { ResourceModel } from '#/types/resource';
+import type { CategoryModel } from '#/types/store/category';
+import type { SpuModel } from '#/types/store/spu';
 
 import { computed, ref, watch } from 'vue';
 

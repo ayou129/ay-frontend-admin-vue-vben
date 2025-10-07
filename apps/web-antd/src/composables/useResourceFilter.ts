@@ -1,4 +1,4 @@
-import type { Resource } from '#/types/resource';
+import type { ResourceModel } from '#/types/resource';
 import type { RequestGetPageQuery } from '#/utils/filter';
 
 import { computed, onUnmounted, ref, watch } from 'vue';
@@ -15,7 +15,7 @@ interface FilterState {
 }
 
 interface FilterResult {
-  resources: Resource[];
+  resources: ResourceModel[];
   total: number;
   loading: boolean;
 }

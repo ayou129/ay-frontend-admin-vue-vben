@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Resource } from '#/types/resource';
+import type { ResourceModel } from '#/types/resource';
 
 import { computed } from 'vue';
 

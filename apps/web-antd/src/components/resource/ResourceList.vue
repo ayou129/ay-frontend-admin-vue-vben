@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Resource } from '#/types/resource';
+import type { ResourceModel } from '#/types/resource';
 
 import { createIconifyIcon } from '@vben/icons';
 
@@ -34,33 +34,33 @@ const EyeIcon = createIconifyIcon('carbon:view');
 
 interface Props {
   loading?: boolean;
-  resources?: Resource[];
+  resources?: ResourceModel[];
   selectedIds?: number[];
   mode?: 'multiple' | 'single';
   maxSelection: number;
 }
 
 interface Emits {
-  (e: 'select', resource: Resource): void;
-  (e: 'preview', resource: Resource): void;
-  (e: 'delete', resource: Resource): void;
-  (e: 'move', resource: Resource): void;
+  (e: 'select', resource: ResourceModel): void;
+  (e: 'preview', resource: ResourceModel): void;
+  (e: 'delete', resource: ResourceModel): void;
+  (e: 'move', resource: ResourceModel): void;
 }
 
 // 是否选中
-const isSelected = (resource: Resource) => {
+const isSelected = (resource: ResourceModel) => {
   return props.selectedIds?.includes(resource.id);
 };
 
 // 是否可以选中（达到上限时）
-const canSelect = (resource: Resource) => {
+const canSelect = (resource: ResourceModel) => {
   if (!props.maxSelection) return true;
   if (isSelected(resource)) return true;
   return (props.selectedIds?.length || 0) < props.maxSelection;
 };
 
 // 处理选择
-const handleSelect = (resource: Resource) => {
+const handleSelect = (resource: ResourceModel) => {
   if (!canSelect(resource)) {
     return;
   }
@@ -68,12 +68,12 @@ const handleSelect = (resource: Resource) => {
 };
 
 // 处理预览
-const handlePreview = (resource: Resource) => {
+const handlePreview = (resource: ResourceModel) => {
   emit('preview', resource);
 };
 
 // 获取文件图标
-const getFileIcon = (resource: Resource) => {
+const getFileIcon = (resource: ResourceModel) => {
   switch (resource.type) {
     case ResourceType.Archive: {
       return ArchiveIcon;
@@ -97,17 +97,17 @@ const getFileIcon = (resource: Resource) => {
 };
 
 // 是否是图片类型
-const isImage = (resource: Resource) => {
+const isImage = (resource: ResourceModel) => {
   return resource.type === ResourceType.Image;
 };
 
 // 删除资源
-const handleDelete = (resource: Resource) => {
+const handleDelete = (resource: ResourceModel) => {
   emit('delete', resource);
 };
 
 // 移动资源
-const handleMove = (resource: Resource) => {
+const handleMove = (resource: ResourceModel) => {
   emit('move', resource);
 };
 </script>

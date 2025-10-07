@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Resource } from '#/types/resource';
+import type { ResourceModel } from '#/types/resource';
 
 import { computed, ref, watch } from 'vue';
 
@@ -43,7 +43,7 @@ interface Props {
 
 interface Emits {
   (e: 'update:open', value: boolean): void;
-  (e: 'confirm', resources: Resource[]): void;
+  (e: 'confirm', resources: ResourceModel[]): void;
 }
 
 // 当前选中的目录ID
@@ -85,7 +85,9 @@ const filteredResources = computed(() => {
 
   // 接受类型筛选（客户端筛选）
   if (props.acceptTypes.length > 0) {
-    result = result.filter((r: Resource) => props.acceptTypes.includes(r.type));
+    result = result.filter((r: ResourceModel) =>
+      props.acceptTypes.includes(r.type),
+    );
   }
 
   return result;
@@ -93,7 +95,7 @@ const filteredResources = computed(() => {
 
 // 已选中的资源
 const selectedResources = computed(() => {
-  return filterResult.value.resources.filter((r: Resource) =>
+  return filterResult.value.resources.filter((r: ResourceModel) =>
     selectedResourceIds.value.includes(r.id),
   );
 });
@@ -126,7 +128,7 @@ const handleFolderSelect = (folderId?: number) => {
 };
 
 // 选择资源
-const handleResourceSelect = (resource: Resource) => {
+const handleResourceSelect = (resource: ResourceModel) => {
   const index = selectedResourceIds.value.indexOf(resource.id);
 
   if (props.mode === 'single') {
@@ -150,7 +152,7 @@ const handleResourceSelect = (resource: Resource) => {
 };
 
 // 预览资源
-const handleResourcePreview = (resource: Resource) => {
+const handleResourcePreview = (resource: ResourceModel) => {
   previewResource.value = resource;
   previewVisible.value = true;
 };
@@ -211,7 +213,7 @@ const handleCancel = () => {
 };
 
 // 删除资源
-const handleDeleteResource = (resource: Resource) => {
+const handleDeleteResource = (resource: ResourceModel) => {
   Modal.confirm({
     title: '确认删除',
     content: `确定要删除文件"${resource.file_original_filename}"吗？`,
@@ -235,7 +237,7 @@ const handleDeleteResource = (resource: Resource) => {
 };
 
 // 移动资源
-const handleMoveResource = (resource: Resource) => {
+const handleMoveResource = (resource: ResourceModel) => {
   moveResource.value = resource;
   moveModalVisible.value = true;
 };

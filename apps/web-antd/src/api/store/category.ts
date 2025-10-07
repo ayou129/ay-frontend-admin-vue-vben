@@ -1,4 +1,4 @@
-import type { Category } from '#/types/store/category';
+import type { CategoryModel } from '#/types/store/category';
 
 import { apiPrefix } from '#/api/config';
 import { http } from '#/api/request';

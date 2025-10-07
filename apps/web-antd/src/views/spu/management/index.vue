@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Spu } from '#/types/store/spu';
+import type { SpuModel } from '#/types/store/spu';
 
 import { ref } from 'vue';
 

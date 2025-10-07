@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Resource } from '#/types/resource';
+import type { ResourceModel } from '#/types/resource';
 
 import { computed, ref, watch } from 'vue';
 import { VueDraggable } from 'vue-draggable-plus';
@@ -22,20 +22,20 @@ const PlusIcon = createIconifyIcon('carbon:add');
 const CloseIcon = createIconifyIcon('carbon:close');
 
 interface Props {
-  modelValue?: Resource[];
+  modelValue?: ResourceModel[];
   max?: number;
   acceptTypes?: ResourceType[];
 }
 
 interface Emits {
-  (e: 'update:modelValue', value: Resource[]): void;
+  (e: 'update:modelValue', value: ResourceModel[]): void;
 }
 
 // 选择器弹窗
 const pickerVisible = ref(false);
 
 // 当前选中的资源（内部状态）
-const selectedResources = ref<Resource[]>([...props.modelValue]);
+const selectedResources = ref<ResourceModel[]>([...props.modelValue]);
 
 // 已选中的资源IDs
 const selectedIds = computed(() => {
@@ -48,7 +48,7 @@ const openPicker = () => {
 };
 
 // 确认选择
-const handleConfirm = (resources: Resource[]) => {
+const handleConfirm = (resources: ResourceModel[]) => {
   selectedResources.value = resources;
   emit('update:modelValue', resources);
 };

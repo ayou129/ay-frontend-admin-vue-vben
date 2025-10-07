@@ -1,6 +1,6 @@
 import type { PhpPageResponse } from '#/types';
 import type { SkuAttrListResponse, SkuDTO } from '#/types/store/sku';
-import type { Spu } from '#/types/store/spu';
+import type { SpuModel } from '#/types/store/spu';
 import type { RequestGetPageQuery } from '#/utils/filter';
 
 import { apiPrefix } from '#/api/config';
