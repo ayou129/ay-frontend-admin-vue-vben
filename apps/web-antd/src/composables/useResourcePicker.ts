@@ -1,4 +1,4 @@
-import type { ResourceModel, ResourceType } from '#/types/resource';
+import type { ResourceType } from '#/types/resource';
 
 import { createVNode, render } from 'vue';
 

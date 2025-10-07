@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import type {
-  UserLevelDTO,
-  UserLevelModel,
-} from '#/types/user-level';
+import type { UserLevelDTO, UserLevelModel } from '#/types/user-level';
 
 import { reactive } from 'vue';
 
@@ -374,9 +371,7 @@ const handleDelete = async (id: number) => {
               (checked) =>
                 handleStatusChange(
                   row.id,
-                  checked
-                    ? UserLevelStatus.Enabled
-                    : UserLevelStatus.Disabled,
+                  checked ? UserLevelStatus.Enabled : UserLevelStatus.Disabled,
                 )
             "
           />

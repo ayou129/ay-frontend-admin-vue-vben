@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { UserModel } from '#/types';
-
 import { Page, useVbenModal } from '@vben/common-ui';
 
 import { Button, Popconfirm, Tag } from 'ant-design-vue';

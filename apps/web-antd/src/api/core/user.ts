@@ -1,5 +1,3 @@
-import type { UserModel } from '#/types';
-
 import { http } from '#/api/request';
 
 import { apiPrefix } from '../config';

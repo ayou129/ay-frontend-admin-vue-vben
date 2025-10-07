@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Key } from 'ant-design-vue/es/_util/type';
 
-import type { ResourceModel, ResourceFolderModel } from '#/types/resource';
+import type { ResourceFolderModel } from '#/types/resource';
 
 import { ref, watch } from 'vue';
 
