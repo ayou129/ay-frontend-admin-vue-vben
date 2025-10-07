@@ -155,8 +155,7 @@ SpuFormModal (Modal 60% 宽度)
 
 1. SKU 管理 API：目前 Swagger 中 SPU 的创建/更新 API 不接受 skus 字段。请确认：
 
-- SKU 是否需要单独的 API 管理？
-- 还是后端会在后续版本中支持在 SPU 表单中一起提交 SKU 数据？
+- SKU 不需要单独的 API 管理，他是和 spu 编辑一起请求保存的
 
 2. 物流设置 Tab：READ.md 中提到了"物流设置"（仅实物商品显示），但 Swagger 中没有相关字段。请提供物流设置需要的字段列表。
 

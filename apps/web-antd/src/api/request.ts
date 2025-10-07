@@ -113,7 +113,7 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
   return client;
 }
 
-export const requestClient = createRequestClient(apiURL, {
+export const http = createRequestClient(apiURL, {
   responseReturn: 'data',
 });
 

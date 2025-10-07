@@ -2,14 +2,14 @@ import type { PhpPageResponse } from '#/types';
 import type { Resource, ResourceFolder } from '#/types/resource';
 import type { RequestGetPageQuery } from '#/utils/filter';
 
-import { apiPrefix } from '#/api/core/config';
-import { requestClient } from '#/api/request';
+import { apiPrefix } from '#/api/config';
+import { http } from '#/api/request';
 
 /**
  * 获取资源目录树
  */
 export async function getResourceFolderTree() {
-  return requestClient.get<{ list: ResourceFolder[] }>(
+  return http.get<{ list: ResourceFolder[] }>(
     `${apiPrefix}/resource/folders/tree`,
   );
 }
@@ -18,7 +18,7 @@ export async function getResourceFolderTree() {
  * 获取目录下的资源文件列表
  */
 export async function getResourceFiles(folderId: number) {
-  return requestClient.get<{ list: Resource[] }>(
+  return http.get<{ list: Resource[] }>(
     `${apiPrefix}/resource/folders/${folderId}/files`,
   );
 }
@@ -27,7 +27,7 @@ export async function getResourceFiles(folderId: number) {
  * 获取资源列表（分页）
  */
 export async function getResourceList(params: RequestGetPageQuery) {
-  const response = await requestClient.post<PhpPageResponse<Resource>>(
+  const response = await http.post<PhpPageResponse<Resource>>(
     `${apiPrefix}/resource/list/page`,
     params,
   );
@@ -42,29 +42,25 @@ export async function getResourceList(params: RequestGetPageQuery) {
  * 获取资源文件详情
  */
 export async function getResourceFileDetail(id: number) {
-  return requestClient.get<Resource>(`${apiPrefix}/resource/files/${id}`);
+  return http.get<Resource>(`${apiPrefix}/resource/files/${id}`);
 }
 
 /**
  * 批量上传文件
  */
 export async function uploadResourceFiles(data: FormData) {
-  return requestClient.post<{ list: Resource[] }>(
-    `${apiPrefix}/resource/files`,
-    data,
-    {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+  return http.post<{ list: Resource[] }>(`${apiPrefix}/resource/files`, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
     },
-  );
+  });
 }
 
 /**
  * 批量删除文件
  */
 export async function deleteResourceFiles(ids: number[]) {
-  return requestClient.delete(`${apiPrefix}/resource/files`, {
+  return http.delete(`${apiPrefix}/resource/files`, {
     data: { ids },
   });
 }
@@ -73,10 +69,9 @@ export async function deleteResourceFiles(ids: number[]) {
  * 移动文件到其他目录
  */
 export async function moveResourceFile(id: number, folderId: number) {
-  return requestClient.put<Resource>(
-    `${apiPrefix}/resource/files/${id}/folder`,
-    { folder_id: folderId },
-  );
+  return http.put<Resource>(`${apiPrefix}/resource/files/${id}/folder`, {
+    folder_id: folderId,
+  });
 }
 
 /**
@@ -87,10 +82,7 @@ export async function createResourceFolder(data: {
   name: string;
   parent_id?: number;
 }) {
-  return requestClient.post<ResourceFolder>(
-    `${apiPrefix}/resource/folders`,
-    data,
-  );
+  return http.post<ResourceFolder>(`${apiPrefix}/resource/folders`, data);
 }
 
 /**
@@ -103,15 +95,12 @@ export async function updateResourceFolder(
     name?: string;
   },
 ) {
-  return requestClient.put<ResourceFolder>(
-    `${apiPrefix}/resource/folders/${id}`,
-    data,
-  );
+  return http.put<ResourceFolder>(`${apiPrefix}/resource/folders/${id}`, data);
 }
 
 /**
  * 删除资源目录
  */
 export async function deleteResourceFolder(id: number) {
-  return requestClient.delete(`${apiPrefix}/resource/folders/${id}`);
+  return http.delete(`${apiPrefix}/resource/folders/${id}`);
 }

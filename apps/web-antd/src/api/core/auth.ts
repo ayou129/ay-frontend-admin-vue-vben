@@ -1,8 +1,8 @@
 import type { UserVO } from '#/types';
 
-import { requestClient } from '#/api/request';
+import { http } from '#/api/request';
 
-import { apiPrefix } from './config';
+import { apiPrefix } from '../config';
 
 export namespace AuthApi {
   /** 登录接口参数 */
@@ -27,21 +27,21 @@ export namespace AuthApi {
  * 登录
  */
 export async function loginApi(data: AuthApi.LoginParams) {
-  return requestClient.post<AuthApi.LoginResult>(`${apiPrefix}/login`, data);
+  return http.post<AuthApi.LoginResult>(`${apiPrefix}/login`, data);
 }
 
 /**
  * 获取用户信息
  */
 export async function getProfileApi() {
-  return requestClient.get<UserVO>(`${apiPrefix}/profile`);
+  return http.get<UserVO>(`${apiPrefix}/profile`);
 }
 
 /**
  * 刷新accessToken
  */
 export async function refreshTokenApi() {
-  return requestClient.post<AuthApi.RefreshTokenResult>(
+  return http.post<AuthApi.RefreshTokenResult>(
     `${apiPrefix}/refresh-token`,
     {},
     {
@@ -62,5 +62,5 @@ export async function logoutApi() {
  * 获取用户权限码
  */
 export async function getAccessCodesApi() {
-  return requestClient.get<string[]>(`${apiPrefix}/codes`);
+  return http.get<string[]>(`${apiPrefix}/codes`);
 }

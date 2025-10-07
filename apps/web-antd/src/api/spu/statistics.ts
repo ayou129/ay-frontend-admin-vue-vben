@@ -1,9 +1,9 @@
 import type { PhpPageResponse } from '#/types';
 import type { RequestGetPageQuery } from '#/utils/filter';
 
-import { requestClient } from '#/api/request';
+import { http } from '#/api/request';
 
-import { apiPrefix } from '../core/config';
+import { apiPrefix } from '../config';
 
 export namespace SpuStatisticsApi {
   /** 商品概况统计数据 */
@@ -69,7 +69,7 @@ export namespace SpuStatisticsApi {
  * 获取商品概况统计
  */
 export async function getSpuOverview() {
-  return requestClient.get<SpuStatisticsApi.OverviewData>(
+  return http.get<SpuStatisticsApi.OverviewData>(
     `${apiPrefix}/store/statistics/overview`,
   );
 }
@@ -78,7 +78,7 @@ export async function getSpuOverview() {
  * 获取商品排行榜
  */
 export async function getSpuRanking(data: RequestGetPageQuery) {
-  return requestClient.post<PhpPageResponse<SpuStatisticsApi.RankingItem>>(
+  return http.post<PhpPageResponse<SpuStatisticsApi.RankingItem>>(
     `${apiPrefix}/store/statistics/ranking`,
     data,
   );

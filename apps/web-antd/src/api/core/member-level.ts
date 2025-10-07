@@ -6,15 +6,15 @@ import type {
   RequestGetPageQuery,
 } from '#/types';
 
-import { requestClient } from '#/api/request';
+import { http } from '#/api/request';
 
-import { apiPrefix } from './config';
+import { apiPrefix } from '../config';
 
 /**
  * 获取会员等级分页列表
  */
 export async function getMemberLevelPageApi(data: RequestGetPageQuery) {
-  return requestClient.post<PhpPageResponse<MemberLevelVO>>(
+  return http.post<PhpPageResponse<MemberLevelVO>>(
     `${apiPrefix}/user-member-level/list/page`,
     data,
   );
@@ -24,14 +24,14 @@ export async function getMemberLevelPageApi(data: RequestGetPageQuery) {
  * 创建会员等级
  */
 export async function createMemberLevelApi(data: MemberLevelDTO) {
-  return requestClient.post(`${apiPrefix}/user-member-level`, data);
+  return http.post(`${apiPrefix}/user-member-level`, data);
 }
 
 /**
  * 更新会员等级
  */
 export async function updateMemberLevelApi(id: number, data: MemberLevelDTO) {
-  return requestClient.put(`${apiPrefix}/user-member-level/${id}`, data);
+  return http.put(`${apiPrefix}/user-member-level/${id}`, data);
 }
 
 /**
@@ -41,12 +41,12 @@ export async function changeMemberLevelStatusApi(
   id: number,
   data: MemberLevelStatusDTO,
 ) {
-  return requestClient.put(`${apiPrefix}/user-member-level/${id}/status`, data);
+  return http.put(`${apiPrefix}/user-member-level/${id}/status`, data);
 }
 
 /**
  * 删除会员等级
  */
 export async function deleteMemberLevelApi(id: number) {
-  return requestClient.delete(`${apiPrefix}/user-member-level/${id}`);
+  return http.delete(`${apiPrefix}/user-member-level/${id}`);
 }
