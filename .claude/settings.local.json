@@ -18,7 +18,12 @@
       "Bash(find:*)",
       "Bash(xargs:*)",
       "Bash(pnpm remove:*)",
-      "Bash(pnpm --filter @vben/web-antd install)"
+      "Bash(pnpm --filter @vben/web-antd install)",
+      "Bash({} ;)",
+      "Bash(for:*)",
+      "Bash(do)",
+      "Bash(\"$file\")",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

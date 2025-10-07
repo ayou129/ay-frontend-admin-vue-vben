@@ -2,7 +2,7 @@
 import type { AnalysisOverviewItem } from '@vben/common-ui';
 
 import type { VxeGridProps } from '#/adapter/vxe-table';
-import type { SpuStatisticsApi } from '#/api/spu/statistics';
+import type { SpuOverviewData, SpuRankingItem } from '#/types/store/statistics';
 import type { RequestGetPageQuery } from '#/utils/filter';
 
 import { onMounted, ref } from 'vue';
@@ -16,12 +16,12 @@ import {
 } from '@vben/icons';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getSpuOverview, getSpuRanking } from '#/api/spu/statistics';
+import { getSpuOverview, getSpuRanking } from '#/api/store/statistics';
 
 import SpuChart from './components/spu-chart.vue';
 
 // 商品概况数据
-const overviewData = ref<SpuStatisticsApi.OverviewData>();
+const overviewData = ref<SpuOverviewData>();
 const overviewItems = ref<AnalysisOverviewItem[]>([]);
 
 // 加载商品概况数据
@@ -111,7 +111,7 @@ const formSchema = [
   },
 ];
 
-const gridOptions: VxeGridProps<SpuStatisticsApi.RankingItem> = {
+const gridOptions: VxeGridProps<SpuRankingItem> = {
   columns: [
     { title: '序号', type: 'seq', width: 60 },
     { field: 'id', title: 'ID', width: 80 },

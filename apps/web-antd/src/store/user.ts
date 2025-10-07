@@ -1,7 +1,7 @@
 import type {
   RequestFilterQuery,
   RequestFilterSortOption,
-  UserVO,
+  UserModel,
 } from '#/types';
 
 import { defineStore } from 'pinia';

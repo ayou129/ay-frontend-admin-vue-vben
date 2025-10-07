@@ -1,29 +1,26 @@
-import type {
-  MemberLevelDTO,
-  RequestFilterQuery,
-  RequestFilterSortOption,
-} from '#/types';
+import type { RequestFilterQuery, RequestFilterSortOption } from '#/types';
+import type { UserLevelDTO } from '#/types/user-level';
 
 import { defineStore } from 'pinia';
 
 import {
-  changeMemberLevelStatusApi,
-  createMemberLevelApi,
-  deleteMemberLevelApi,
-  getMemberLevelPageApi,
-  updateMemberLevelApi,
-} from '#/api/core/member-level';
-import { MemberLevelStatus } from '#/types';
+  changeUserLevelStatusApi,
+  createUserLevelApi,
+  deleteUserLevelApi,
+  getUserLevelPageApi,
+  updateUserLevelApi,
+} from '#/api/core/user-level';
+import { UserLevelStatus } from '#/types/user-level';
 import { DEFAULT_FILTER_SORT_OPTION } from '#/utils/filter';
 
-export const useMemberLevelStore = defineStore('memberLevel', () => {
+export const useUserLevelStore = defineStore('userLevel', () => {
   // 格式化状态
-  const format_status = (status?: MemberLevelStatus) => {
+  const format_status = (status?: UserLevelStatus) => {
     switch (status) {
-      case MemberLevelStatus.Disabled: {
+      case UserLevelStatus.Disabled: {
         return { text: '已禁用', color: 'red' };
       }
-      case MemberLevelStatus.Enabled: {
+      case UserLevelStatus.Enabled: {
         return { text: '已启用', color: 'green' };
       }
       default: {
@@ -77,7 +74,7 @@ export const useMemberLevelStore = defineStore('memberLevel', () => {
     filterSortOption: RequestFilterSortOption = DEFAULT_FILTER_SORT_OPTION,
   ) => {
     try {
-      const response = await getMemberLevelPageApi({
+      const response = await getUserLevelPageApi({
         page,
         page_size: pageSize,
         filters,
@@ -90,40 +87,40 @@ export const useMemberLevelStore = defineStore('memberLevel', () => {
     }
   };
 
-  // 创建会员等级
-  const create = async (dto: MemberLevelDTO) => {
+  // 创建用户等级
+  const create = async (dto: UserLevelDTO) => {
     try {
-      await createMemberLevelApi(dto);
+      await createUserLevelApi(dto);
       return true;
     } catch {
       return false;
     }
   };
 
-  // 更新会员等级
-  const update = async (id: number, dto: MemberLevelDTO) => {
+  // 更新用户等级
+  const update = async (id: number, dto: UserLevelDTO) => {
     try {
-      await updateMemberLevelApi(id, dto);
+      await updateUserLevelApi(id, dto);
       return true;
     } catch {
       return false;
     }
   };
 
-  // 启停会员等级
-  const changeStatus = async (id: number, status: MemberLevelStatus) => {
+  // 启停用户等级
+  const changeStatus = async (id: number, status: UserLevelStatus) => {
     try {
-      await changeMemberLevelStatusApi(id, { value: status });
+      await changeUserLevelStatusApi(id, { value: status });
       return true;
     } catch {
       return false;
     }
   };
 
-  // 删除会员等级
-  const deleteMemberLevel = async (id: number) => {
+  // 删除用户等级
+  const deleteUserLevel = async (id: number) => {
     try {
-      await deleteMemberLevelApi(id);
+      await deleteUserLevelApi(id);
       return true;
     } catch {
       return false;
@@ -138,6 +135,6 @@ export const useMemberLevelStore = defineStore('memberLevel', () => {
     create,
     update,
     changeStatus,
-    delete: deleteMemberLevel,
+    delete: deleteUserLevel,
   };
 });

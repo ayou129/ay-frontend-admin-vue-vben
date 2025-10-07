@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import type { MemberLevelDTO, MemberLevelVO } from '#/types';
+import type {
+  UserLevelDTO,
+  UserLevelModel,
+} from '#/types/user-level';
 
 import { reactive } from 'vue';
 
@@ -9,15 +12,16 @@ import { Button, Popconfirm, Switch } from 'ant-design-vue';
 
 import { useVbenForm } from '#/adapter/form';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { useMemberLevelStore } from '#/store/member-level';
-import { FilterOperators, MemberLevelStatus, ValueTypes } from '#/types';
+import { useUserLevelStore } from '#/store/user-level';
+import { FilterOperators, ValueTypes } from '#/types';
+import { UserLevelStatus } from '#/types/user-level';
 
 defineOptions({
-  name: 'MemberLevelManagement',
+  name: 'UserLevelManagement',
 });
 
 // Store
-const memberLevelStore = useMemberLevelStore();
+const userLevelStore = useUserLevelStore();
 
 // 字段筛选配置
 const getFieldFilterConfig = (field: string, value: any) => {
@@ -125,7 +129,7 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
             sort_order: 'desc' as const,
           };
 
-          const response = await memberLevelStore.fetchPage(
+          const response = await userLevelStore.fetchPage(
             page.currentPage,
             page.pageSize,
             filters,
@@ -154,8 +158,8 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
         componentProps: {
           allowClear: true,
           options: [
-            { label: '禁用', value: MemberLevelStatus.Disabled },
-            { label: '启用', value: MemberLevelStatus.Enabled },
+            { label: '禁用', value: UserLevelStatus.Disabled },
+            { label: '启用', value: UserLevelStatus.Enabled },
           ],
           placeholder: '请选择状态',
         },
@@ -228,8 +232,8 @@ const memberLevelFormSchema = [
     component: 'Select',
     componentProps: {
       options: [
-        { label: '禁用', value: MemberLevelStatus.Disabled },
-        { label: '启用', value: MemberLevelStatus.Enabled },
+        { label: '禁用', value: UserLevelStatus.Disabled },
+        { label: '启用', value: UserLevelStatus.Enabled },
       ],
     },
     fieldName: 'status',
@@ -260,8 +264,8 @@ const [CreateModal, createModalApi] = useVbenModal({
       createModalApi.setState({ confirmLoading: true });
       try {
         const formData =
-          (await createFormApi.getValues()) as unknown as MemberLevelDTO;
-        const success = await memberLevelStore.create(formData);
+          (await createFormApi.getValues()) as unknown as UserLevelDTO;
+        const success = await userLevelStore.create(formData);
         if (success) {
           createModalApi.close();
           createFormApi.resetForm();
@@ -287,9 +291,9 @@ const [EditModal, editModalApi] = useVbenModal({
       editModalApi.setState({ confirmLoading: true });
       try {
         const formData =
-          (await editFormApi.getValues()) as unknown as MemberLevelDTO;
+          (await editFormApi.getValues()) as unknown as UserLevelDTO;
         const { id } = editModalApi.getData<{ id: number }>();
-        const success = await memberLevelStore.update(id, formData);
+        const success = await userLevelStore.update(id, formData);
         if (success) {
           editModalApi.close();
           gridApi.query();
@@ -315,16 +319,16 @@ const handleCreate = () => {
   createModalApi.open();
 };
 
-const handleEdit = (memberLevel: MemberLevelVO) => {
+const handleEdit = (memberLevel: UserLevelModel) => {
   editFormApi.setValues(memberLevel);
   editModalApi.setData({ id: memberLevel.id });
   editModalApi.open();
 };
 
-const handleStatusChange = async (id: number, status: MemberLevelStatus) => {
+const handleStatusChange = async (id: number, status: UserLevelStatus) => {
   statusLoadingState[id] = true;
   try {
-    const success = await memberLevelStore.changeStatus(id, status);
+    const success = await userLevelStore.changeStatus(id, status);
     if (success) {
       gridApi.query();
     }
@@ -336,7 +340,7 @@ const handleStatusChange = async (id: number, status: MemberLevelStatus) => {
 const handleDelete = async (id: number) => {
   deleteLoadingState[id] = true;
   try {
-    const success = await memberLevelStore.delete(id);
+    const success = await userLevelStore.delete(id);
     if (success) {
       gridApi.query();
     }
@@ -354,32 +358,32 @@ const handleDelete = async (id: number) => {
       </template>
 
       <template #point_range="{ row }">
-        {{ memberLevelStore.format_point_range(row.point_min, row.point_max) }}
+        {{ userLevelStore.format_point_range(row.point_min, row.point_max) }}
       </template>
 
       <template #discount_rate="{ row }">
-        {{ memberLevelStore.format_discount_rate(row.discount_rate) }}
+        {{ userLevelStore.format_discount_rate(row.discount_rate) }}
       </template>
 
       <template #status="{ row }">
         <div class="flex items-center gap-2">
           <Switch
-            :checked="row.status === MemberLevelStatus.Enabled"
+            :checked="row.status === UserLevelStatus.Enabled"
             :loading="statusLoadingState[row.id]"
             @change="
               (checked) =>
                 handleStatusChange(
                   row.id,
                   checked
-                    ? MemberLevelStatus.Enabled
-                    : MemberLevelStatus.Disabled,
+                    ? UserLevelStatus.Enabled
+                    : UserLevelStatus.Disabled,
                 )
             "
           />
           <span
-            :style="{ color: memberLevelStore.format_status(row.status).color }"
+            :style="{ color: userLevelStore.format_status(row.status).color }"
           >
-            {{ memberLevelStore.format_status(row.status).text }}
+            {{ userLevelStore.format_status(row.status).text }}
           </span>
         </div>
       </template>

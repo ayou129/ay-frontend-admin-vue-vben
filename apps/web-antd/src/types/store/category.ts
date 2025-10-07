@@ -1,5 +1,5 @@
-export interface Category {
-  children?: Category[];
+export interface CategoryModel {
+  children?: CategoryModel[];
   created_at: string;
   id: number;
   name: string;

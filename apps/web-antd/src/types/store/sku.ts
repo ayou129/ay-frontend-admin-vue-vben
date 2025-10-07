@@ -1,4 +1,4 @@
-import type { Resource } from '#/types/resource';
+import type { ResourceModel } from '#/types/resource';
 
 // SKU 属性值
 export interface SkuAttrValue {
@@ -39,7 +39,20 @@ export interface Sku {
   stock_count: number;
   attr_value?: Record<string, string>; // 如 {"颜色": "红色", "尺码": "XL"}
   allow_member_discount: number; // 是否允许会员折扣 0=否 1=是
-  main_image?: Resource; // SKU主图
+  main_image?: ResourceModel; // SKU主图
   created_at: string;
   updated_at: string;
+}
+
+// SKU 提交数据类型（用于创建和更新）
+export interface SkuDTO {
+  id?: number; // 编辑时需要传递
+  spu_id?: number; // 编辑时需要传递
+  name: string;
+  code: string;
+  price: number | string;
+  stock_count: number;
+  attr_value?: Record<string, string>;
+  allow_member_discount: number;
+  main_image_id?: number;
 }

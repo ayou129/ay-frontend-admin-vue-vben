@@ -64,11 +64,11 @@ const selectedResourceIds = ref<number[]>([]);
 
 // 预览相关
 const previewVisible = ref(false);
-const previewResource = ref<Resource>();
+const previewResource = ref<ResourceModel>();
 
 // 移动相关
 const moveModalVisible = ref(false);
-const moveResource = ref<Resource>();
+const moveResource = ref<ResourceModel>();
 
 // 类型选项
 const typeOptions = [

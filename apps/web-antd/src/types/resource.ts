@@ -6,14 +6,48 @@ export enum ResourceType {
   Video = 3, // 视频
 }
 
+export const resourceTypeTextMap: Record<ResourceType, string> = {
+  [ResourceType.Image]: '图片',
+  [ResourceType.Audio]: '音频',
+  [ResourceType.Video]: '视频',
+  [ResourceType.Document]: '文档',
+  [ResourceType.Archive]: '压缩包',
+};
+
+export const resourceTypeColorMap: Record<ResourceType, string> = {
+  [ResourceType.Image]: 'green',
+  [ResourceType.Audio]: 'blue',
+  [ResourceType.Video]: 'purple',
+  [ResourceType.Document]: 'orange',
+  [ResourceType.Archive]: 'gray',
+};
+
 export enum ResourceUserVisibility {
   Friends = 1, // 好友可见
   Private = 0, // 仅自己
   Public = 2, // 公开
 }
 
-// 资源类型
-export interface Resource {
+export const resourceUserVisibilityTextMap: Record<
+  ResourceUserVisibility,
+  string
+> = {
+  [ResourceUserVisibility.Private]: '仅自己',
+  [ResourceUserVisibility.Friends]: '好友可见',
+  [ResourceUserVisibility.Public]: '公开',
+};
+
+export const resourceUserVisibilityColorMap: Record<
+  ResourceUserVisibility,
+  string
+> = {
+  [ResourceUserVisibility.Private]: 'red',
+  [ResourceUserVisibility.Friends]: 'orange',
+  [ResourceUserVisibility.Public]: 'green',
+};
+
+// 资源模型
+export interface ResourceModel {
   created_at: string;
   file_ext: string;
   file_md5: string;
@@ -21,7 +55,7 @@ export interface Resource {
   file_path: string;
   file_size: number;
   file_slug: string;
-  folder?: ResourceFolder;
+  folder?: ResourceFolderModel;
   folder_id: number;
   formatted_size?: string; // 格式化后的文件大小
   id: number;
@@ -33,14 +67,14 @@ export interface Resource {
   user_visibility: ResourceUserVisibility;
 }
 
-// 资源文件夹类型
-export interface ResourceFolder {
+// 资源文件夹模型
+export interface ResourceFolderModel {
   id: number;
   name: string;
   parent_id: number;
   created_at: string;
   updated_at: string;
-  children?: ResourceFolder[]; // 子文件夹列表
+  children?: ResourceFolderModel[]; // 子文件夹列表
 }
 
 // 资源文件夹更新参数

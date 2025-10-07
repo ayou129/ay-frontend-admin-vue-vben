@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { UserVO } from '#/types';
+import type { UserModel } from '#/types';
 
 import { Page, useVbenModal } from '@vben/common-ui';
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ResourceFolder } from '#/types/resource';
+import type { ResourceFolderModel } from '#/types/resource';
 
 import { ref, watch } from 'vue';
 
@@ -7,13 +7,13 @@ import { message, Modal } from 'ant-design-vue';
 
 import { useVbenForm, z } from '#/adapter/form';
 import {
-  createResourceFolder,
-  updateResourceFolder,
+  createResourceFolderModel,
+  updateResourceFolderModel,
 } from '#/api/resource/resource';
 
 interface Props {
   open: boolean;
-  editData?: ResourceFolder;
+  editData?: ResourceFolderModel;
   parentId?: number;
 }
 
@@ -68,14 +68,14 @@ const handleConfirm = async () => {
 
   try {
     if (isEdit.value && props.editData) {
-      await updateResourceFolder(props.editData.id, values);
+      await updateResourceFolderModel(props.editData.id, values);
       message.success('更新目录成功');
     } else {
       const data: any = { ...values };
       if (props.parentId !== undefined) {
         data.parent_id = props.parentId;
       }
-      await createResourceFolder(data);
+      await createResourceFolderModel(data);
       message.success('创建目录成功');
     }
     emit('success');

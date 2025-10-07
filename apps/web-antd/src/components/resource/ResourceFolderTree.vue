@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TreeProps } from 'ant-design-vue';
 
-import type { ResourceFolder } from '#/types/resource';
+import type { ResourceFolderModel } from '#/types/resource';
 
 import { computed, onMounted, ref } from 'vue';
 
@@ -39,12 +39,12 @@ interface Emits {
 }
 
 // 目录树数据
-const folderTree = ref<ResourceFolder[]>([]);
+const folderTree = ref<ResourceFolderModel[]>([]);
 const loading = ref(false);
 
 // 转换为 Tree 组件所需的格式
 const treeData = computed<TreeProps['treeData']>(() => {
-  const transform = (folders: ResourceFolder[]): any[] => {
+  const transform = (folders: ResourceFolderModel[]): any[] => {
     return folders.map((folder) => ({
       key: folder.id,
       title: folder.name,
@@ -107,14 +107,14 @@ onMounted(() => {
 
 // 目录表单弹窗
 const folderFormVisible = ref(false);
-const editingFolder = ref<ResourceFolder>();
+const editingFolder = ref<ResourceFolderModel>();
 const parentFolderId = ref<number>();
 
 // 在树形结构中查找目录
 const findFolder = (
-  folders: ResourceFolder[],
+  folders: ResourceFolderModel[],
   id: number | string,
-): ResourceFolder | undefined => {
+): ResourceFolderModel | undefined => {
   for (const folder of folders) {
     if (folder.id === id) return folder;
     if (folder.children) {

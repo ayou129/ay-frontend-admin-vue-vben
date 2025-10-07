@@ -22,11 +22,6 @@ export {
 // API 相关类型
 export type * from './api';
 
-// 会员等级相关类型
-export type * from './member-level';
-
-// 会员等级相关枚举（需要作为值导出）
-export { MemberLevelStatus } from './member-level';
 // 资源相关类型
 export type * from './resource';
 // Store 相关类型

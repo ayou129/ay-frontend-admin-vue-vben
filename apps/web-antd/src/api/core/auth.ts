@@ -1,4 +1,4 @@
-import type { UserVO } from '#/types';
+import type { UserModel } from '#/types';
 
 import { http } from '#/api/request';
 

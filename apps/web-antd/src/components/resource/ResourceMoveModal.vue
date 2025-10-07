@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import type { Key } from 'ant-design-vue/es/_util/type';
 
-import type { Resource, ResourceFolder } from '#/types/resource';
+import type { ResourceModel, ResourceFolderModel } from '#/types/resource';
 
 import { ref, watch } from 'vue';
 
 import { message, Modal, Tree } from 'ant-design-vue';
 
 import {
-  getResourceFolderTree,
+  getResourceFolderModelTree,
   moveResourceFile,
 } from '#/api/resource/resource';
 
@@ -26,7 +26,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 // 目录树数据
-const folderTree = ref<ResourceFolder[]>([]);
+const folderTree = ref<ResourceFolderModel[]>([]);
 const loading = ref(false);
 const selectedFolderId = ref<Key[]>([]);
 
@@ -37,11 +37,11 @@ const treeData = ref<any[]>([]);
 const loadFolderTree = async () => {
   try {
     loading.value = true;
-    const response = await getResourceFolderTree();
+    const response = await getResourceFolderModelTree();
     folderTree.value = response.list;
 
     // 转换为树形数据
-    const transform = (folders: ResourceFolder[]): any[] => {
+    const transform = (folders: ResourceFolderModel[]): any[] => {
       return folders.map((folder) => ({
         key: folder.id,
         title: folder.name,
