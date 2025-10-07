@@ -1,14 +1,30 @@
 <script setup lang="ts">
-import type { Sku } from '#/types/store/sku';
+import type { Sku, SkuAttr } from '#/types/store/sku';
 
-import { ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 import { createIconifyIcon } from '@vben/icons';
 
-import { Button, Image, InputNumber, Table } from 'ant-design-vue';
+import {
+  Alert,
+  Button,
+  Dropdown,
+  Image,
+  InputNumber,
+  Menu,
+  Table,
+} from 'ant-design-vue';
 
+import { getSkuAttrList } from '#/api/store/spu';
 import { openResourcePicker } from '#/components/resource';
 import { ResourceType } from '#/types/resource';
+
+// Props
+interface Props {
+  categoryId?: number;
+}
+
+const props = defineProps<Props>();
 
 // 创建图标
 const PlusIcon = createIconifyIcon('carbon:add');
@@ -16,6 +32,13 @@ const DeleteIcon = createIconifyIcon('carbon:trash-can');
 
 // SKU 列表
 const skuList = ref<Sku[]>([]);
+
+// 当前分类的属性列表
+const attrList = ref<SkuAttr[]>([]);
+const combinations = ref<string[]>([]);
+
+// 加载状态
+const loading = ref(false);
 
 // 表格列定义
 const columns = [
@@ -30,12 +53,6 @@ const columns = [
     dataIndex: 'code',
     key: 'code',
     width: 120,
-  },
-  {
-    title: '规格',
-    dataIndex: 'specification',
-    key: 'specification',
-    width: 150,
   },
   {
     title: '价格',
@@ -68,15 +85,65 @@ const columns = [
   },
 ];
 
-// 添加 SKU
-const handleAddSku = () => {
+// 计算可用的规格组合（未添加的）
+const availableCombinations = computed(() => {
+  const existingSpecs = new Set(
+    skuList.value
+      .map((sku) =>
+        sku.attr_value ? Object.values(sku.attr_value).join('-') : '',
+      )
+      .filter(Boolean),
+  );
+  return combinations.value.filter((c) => !existingSpecs.has(c));
+});
+
+// 是否显示添加按钮
+const showAddButton = computed(() => availableCombinations.value.length > 0);
+
+// 获取 SKU 属性列表
+const fetchSkuAttrList = async (categoryId: number) => {
+  if (!categoryId) {
+    attrList.value = [];
+    combinations.value = [];
+    return;
+  }
+
+  try {
+    loading.value = true;
+    const response = await getSkuAttrList(categoryId);
+    attrList.value = response.attrs || [];
+    combinations.value = response.combinations || [];
+  } catch (error) {
+    console.error('获取 SKU 属性列表失败:', error);
+    attrList.value = [];
+    combinations.value = [];
+  } finally {
+    loading.value = false;
+  }
+};
+
+// 解析组合字符串为 attr_value 对象
+const parseCombination = (combination: string): Record<string, string> => {
+  const values = combination.split('-');
+  const attrValue: Record<string, string> = {};
+  attrList.value.forEach((attr, index) => {
+    if (values[index]) {
+      attrValue[attr.name] = values[index];
+    }
+  });
+  return attrValue;
+};
+
+// 添加 SKU（通过选择组合）
+const handleAddSkuByCombination = (combination: string) => {
+  const attrValue = parseCombination(combination);
   const newSku: any = {
     id: Date.now(), // 临时ID
-    name: '',
+    name: combination, // name 就是组合字符串，如 "红色-XL"
     code: '',
     price: '0',
     stock_count: 0,
-    specification: '',
+    attr_value: attrValue, // JSON 版本，如 {"颜色": "红色", "尺码": "XL"}
     allow_member_discount: 1,
     main_image: undefined,
   };
@@ -111,6 +178,20 @@ const handleRemoveImage = (index: number) => {
   }
 };
 
+// 监听 categoryId 变化
+watch(
+  () => props.categoryId,
+  (newCategoryId) => {
+    if (newCategoryId) {
+      fetchSkuAttrList(newCategoryId);
+    } else {
+      attrList.value = [];
+      combinations.value = [];
+    }
+  },
+  { immediate: true },
+);
+
 // 暴露方法供父组件调用
 defineExpose({
   getSkuList: () => skuList.value,
@@ -122,18 +203,81 @@ defineExpose({
 
 <template>
   <div class="sku-management">
-    <div class="mb-4 flex justify-end">
-      <Button type="primary" @click="handleAddSku">
-        <template #icon>
-          <PlusIcon class="size-4" />
-        </template>
-        添加 SKU
-      </Button>
+    <!-- 顶部提示和按钮 -->
+    <div class="mb-3 flex items-center justify-between gap-4">
+      <!-- 左侧提示 -->
+      <Alert
+        message="修改商品分类后，SKU 属性列表会自动更新，但不会删除已存在的其他分类的 SKU 数据。"
+        type="info"
+        show-icon
+        class="flex-1"
+        :style="{ fontSize: '12px' }"
+      />
+
+      <!-- 右侧按钮 -->
+      <div class="flex-shrink-0">
+        <Dropdown v-if="showAddButton" :trigger="['click']">
+          <Button type="primary">
+            <template #icon>
+              <PlusIcon class="size-4" />
+            </template>
+            添加 SKU
+          </Button>
+          <template #overlay>
+            <Menu>
+              <Menu.Item
+                v-for="combination in availableCombinations"
+                :key="combination"
+                @click="handleAddSkuByCombination(combination)"
+              >
+                {{ combination }}
+              </Menu.Item>
+            </Menu>
+          </template>
+        </Dropdown>
+        <span v-else class="text-sm text-gray-400">
+          {{
+            attrList.length === 0
+              ? '请先在基础信息中选择商品分类'
+              : '所有规格组合已添加完毕'
+          }}
+        </span>
+      </div>
     </div>
 
+    <!-- 当前分类的属性展示 -->
+    <div
+      v-if="attrList.length > 0"
+      class="mb-4 rounded border border-gray-200 bg-gray-50 p-3"
+    >
+      <div class="mb-2 font-medium text-gray-700">当前分类规格属性：</div>
+      <div class="space-y-2">
+        <div
+          v-for="attr in attrList"
+          :key="attr.id"
+          class="flex items-start gap-2"
+        >
+          <span class="min-w-20 font-medium text-gray-600">
+            {{ attr.name }}:
+          </span>
+          <div class="flex flex-wrap gap-2">
+            <span
+              v-for="value in attr.values"
+              :key="value.id"
+              class="rounded bg-blue-100 px-2 py-1 text-sm text-blue-700"
+            >
+              {{ value.value }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SKU 表格 -->
     <Table
       :columns="columns"
       :data-source="skuList"
+      :loading="loading"
       :pagination="false"
       :scroll="{ x: 1000 }"
       row-key="id"
@@ -153,15 +297,6 @@ defineExpose({
           <a-input
             v-model:value="record.code"
             placeholder="请输入SKU编码"
-            size="small"
-          />
-        </template>
-
-        <!-- 规格 -->
-        <template v-else-if="column.key === 'specification'">
-          <a-input
-            v-model:value="record.specification"
-            placeholder="如: 红色/L"
             size="small"
           />
         </template>

@@ -169,6 +169,21 @@ const [BasicInfoForm, basicInfoFormApi] = useVbenForm({
 // ===================
 const skuManagementRef = ref();
 
+// 当前选中的分类 ID
+const currentCategoryId = ref<number | undefined>();
+
+// 监听表单的 category_id 变化
+watch(
+  [
+    () => basicInfoFormApi.getValues().category_id,
+    () => props.editData?.category_id,
+  ],
+  ([formCategoryId, editCategoryId]) => {
+    currentCategoryId.value = formCategoryId || editCategoryId;
+  },
+  { immediate: true, deep: true },
+);
+
 // ===================
 // Tab 3: 商品详情
 // ===================
@@ -340,7 +355,10 @@ defineExpose({
       <!-- Tab 2: 库存管理 -->
       <Tabs.TabPane key="stock" tab="库存管理">
         <div class="tab-content-wrapper">
-          <SkuManagement ref="skuManagementRef" />
+          <SkuManagement
+            ref="skuManagementRef"
+            :category-id="currentCategoryId"
+          />
         </div>
       </Tabs.TabPane>
 
@@ -376,6 +394,7 @@ defineExpose({
   display: flex;
   flex-direction: column;
   height: 600px;
+  overflow: hidden;
 }
 
 .spu-form-tabs :deep(.ant-tabs) {
@@ -389,13 +408,15 @@ defineExpose({
 .spu-form-tabs :deep(.ant-tabs-nav) {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 100;
   margin-bottom: 0;
   background-color: white;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 5%);
 }
 
 .spu-form-tabs :deep(.ant-tabs-content-holder) {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
 }
 
@@ -403,7 +424,12 @@ defineExpose({
   height: 100%;
 }
 
+.spu-form-tabs :deep(.ant-tabs-tabpane) {
+  height: 100%;
+}
+
 .tab-content-wrapper {
+  min-height: 100%;
   padding: 16px;
 }
 </style>
