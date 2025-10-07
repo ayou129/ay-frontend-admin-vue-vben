@@ -1,4 +1,4 @@
-import type { CategoryModel } from '#/types/store/category';
+import type { CategoryModel } from '#/types';
 
 import { apiPrefix } from '#/api/config';
 import { http } from '#/api/request';
@@ -7,14 +7,16 @@ import { http } from '#/api/request';
  * 获取分类树
  */
 export async function getCategoryTree() {
-  return http.get<{ list: Category[] }>(`${apiPrefix}/store/categories/tree`);
+  return http.get<{ list: CategoryModel[] }>(
+    `${apiPrefix}/store/categories/tree`,
+  );
 }
 
 /**
  * 获取分类详情
  */
 export async function getCategoryDetail(id: number) {
-  return http.get<Category>(`${apiPrefix}/store/categories/${id}`);
+  return http.get<CategoryModel>(`${apiPrefix}/store/categories/${id}`);
 }
 
 /**
@@ -24,7 +26,7 @@ export async function createCategory(data: {
   name: string;
   parent_id?: number;
 }) {
-  return http.post<Category>(`${apiPrefix}/store/categories`, data);
+  return http.post<CategoryModel>(`${apiPrefix}/store/categories`, data);
 }
 
 /**
@@ -37,7 +39,7 @@ export async function updateCategory(
     parent_id?: number;
   },
 ) {
-  return http.put<Category>(`${apiPrefix}/store/categories/${id}`, data);
+  return http.put<CategoryModel>(`${apiPrefix}/store/categories/${id}`, data);
 }
 
 /**

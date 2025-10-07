@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import type { OnActionClickParams, VxeGridProps } from '#/adapter/vxe-table';
-import type { CategoryModel } from '#/types/store/category';
 
 import { nextTick, ref } from 'vue';
 

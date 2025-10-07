@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { SpuModel } from '#/types/store/spu';
-
 import { ref } from 'vue';
 
 import { Page, useVbenModal } from '@vben/common-ui';

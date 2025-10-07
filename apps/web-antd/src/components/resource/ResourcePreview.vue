@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { ResourceModel } from '#/types/resource';
-
 import { computed } from 'vue';
 
 import { Modal } from 'ant-design-vue';

@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import type { VbenFormSchema } from '#/adapter/form';
-import type { CategoryModel } from '#/types/store/category';
 
 import { watch } from 'vue';
 
