@@ -60,7 +60,7 @@ const handleAddSpu = () => {
 };
 
 // 编辑商品
-const handleEditSpu = (row: Spu) => {
+const handleEditSpu = (row: SpuModel) => {
   editData.value = row;
   drawerTitle.value = '编辑商品';
   modalApi.open();

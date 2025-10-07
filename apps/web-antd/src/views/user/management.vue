@@ -275,7 +275,7 @@ const handleCreate = () => {
   createModalApi.open();
 };
 
-const handleEdit = (user: UserVO) => {
+const handleEdit = (user: UserModel) => {
   editFormApi.setValues(user);
   editModalApi.setData({ id: user.id });
   editModalApi.open();

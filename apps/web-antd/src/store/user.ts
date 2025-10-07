@@ -1,4 +1,8 @@
-import type { RequestFilterQuery, RequestFilterSortOption } from '#/types';
+import type {
+  RequestFilterQuery,
+  RequestFilterSortOption,
+  UserModel,
+} from '#/types';
 
 import { defineStore } from 'pinia';
 

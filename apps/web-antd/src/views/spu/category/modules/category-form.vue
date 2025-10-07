@@ -10,7 +10,7 @@ import { getCategoryTree } from '#/api/store/category';
 
 interface Props {
   editData?: {
-    category?: Category;
+    category?: CategoryModel;
     onSuccess?: (data: any) => Promise<void>;
     parent_id?: number;
   };

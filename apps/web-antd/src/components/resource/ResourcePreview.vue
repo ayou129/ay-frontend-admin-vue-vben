@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { ResourceModel } from '#/types/resource';
+
 import { computed } from 'vue';
 
 import { Modal } from 'ant-design-vue';
@@ -7,7 +9,7 @@ import { ResourceType } from '#/types/resource';
 
 interface Props {
   open: boolean;
-  resource?: Resource;
+  resource?: ResourceModel;
 }
 
 interface Emits {

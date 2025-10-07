@@ -24,7 +24,7 @@ interface Props {
 
 interface Emits {
   add: [];
-  edit: [row: Spu];
+  edit: [row: SpuModel];
 }
 
 const props = defineProps<Props>();
@@ -101,7 +101,7 @@ const buildFilters = () => {
 };
 
 // 表格配置
-const gridOptions: VxeGridProps<Spu> = {
+const gridOptions: VxeGridProps<SpuModel> = {
   columns: [
     { type: 'checkbox', width: 50 },
     { field: 'id', title: 'ID', width: 80 },
@@ -194,12 +194,12 @@ const handleExport = () => {
 };
 
 // 编辑商品
-const handleEdit = (row: Spu) => {
+const handleEdit = (row: SpuModel) => {
   emit('edit', row);
 };
 
 // 删除商品
-const handleDelete = async (row: Spu) => {
+const handleDelete = async (row: SpuModel) => {
   try {
     await deleteSpu(row.id);
     message.success(`删除商品: ${row.name} 成功`);

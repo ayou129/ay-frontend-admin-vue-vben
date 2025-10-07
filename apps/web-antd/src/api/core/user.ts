@@ -1,3 +1,5 @@
+import type { PhpPageResponse, RequestGetPageQuery, UserModel } from '#/types';
+
 import { http } from '#/api/request';
 
 import { apiPrefix } from '../config';

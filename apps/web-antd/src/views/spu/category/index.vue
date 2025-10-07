@@ -73,7 +73,7 @@ const [FormModal, modalApi] = useVbenModal({
   },
 });
 
-const gridOptions: VxeGridProps<Category> = {
+const gridOptions: VxeGridProps<CategoryModel> = {
   columns: [
     {
       align: 'left',
@@ -154,15 +154,15 @@ const gridOptions: VxeGridProps<Category> = {
 
 // 树形数据过滤
 function filterTreeData(
-  data: Category[],
+  data: CategoryModel[],
   params: { keyword: string },
-): Category[] {
-  const result: Category[] = [];
+): CategoryModel[] {
+  const result: CategoryModel[] = [];
 
   for (const item of data) {
     const matchKeyword = !params.keyword || item.name.includes(params.keyword);
 
-    const filteredChildren: Category[] = item.children
+    const filteredChildren: CategoryModel[] = item.children
       ? filterTreeData(item.children, params)
       : [];
 
@@ -200,7 +200,7 @@ async function toggleExpandAll() {
   }
 }
 
-function onActionClick({ code, row }: OnActionClickParams<Category>) {
+function onActionClick({ code, row }: OnActionClickParams<CategoryModel>) {
   switch (code) {
     case 'append': {
       onAppend(row);
@@ -233,7 +233,7 @@ function onCreate() {
   modalApi.open();
 }
 
-function onEdit(row: Category) {
+function onEdit(row: CategoryModel) {
   editData.value = {
     category: row,
     onSuccess: async (data: { name?: string; parent_id?: number }) => {
@@ -246,7 +246,7 @@ function onEdit(row: Category) {
   modalApi.open();
 }
 
-function onAppend(row: Category) {
+function onAppend(row: CategoryModel) {
   editData.value = {
     parent_id: row.id,
     onSuccess: async (data: { name: string; parent_id?: number }) => {
@@ -259,7 +259,7 @@ function onAppend(row: Category) {
   modalApi.open();
 }
 
-async function onDelete(row: Category) {
+async function onDelete(row: CategoryModel) {
   try {
     await deleteCategory(row.id);
     message.success(`删除分类: ${row.name} 成功`);

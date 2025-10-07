@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { FormInstance, Rule } from 'ant-design-vue/es/form';
 
+import type { ResourceModel } from '#/types/resource';
+import type { CategoryModel } from '#/types/store/category';
+import type { SpuModel } from '#/types/store/spu';
+
 import { computed, ref, watch } from 'vue';
 
 import { Form, Input, message, Select, Tabs } from 'ant-design-vue';
@@ -16,7 +20,7 @@ import SpuResourceSelector from './SpuResourceSelector.vue';
 
 // Props定义
 interface Props {
-  editData?: null | Spu;
+  editData?: null | SpuModel;
 }
 
 const props = defineProps<Props>();
@@ -55,7 +59,7 @@ const basicFormState = ref({
   type: undefined as number | undefined,
   status: undefined as number | undefined,
   category_id: undefined as number | undefined,
-  carousels: [] as Resource[],
+  carousels: [] as ResourceModel[],
   valid_type: undefined as number | undefined,
   valid_value: '',
 });
@@ -76,7 +80,7 @@ const categoryOptions = ref<Array<{ label: string; value: number }>>([]);
 const loadCategoryTree = async () => {
   const response = await getCategoryTree();
   const flattenCategories = (
-    categories: Category[],
+    categories: CategoryModel[],
   ): Array<{ label: string; value: number }> => {
     let result: Array<{ label: string; value: number }> = [];
     for (const category of categories) {
@@ -119,7 +123,7 @@ const detailContent = ref('');
 // ===================
 
 // 设置表单值（编辑时）
-const setFormValues = async (data: Spu) => {
+const setFormValues = async (data: SpuModel) => {
   basicFormState.value = {
     name: data.name || '',
     type: data.type === undefined ? undefined : Number(data.type),

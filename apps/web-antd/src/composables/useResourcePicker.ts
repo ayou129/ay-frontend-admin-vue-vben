@@ -1,4 +1,4 @@
-import type { ResourceType } from '#/types/resource';
+import type { ResourceModel, ResourceType } from '#/types/resource';
 
 import { createVNode, render } from 'vue';
 
@@ -30,7 +30,7 @@ export interface ResourcePickerOptions {
  */
 export function openResourcePicker(
   options: ResourcePickerOptions = {},
-): Promise<Resource[]> {
+): Promise<ResourceModel[]> {
   return new Promise((resolve) => {
     // 创建容器
     const container = document.createElement('div');
