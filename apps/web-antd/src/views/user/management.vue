@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { UserModel } from '#/types';
+
 import { Page, useVbenModal } from '@vben/common-ui';
 
 import { Button, Popconfirm, Tag } from 'ant-design-vue';
@@ -225,7 +227,7 @@ const [CreateModal, createModalApi] = useVbenModal({
     const valid = await createFormApi.validate();
     if (valid) {
       const formData =
-        (await createFormApi.getValues()) as unknown as Partial<UserVO>;
+        (await createFormApi.getValues()) as unknown as Partial<UserModel>;
       const success = await userStore.create(formData);
       if (success) {
         createModalApi.close();
@@ -249,7 +251,7 @@ const [EditModal, editModalApi] = useVbenModal({
     const valid = await editFormApi.validate();
     if (valid) {
       const formData =
-        (await editFormApi.getValues()) as unknown as Partial<UserVO>;
+        (await editFormApi.getValues()) as unknown as Partial<UserModel>;
       const { id } = editModalApi.getData<{ id: number }>();
       const success = await userStore.update(id, formData);
       if (success) {

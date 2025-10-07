@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { SpuModel } from '#/types/store/spu';
+
 import { ref } from 'vue';
 
 import { Page, useVbenModal } from '@vben/common-ui';
@@ -11,7 +13,7 @@ import SpuTable from './components/spu-table.vue';
 const searchParams = ref({});
 
 // 当前编辑的商品数据
-const editData = ref<null | Spu>(null);
+const editData = ref<null | SpuModel>(null);
 
 // 抽屉标题
 const drawerTitle = ref('商品信息');

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { VxeGridProps } from '#/adapter/vxe-table';
-import type { SpuOrderType, SpuStatus } from '#/types/store/spu';
+import type { SpuModel, SpuOrderType, SpuStatus } from '#/types/store/spu';
 import type { RequestGetPageQuery } from '#/utils/filter';
 
 import { ref } from 'vue';
