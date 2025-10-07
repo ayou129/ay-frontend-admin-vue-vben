@@ -101,7 +101,6 @@ watch(
       if (props.editData) {
         formApi.setValues({
           name: props.editData.name,
-          description: props.editData.description || '',
         });
       } else {
         formApi.resetForm();

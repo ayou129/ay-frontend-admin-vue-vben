@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { Key } from 'ant-design-vue/es/_util/type';
+
 import type { Resource, ResourceFolder } from '#/types/resource';
 
 import { ref, watch } from 'vue';
@@ -26,7 +28,7 @@ const emit = defineEmits<Emits>();
 // 目录树数据
 const folderTree = ref<ResourceFolder[]>([]);
 const loading = ref(false);
-const selectedFolderId = ref<number>();
+const selectedFolderId = ref<Key[]>([]);
 
 // 转换为 Tree 组件所需的格式
 const treeData = ref<any[]>([]);
@@ -55,21 +57,22 @@ const loadFolderTree = async () => {
 };
 
 // 选择目录
-const onSelect = (keys: number[]) => {
-  if (keys.length > 0) {
-    selectedFolderId.value = keys[0];
-  }
+const onSelect = (keys: Key[]) => {
+  selectedFolderId.value = keys;
 };
 
 // 确认移动
 const handleConfirm = async () => {
-  if (!props.resource || selectedFolderId.value === undefined) {
+  if (!props.resource || selectedFolderId.value.length === 0) {
     message.error('请选择目标目录');
     return;
   }
 
   try {
-    await moveResourceFile(props.resource.id, selectedFolderId.value);
+    await moveResourceFile(
+      props.resource.id,
+      Number(selectedFolderId.value[0]),
+    );
     message.success('移动文件成功');
     emit('success');
     handleCancel();
@@ -82,7 +85,7 @@ const handleConfirm = async () => {
 // 取消
 const handleCancel = () => {
   emit('update:open', false);
-  selectedFolderId.value = undefined;
+  selectedFolderId.value = [];
 };
 
 // 监听弹窗打开
@@ -91,7 +94,7 @@ watch(
   (isOpen) => {
     if (isOpen) {
       loadFolderTree();
-      selectedFolderId.value = undefined;
+      selectedFolderId.value = [];
     }
   },
 );

@@ -16,7 +16,7 @@ function useAccess() {
    * @param roles
    */
   function hasAccessByRoles(roles: string[]) {
-    const userRoleSet = new Set(userStore.userRoles);
+    const userRoleSet = new Set(userStore.profile?.roles);
     const intersection = roles.filter((item) => userRoleSet.has(item));
     return intersection.length > 0;
   }

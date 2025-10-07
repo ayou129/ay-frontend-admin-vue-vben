@@ -51,6 +51,11 @@ export const useUserStore = defineStore('core-user', {
       this.roles = roles;
     },
   },
+  getters: {
+    userInfo(): BasicSysUser | null {
+      return this.profile;
+    },
+  },
   state: (): AccessState => ({
     profile: null,
     roles: [],
