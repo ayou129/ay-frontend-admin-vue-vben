@@ -77,17 +77,18 @@ export interface ResourceFolderModel {
   children?: ResourceFolderModel[]; // 子文件夹列表
 }
 
-// 资源文件夹更新参数
-export interface ResourceFolderUpdateParams {
-  id: number;
+// 创建资源文件夹 DTO
+export interface CreateResourceFolderDTO {
   name: string;
-  parent_id: number;
+  parent_id?: number;
+  description?: string;
 }
 
-// 创建资源请求
-export interface ResourceCreateParams {
-  files: File[];
-  folder_id: number;
+// 更新资源文件夹 DTO
+export interface UpdateResourceFolderDTO {
+  name?: string;
+  parent_id?: number;
+  description?: string;
 }
 
 export enum ResourceRelationType {

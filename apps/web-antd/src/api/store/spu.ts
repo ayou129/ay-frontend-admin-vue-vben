@@ -1,6 +1,10 @@
 import type { PhpPageResponse } from '#/types';
-import type { SkuAttrListResponse, SkuDTO } from '#/types/store/sku';
-import type { SpuModel } from '#/types/store/spu';
+import type { SkuAttrListResponse } from '#/types/store/sku';
+import type {
+  CreateSpuDTO,
+  SpuModel,
+  UpdateSpuDTO,
+} from '#/types/store/spu';
 import type { RequestGetPageQuery } from '#/utils/filter';
 
 import { apiPrefix } from '#/api/config';
@@ -32,37 +36,14 @@ export async function getSpuDetail(id: number) {
 /**
  * 创建商品
  */
-export async function createSpu(data: {
-  carousel_ids?: number[];
-  category_id: number;
-  detail?: string;
-  name: string;
-  skus?: SkuDTO[];
-  status: number;
-  type: number;
-  valid_type?: number;
-  valid_value?: string;
-}) {
+export async function createSpu(data: CreateSpuDTO) {
   return http.post<SpuModel>(`${apiPrefix}/store/spu`, data);
 }
 
 /**
  * 更新商品
  */
-export async function updateSpu(
-  id: number,
-  data: {
-    carousel_ids?: number[];
-    category_id?: number;
-    detail?: string;
-    name?: string;
-    skus?: SkuDTO[];
-    status?: number;
-    type?: number;
-    valid_type?: number;
-    valid_value?: string;
-  },
-) {
+export async function updateSpu(id: number, data: UpdateSpuDTO) {
   return http.put<SpuModel>(`${apiPrefix}/store/spu/${id}`, data);
 }
 

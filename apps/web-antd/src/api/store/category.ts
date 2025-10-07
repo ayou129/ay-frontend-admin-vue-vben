@@ -1,4 +1,8 @@
-import type { CategoryModel } from '#/types';
+import type {
+  CategoryModel,
+  CreateCategoryDTO,
+  UpdateCategoryDTO,
+} from '#/types/store/category';
 
 import { apiPrefix } from '#/api/config';
 import { http } from '#/api/request';
@@ -22,23 +26,14 @@ export async function getCategoryDetail(id: number) {
 /**
  * 创建分类
  */
-export async function createCategory(data: {
-  name: string;
-  parent_id?: number;
-}) {
+export async function createCategory(data: CreateCategoryDTO) {
   return http.post<CategoryModel>(`${apiPrefix}/store/categories`, data);
 }
 
 /**
  * 更新分类
  */
-export async function updateCategory(
-  id: number,
-  data: {
-    name?: string;
-    parent_id?: number;
-  },
-) {
+export async function updateCategory(id: number, data: UpdateCategoryDTO) {
   return http.put<CategoryModel>(`${apiPrefix}/store/categories/${id}`, data);
 }
 

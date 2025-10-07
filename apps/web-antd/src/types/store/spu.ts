@@ -65,3 +65,29 @@ export interface SpuModel {
   skus?: Sku[];
   carousels?: ResourceModel[]; // 商品轮播图列表
 }
+
+// 创建商品 DTO
+export interface CreateSpuDTO {
+  category_id: number;
+  name: string;
+  status: number;
+  type: number;
+  carousel_ids?: number[];
+  detail?: string;
+  skus?: any[]; // SKU 数据，根据实际业务需要调整类型
+  valid_type?: number;
+  valid_value?: string;
+}
+
+// 更新商品 DTO
+export interface UpdateSpuDTO {
+  category_id?: number;
+  name?: string;
+  status?: number;
+  type?: number;
+  carousel_ids?: number[];
+  detail?: string;
+  skus?: any[]; // SKU 数据，根据实际业务需要调整类型
+  valid_type?: number;
+  valid_value?: string;
+}

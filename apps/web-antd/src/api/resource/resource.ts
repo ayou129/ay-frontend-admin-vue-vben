@@ -1,5 +1,10 @@
 import type { PhpPageResponse } from '#/types';
-import type { ResourceFolderModel, ResourceModel } from '#/types/resource';
+import type {
+  CreateResourceFolderDTO,
+  ResourceFolderModel,
+  ResourceModel,
+  UpdateResourceFolderDTO,
+} from '#/types/resource';
 import type { RequestGetPageQuery } from '#/utils/filter';
 
 import { apiPrefix } from '#/api/config';
@@ -81,11 +86,7 @@ export async function moveResourceFile(id: number, folderId: number) {
 /**
  * 创建资源目录
  */
-export async function createResourceFolder(data: {
-  description?: string;
-  name: string;
-  parent_id?: number;
-}) {
+export async function createResourceFolder(data: CreateResourceFolderDTO) {
   return http.post<ResourceFolderModel>(`${apiPrefix}/resource/folders`, data);
 }
 
@@ -94,10 +95,7 @@ export async function createResourceFolder(data: {
  */
 export async function updateResourceFolder(
   id: number,
-  data: {
-    description?: string;
-    name?: string;
-  },
+  data: UpdateResourceFolderDTO,
 ) {
   return http.put<ResourceFolderModel>(
     `${apiPrefix}/resource/folders/${id}`,
