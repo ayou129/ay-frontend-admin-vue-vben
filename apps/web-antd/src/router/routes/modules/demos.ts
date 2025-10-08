@@ -1,6 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router';
 
-import { $t } from '#/locales';
+// import { $t } from '#/locales';
 
 // 演示菜单已隐藏
 const routes: RouteRecordRaw[] = [];
