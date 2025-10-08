@@ -231,9 +231,11 @@ const submitForm = async () => {
       message.success('添加商品成功');
     }
   } catch (error: any) {
-    if (error.message !== '基础信息表单验证失败') {
-      message.error(error.message || '提交失败');
+    // 前端校验错误需要提示，其他错误已由 HTTP 拦截器处理
+    if (error.message === '基础信息表单验证失败') {
+      // 表单验证错误，不需要再次提示
     }
+    // HTTP 错误已由拦截器处理，不需要再次提示
     throw error;
   }
 };

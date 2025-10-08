@@ -63,6 +63,7 @@ const onSelect = (keys: Key[]) => {
 
 // 确认移动
 const handleConfirm = async () => {
+  // 前端校验错误，可以自拟提示
   if (!props.resource || selectedFolderId.value.length === 0) {
     message.error('请选择目标目录');
     return;
@@ -78,7 +79,7 @@ const handleConfirm = async () => {
     handleCancel();
   } catch (error) {
     console.error('移动文件失败:', error);
-    message.error('移动文件失败');
+    // 错误信息已由 HTTP 拦截器处理，不需要再次提示
   }
 };
 

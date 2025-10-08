@@ -117,7 +117,7 @@ const loadResources = async (folderId?: number) => {
     }
   } catch (error) {
     console.error('加载资源列表失败:', error);
-    message.error('加载资源列表失败');
+    // 错误信息已由 HTTP 拦截器处理，不需要再次提示
   }
 };
 
@@ -157,7 +157,7 @@ const handleResourcePreview = (resource: ResourceModel) => {
   previewVisible.value = true;
 };
 
-// 上传文件前的校验
+// 上传文件前的校验（前端校验错误，可以自拟提示）
 const beforeUpload = (_file: File, fileList: File[]) => {
   const maxCount = 30;
   if (fileList.length > maxCount) {
@@ -196,7 +196,7 @@ const handleUpload = async (options: any) => {
     options.onSuccess();
   } catch (error) {
     console.error('上传失败:', error);
-    message.error('上传失败');
+    // 错误信息已由 HTTP 拦截器处理，不需要再次提示
     options.onError(error);
   }
 };
@@ -230,7 +230,7 @@ const handleDeleteResource = (resource: ResourceModel) => {
         }
       } catch (error) {
         console.error('删除文件失败:', error);
-        message.error('删除文件失败');
+        // 错误信息已由 HTTP 拦截器处理，不需要再次提示
       }
     },
   });

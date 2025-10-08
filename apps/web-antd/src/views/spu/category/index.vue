@@ -266,7 +266,7 @@ async function onDelete(row: CategoryModel) {
     message.success(`删除分类: ${row.name} 成功`);
     onRefresh();
   } catch {
-    message.error(`删除分类: ${row.name} 失败`);
+    // 错误信息已由 HTTP 拦截器处理，不需要再次提示
   }
 }
 </script>

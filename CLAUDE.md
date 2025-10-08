@@ -211,8 +211,8 @@ src/views/spu/management/components/
 - 选择按钮：打开 ResourcePickerModal
 
 数据绑定方式建议：
-- v-model 绑定 Resource[]（完整对象，包含id、url、name等）
-- 编辑回显：后端返回 carousels: Resource[] 直接赋值
+- v-model 绑定 ResourceModel[]（完整对象，包含id、url、name等）
+- 编辑回显：后端返回 carousels: ResourceModel[] 直接赋值
 - 提交时：提取 carousels.map(r => r.id) 或直接传完整对象
 
 ResourcePickerModal 需支持：
@@ -230,7 +230,7 @@ ResourcePickerModal 需支持：
   - 显示资源预览
 2. 选择资源：
   - 点击"选择资源" → 打开 ResourcePickerModal 时 交互 IDs 进行数据回显
-  - 对文件进行操作 → 返回 Resource[]
+  - 对文件进行操作 → 返回 ResourceModel[]
   - 更新 v-model
 3. 保存：
   - 提交 carousels: [{...}] 到后端，注意顺序，前端传入的顺序就是后端保存的顺序
@@ -422,7 +422,7 @@ const resetForm = () => {
 
 ## 数据源规范
 
-所有 API、参数、返回体、枚举 必须根据 swagger JSON 定义 swagger 地址：http://localhost:9500/http.json 错误提示规范网络错误：只在 HTTP 拦截器中提示 "网络错误，换个网络试试" 业务错误：所有其他地方只提示后端返回的 msg 字段特殊情况：前端校验错误自拟提示（如 "请输入xxx"、"请先阅读并同意用户协议"）
+所有 API、参数、返回体、枚举 必须根据 swagger JSON 定义 swagger 地址：http://localhost:9500/http.json 。错误提示规范网络错误：只在 HTTP 拦截器中提示 "网络错误，换个网络试试" 业务错误：所有其他地方只提示后端返回的 msg。字段特殊情况：前端校验错误自拟提示（如 "请输入xxx"、"请先阅读并同意用户协议"）。
 
 ## 命名规范
 

@@ -1,6 +1,6 @@
 import type { ResourceModel } from '#/types/resource';
 import type { CategoryModel } from '#/types/store/category';
-import type { Sku } from '#/types/store/sku';
+import type { Sku, SkuDTO } from '#/types/store/sku';
 
 export enum SpuOrderType {
   Hotel = 3, // 酒店订单
@@ -74,7 +74,7 @@ export interface CreateSpuDTO {
   type: number;
   carousel_ids?: number[];
   detail?: string;
-  skus?: any[]; // SKU 数据，根据实际业务需要调整类型
+  skus?: SkuDTO[];
   valid_type?: number;
   valid_value?: string;
 }
@@ -87,7 +87,7 @@ export interface UpdateSpuDTO {
   type?: number;
   carousel_ids?: number[];
   detail?: string;
-  skus?: any[]; // SKU 数据，根据实际业务需要调整类型
+  skus?: SkuDTO[];
   valid_type?: number;
   valid_value?: string;
 }

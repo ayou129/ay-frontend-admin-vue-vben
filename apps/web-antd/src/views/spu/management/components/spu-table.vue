@@ -206,7 +206,7 @@ const handleDelete = async (row: SpuModel) => {
     gridApi.query();
   } catch (error) {
     console.error('删除商品失败:', error);
-    message.error(`删除商品: ${row.name} 失败`);
+    // 错误信息已由 HTTP 拦截器处理，不需要再次提示
   }
 };
 
