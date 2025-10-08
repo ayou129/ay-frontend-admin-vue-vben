@@ -3,8 +3,6 @@ import type { Sku, SkuAttr } from '#/types/store/sku';
 
 import { computed, ref, watch } from 'vue';
 
-import { SkuStatus } from '#/types/store/sku';
-
 import { createIconifyIcon } from '@vben/icons';
 
 import {
@@ -16,10 +14,10 @@ import {
   Input,
   InputNumber,
   Menu,
+  message,
   Modal,
   Switch,
   Table,
-  message,
 } from 'ant-design-vue';
 
 import {
@@ -29,6 +27,7 @@ import {
 } from '#/api/store/spu';
 import { openResourcePicker } from '#/components/resource';
 import { ResourceType } from '#/types/resource';
+import { SkuStatus } from '#/types/store/sku';
 
 // Props
 interface Props {
