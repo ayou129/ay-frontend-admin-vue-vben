@@ -359,6 +359,7 @@ defineExpose({
         <SkuManagement
           ref="skuManagementRef"
           :category-id="currentCategoryId"
+          :spu-id="editData?.id"
         />
       </Tabs.TabPane>
 

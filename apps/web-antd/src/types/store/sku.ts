@@ -29,6 +29,17 @@ export interface SkuAttrListResponse {
   combinations: string[]; // 如 ["红色-L", "红色-M", ...]
 }
 
+// SKU 状态枚举
+export enum SkuStatus {
+  Disabled = 0, // 禁用
+  Enabled = 1, // 启用
+}
+
+export const skuStatusTextMap: Record<SkuStatus, string> = {
+  [SkuStatus.Disabled]: '禁用',
+  [SkuStatus.Enabled]: '启用',
+};
+
 // SKU
 export interface Sku {
   id: number;
@@ -39,6 +50,7 @@ export interface Sku {
   stock_count: number;
   attr_value?: Record<string, string>; // 如 {"颜色": "红色", "尺码": "XL"}
   allow_member_discount: number; // 是否允许会员折扣 0=否 1=是
+  status: SkuStatus; // SKU 状态 0=禁用 1=启用
   main_image?: ResourceModel; // SKU主图
   created_at: string;
   updated_at: string;

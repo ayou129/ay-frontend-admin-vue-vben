@@ -58,3 +58,12 @@ export async function getSkuAttrList(categoryId: number) {
     `${apiPrefix}/store/spu/sku/attr/list/${categoryId}`,
   );
 }
+
+/**
+ * 批量删除 SKU
+ */
+export async function deleteBatchSkuByIds(spuId: number, skuIds: number[]) {
+  return http.delete(`${apiPrefix}/store/spu/${spuId}/sku/batch`, {
+    data: { sku_ids: skuIds },
+  });
+}
