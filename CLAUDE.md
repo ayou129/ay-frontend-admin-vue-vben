@@ -422,8 +422,10 @@ const resetForm = () => {
 ## 数据源规范
 
 1. 所有 API、参数、返回体、枚举 必须根据 swagger JSON 定义 swagger 地址：http://localhost:9500/http.json 。
-  - 获取值的时候 可以通过 swagger json 的格式去匹配，因为 json 太大了，但是格式是固定的
-~~~json
+
+- 获取值的时候 可以通过 swagger json 的格式去匹配，因为 json 太大了，但是格式是固定的
+
+```json
 {
   "openapi": "3.0.0",
   "paths": {
@@ -434,16 +436,16 @@ const resetForm = () => {
     "schemas": {
       "Paginate": {},
       "ApiResponse": {},
-      "其他数据模型 以及枚举 以及 其他特殊的schemas": {},
+      "其他数据模型 以及枚举 以及 其他特殊的schemas": {}
     },
     //这里是鉴权 Schemas
     "securitySchemes": {}
   },
   "tags": [],
   "servers": [],
-  "info": [],
+  "info": []
 }
-~~~
+```
 
 2. 错误提示规范网络错误：只在 HTTP 拦截器中提示 "网络错误，换个网络试试" 业务错误：所有其他地方只提示后端返回的 msg。
 3. 字段特殊情况：前端校验错误自拟提示（如 "请输入xxx"、"请先阅读并同意用户协议"）。
