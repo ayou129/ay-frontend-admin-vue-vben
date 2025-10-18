@@ -47,7 +47,7 @@
     "dev:ele": "pnpm -F @vben/web-ele run dev",
     "dev:naive": "pnpm -F @vben/web-naive run dev",
     "dev:play": "pnpm -F @vben/playground run dev",
-    "format": "vsh lint --format",
+    "format": "vsh lint --format apps/web-antd/src",
     "lint": "vsh lint",
     "postinstall": "pnpm -r run stub --if-present",
     "preinstall": "npx only-allow pnpm",
