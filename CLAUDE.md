@@ -322,3 +322,104 @@ export default defineConfig({
   },
 });
 ```
+
+## 资源模块 API 设计参考（供 Go 后端开发）
+
+### 数据模型
+
+**资源表 (resources)**
+
+```go
+type Resource struct {
+    ID                   int64     `json:"id"`
+    UserID               int64     `json:"user_id"`
+    FolderID             int64     `json:"folder_id"`
+    Type                 int       `json:"type"`           // 1=图片 2=音频 3=视频 4=文档 5=压缩包
+    FileOriginalFilename string    `json:"file_original_filename"`
+    FilePath             string    `json:"file_path"`
+    FileSize             int64     `json:"file_size"`      // 字节
+    FileMD5              string    `json:"file_md5"`
+    FileExt              string    `json:"file_ext"`
+    FileSlug             string    `json:"file_slug"`
+    URL                  string    `json:"url"`            // 访问URL
+    IsPublic             int       `json:"is_public"`
+    UserVisibility       int       `json:"user_visibility"` // 0=私有 1=好友 2=公开
+    CreatedAt            time.Time `json:"created_at"`
+    UpdatedAt            time.Time `json:"updated_at"`
+}
+```
+
+**资源目录表 (resource_folders)**
+
+```go
+type ResourceFolder struct {
+    ID          int64     `json:"id"`
+    Name        string    `json:"name"`
+    ParentID    int64     `json:"parent_id"`    // 0表示根目录
+    Description string    `json:"description"`
+    CreatedAt   time.Time `json:"created_at"`
+    UpdatedAt   time.Time `json:"updated_at"`
+}
+```
+
+**资源关联表 (resource_relations)** - 用于SPU轮播图等关联
+
+```go
+type ResourceRelation struct {
+    ID           int64 `json:"id"`
+    ResourceID   int64 `json:"resource_id"`
+    RelationType int   `json:"relation_type"`  // 1=SPU轮播图 2=SKU主图
+    RelationID   int64 `json:"relation_id"`    // SPU_ID或SKU_ID
+    Sort         int   `json:"sort"`           // 排序
+}
+```
+
+### API 端点清单
+
+**目录管理**
+
+- `GET    /api/v1/admin/resource/folders/tree` - 获取目录树（递归children）
+- `GET    /api/v1/admin/resource/folders/{id}/files` - 获取指定目录下的文件列表
+- `POST   /api/v1/admin/resource/folders` - 创建目录（name, parent_id, description）
+- `PUT    /api/v1/admin/resource/folders/{id}` - 更新目录
+- `DELETE /api/v1/admin/resource/folders/{id}` - 删除目录（需级联处理子目录）
+
+**文件管理**
+
+- `POST   /api/v1/admin/resource/list/page` - 分页查询（PageQueryDTO，支持文件名模糊搜索、类型筛选）
+- `GET    /api/v1/admin/resource/files/{id}` - 获取文件详情
+- `POST   /api/v1/admin/resource/files` - 批量上传（multipart/form-data，files[]，可选folder_id）
+- `PUT    /api/v1/admin/resource/files/{id}/folder` - 移动文件到其他目录（folder_id）
+- `DELETE /api/v1/admin/resource/files` - 批量删除（ids[]）
+
+### 关键业务逻辑
+
+**文件上传处理**
+
+1. 接收 `multipart/form-data`，解析 `files[]` 和可选的 `folder_id`
+2. 计算 MD5 防重复上传（可选：MD5 存在则返回已有记录）
+3. 根据文件扩展名自动识别 `type`（jpg/png→1, mp3/wav→2, mp4→3, pdf/doc→4, zip→5）
+4. 存储文件到本地/OSS，生成 `file_path` 和 `url`
+5. 记录 `file_size`（字节）、`file_original_filename`
+6. 返回 `{ list: ResourceModel[] }`
+
+**目录树构建**
+
+- 递归查询 `resource_folders`，构建带 `children` 的树形结构
+- 前端需要顶级"全部资源"节点（folder_id=undefined），后端返回根目录列表
+
+**分页查询支持**
+
+- 使用 `PageQueryDTO` 标准结构
+- 支持筛选：
+  - `file_original_filename LIKE` - 文件名模糊搜索
+  - `type =` - 类型精确匹配
+  - `folder_id =` - 目录精确匹配
+- 返回 `GoPageModel<Resource>`（list, total, page, page_size）
+
+**SPU 轮播图关联处理**
+
+- 创建/更新 SPU 时，接收 `carousels: [{ resource_id, sort }]`
+- 先删除旧关联：`DELETE FROM resource_relations WHERE relation_type=1 AND relation_id=spu_id`
+- 插入新关联：按 `sort` 顺序插入
+- 查询 SPU 时，JOIN 查询返回完整 ResourceModel 数组
