@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type { PageQueryDTO } from '@ay-shared-core/utils/page_query';
+
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { SpuModel, SpuOrderType, SpuStatus } from '#/types/store/spu';
-import type { RequestGetPageQuery } from '#/utils/filter';
 
 import { ref } from 'vue';
 
@@ -14,8 +15,8 @@ import { deleteSpu, getSpuList } from '#/api/store/spu';
 import {
   createNumberFilter,
   createStringFilter,
-  FilterOperators,
-} from '#/utils/filter';
+  FILTER_OPERATORS,
+} from '#/types';
 
 // Props和Emits定义
 interface Props {
@@ -48,7 +49,7 @@ const buildFilters = () => {
   // 关键词搜索
   if (formValues.keyword) {
     filters.push(
-      createStringFilter('name', FilterOperators.LIKE, formValues.keyword),
+      createStringFilter('name', FILTER_OPERATORS.LIKE, formValues.keyword),
     );
   }
 
@@ -57,7 +58,7 @@ const buildFilters = () => {
     filters.push(
       createNumberFilter(
         'type',
-        FilterOperators.EQUAL,
+        FILTER_OPERATORS.EQUAL,
         Number(formValues.type),
       ),
     );
@@ -68,16 +69,16 @@ const buildFilters = () => {
     filters.push(
       createNumberFilter(
         'status',
-        FilterOperators.EQUAL,
+        FILTER_OPERATORS.EQUAL,
         Number(formValues.status),
       ),
     );
   } else {
     // 仅当搜索表单没有状态筛选时，才使用Tab状态筛选
     if (activeTab.value === 'on_sale') {
-      filters.push(createNumberFilter('status', FilterOperators.EQUAL, 1));
+      filters.push(createNumberFilter('status', FILTER_OPERATORS.EQUAL, 1));
     } else if (activeTab.value === 'off_shelf') {
-      filters.push(createNumberFilter('status', FilterOperators.EQUAL, -1));
+      filters.push(createNumberFilter('status', FILTER_OPERATORS.EQUAL, -1));
     }
   }
 
@@ -86,12 +87,12 @@ const buildFilters = () => {
     filters.push(
       createStringFilter(
         'created_at',
-        FilterOperators.GTE,
+        FILTER_OPERATORS.GTE,
         formValues.dateRange[0],
       ),
       createStringFilter(
         'created_at',
-        FilterOperators.LTE,
+        FILTER_OPERATORS.LTE,
         formValues.dateRange[1],
       ),
     );
@@ -142,11 +143,11 @@ const gridOptions: VxeGridProps<SpuModel> = {
   proxyConfig: {
     ajax: {
       query: async ({ page }) => {
-        const params: RequestGetPageQuery = {
+        const params: PageQueryDTO = {
           page: page.currentPage,
           page_size: page.pageSize,
           filters: buildFilters(),
-          filter_sort_option: { sort_field: 'id', sort_order: 'desc' },
+          sort_option: { sort_field: 'id', sort_order: 'desc' },
         };
 
         try {

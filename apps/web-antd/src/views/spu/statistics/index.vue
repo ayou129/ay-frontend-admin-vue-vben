@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import type { PageQueryDTO } from '@ay-shared-core/utils/page_query';
+
 import type { AnalysisOverviewItem } from '@vben/common-ui';
 
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { SpuOverviewData, SpuRankingItem } from '#/types/store/statistics';
-import type { RequestGetPageQuery } from '#/utils/filter';
 
 import { onMounted, ref } from 'vue';
 
@@ -138,16 +139,16 @@ const gridOptions: VxeGridProps<SpuRankingItem> = {
   proxyConfig: {
     ajax: {
       query: async ({ page }, formValues) => {
-        const params: RequestGetPageQuery = {
+        const params: PageQueryDTO = {
           page: page.currentPage,
           page_size: page.pageSize,
           filters: [],
-          filter_sort_option: { sort_field: 'id', sort_order: 'desc' },
+          sort_option: { sort_field: 'id', sort_order: 'desc' },
         };
 
         // 处理筛选条件
         if (formValues.ranking_type) {
-          params.filter_sort_option = {
+          params.sort_option = {
             sort_field: formValues.ranking_type,
             sort_order: 'desc',
           };

@@ -1,11 +1,12 @@
+import type { PageQueryDTO } from '@ay-shared-core/utils/page_query';
+
 import type { ResourceModel } from '#/types/resource';
-import type { RequestGetPageQuery } from '#/utils/filter';
 
 import { computed, onUnmounted, ref, watch } from 'vue';
 
 import { getResourceList } from '#/api/resource/resource';
+import { createLikeFilter, FILTER_OPERATORS } from '#/types';
 import { ResourceType } from '#/types/resource';
-import { createLikeFilter, FilterOperators, ValueTypes } from '#/utils/filter';
 
 interface FilterState {
   searchKeyword: string;
@@ -49,8 +50,8 @@ export function useResourceFilter(pageSize = 1000) {
     { immediate: true },
   );
 
-  const buildFilters = (): RequestGetPageQuery['filters'] => {
-    const filters: RequestGetPageQuery['filters'] = [];
+  const buildFilters = (): PageQueryDTO['filters'] => {
+    const filters: PageQueryDTO['filters'] = [];
 
     if (debouncedKeyword.value.trim()) {
       filters.push(
@@ -64,9 +65,8 @@ export function useResourceFilter(pageSize = 1000) {
     if (state.value.typeFilter !== undefined) {
       filters.push({
         field: 'type',
-        operator: FilterOperators.EQUAL,
+        operator: FILTER_OPERATORS.EQUAL,
         value: state.value.typeFilter,
-        value_type: ValueTypes.NUMBER,
       });
     }
 
@@ -81,7 +81,7 @@ export function useResourceFilter(pageSize = 1000) {
         page: state.value.currentPage,
         page_size: state.value.pageSize,
         filters: buildFilters(),
-        filter_sort_option: { sort_field: 'id', sort_order: 'desc' },
+        sort_option: { sort_field: 'id', sort_order: 'desc' },
       });
 
       data.value = {

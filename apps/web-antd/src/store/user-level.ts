@@ -1,4 +1,4 @@
-import type { RequestFilterQuery, RequestFilterSortOption } from '#/types';
+import type { FilterQuery, FilterSortOption } from '#/types';
 import type { UserLevelDTO } from '#/types/user-level';
 
 import { defineStore } from 'pinia';
@@ -10,8 +10,8 @@ import {
   getUserLevelPageApi,
   updateUserLevelApi,
 } from '#/api/core/user-level';
+import { DEFAULT_SORT_OPTION } from '#/types';
 import { UserLevelStatus } from '#/types/user-level';
-import { DEFAULT_FILTER_SORT_OPTION } from '#/utils/filter';
 
 export const useUserLevelStore = defineStore('userLevel', () => {
   // 格式化状态
@@ -70,15 +70,15 @@ export const useUserLevelStore = defineStore('userLevel', () => {
   const fetchPage = async (
     page: number,
     pageSize: number,
-    filters: RequestFilterQuery[] = [],
-    filterSortOption: RequestFilterSortOption = DEFAULT_FILTER_SORT_OPTION,
+    filters: FilterQuery[] = [],
+    sortOption: FilterSortOption = DEFAULT_SORT_OPTION,
   ) => {
     try {
       const response = await getUserLevelPageApi({
         page,
         page_size: pageSize,
         filters,
-        filter_sort_option: filterSortOption,
+        sort_option: sortOption,
       });
 
       return response; // 直接返回数据给VxeTable

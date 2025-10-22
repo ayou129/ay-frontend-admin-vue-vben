@@ -1,7 +1,8 @@
-import type { PhpPageResponse } from '#/types';
+import type { GoPageModel } from '@ay-shared-core/types/api';
+import type { PageQueryDTO } from '@ay-shared-core/utils/page_query';
+
 import type { SkuAttrListResponse } from '#/types/store/sku';
 import type { CreateSpuDTO, SpuModel, UpdateSpuDTO } from '#/types/store/spu';
-import type { RequestGetPageQuery } from '#/utils/filter';
 
 import { apiPrefix } from '#/api/config';
 import { http } from '#/api/request';
@@ -9,15 +10,15 @@ import { http } from '#/api/request';
 /**
  * 获取商品列表
  */
-export async function getSpuList(params: RequestGetPageQuery) {
-  const response = await http.post<PhpPageResponse<SpuModel>>(
-    `${apiPrefix}/store/spu/list/page`,
+export async function getSpuList(params: PageQueryDTO) {
+  const response = await http.post<GoPageModel<SpuModel>>(
+    `${apiPrefix}/admin/store/spu/list/page`,
     params,
   );
 
   // 转换为 VxeGrid 期望的格式 {items: [], total: 0}
   return {
-    items: response.data,
+    items: response.list,
     total: response.total,
   };
 }
@@ -26,28 +27,28 @@ export async function getSpuList(params: RequestGetPageQuery) {
  * 获取商品详情
  */
 export async function getSpuDetail(id: number) {
-  return http.get<SpuModel>(`${apiPrefix}/store/spu/${id}`);
+  return http.get<SpuModel>(`${apiPrefix}/admin/store/spu/${id}`);
 }
 
 /**
  * 创建商品
  */
 export async function createSpu(data: CreateSpuDTO) {
-  return http.post<SpuModel>(`${apiPrefix}/store/spu`, data);
+  return http.post<SpuModel>(`${apiPrefix}/admin/store/spu`, data);
 }
 
 /**
  * 更新商品
  */
 export async function updateSpu(id: number, data: UpdateSpuDTO) {
-  return http.put<SpuModel>(`${apiPrefix}/store/spu/${id}`, data);
+  return http.put<SpuModel>(`${apiPrefix}/admin/store/spu/${id}`, data);
 }
 
 /**
  * 删除商品
  */
 export async function deleteSpu(id: number) {
-  return http.delete(`${apiPrefix}/store/spu/${id}`);
+  return http.delete(`${apiPrefix}/admin/store/spu/${id}`);
 }
 
 /**
@@ -55,7 +56,7 @@ export async function deleteSpu(id: number) {
  */
 export async function getSkuAttrList(categoryId: number) {
   return http.get<SkuAttrListResponse>(
-    `${apiPrefix}/store/spu/sku/attr/list/${categoryId}`,
+    `${apiPrefix}/admin/store/spu/sku/attr/list/${categoryId}`,
   );
 }
 

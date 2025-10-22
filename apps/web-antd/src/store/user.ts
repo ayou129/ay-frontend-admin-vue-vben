@@ -1,9 +1,11 @@
+import type { UserModel } from '@ay-shared-core/types/user';
 import type {
-  RequestFilterQuery,
-  RequestFilterSortOption,
-  UserModel,
-} from '#/types';
+  FilterQuery,
+  FilterSortOption,
+} from '@ay-shared-core/utils/page_query';
 
+import { UserStatusEnum } from '@ay-shared-core/types/user';
+import { DEFAULT_SORT_OPTION } from '@ay-shared-core/utils/page_query';
 import { defineStore } from 'pinia';
 
 import {
@@ -12,26 +14,18 @@ import {
   getUserPageApi,
   updateUserApi,
 } from '#/api/core/user';
-import { UserStatus } from '#/types';
-import { DEFAULT_FILTER_SORT_OPTION } from '#/utils/filter';
 
 export const useUserStore = defineStore('user', () => {
   // 移除loading状态，由VxeTable自动管理
 
   // 格式化方法
-  const format_status = (status?: UserStatus) => {
+  const format_status = (status?: UserStatusEnum) => {
     switch (status) {
-      case UserStatus.Active: {
+      case UserStatusEnum.ACTIVE: {
         return { text: '正常', color: 'green' };
       }
-      case UserStatus.Deleted: {
-        return { text: '已删除', color: 'gray' };
-      }
-      case UserStatus.Frozen: {
-        return { text: '冻结', color: 'red' };
-      }
-      case UserStatus.Inactive: {
-        return { text: '未激活', color: 'orange' };
+      case UserStatusEnum.DISABLED: {
+        return { text: '禁用', color: 'gray' };
       }
       default: {
         return { text: '未知', color: 'gray' };
@@ -43,15 +37,15 @@ export const useUserStore = defineStore('user', () => {
   const fetchPage = async (
     page: number,
     pageSize: number,
-    filters: RequestFilterQuery[] = [],
-    filterSortOption: RequestFilterSortOption = DEFAULT_FILTER_SORT_OPTION,
+    filters: FilterQuery[] = [],
+    sortOption: FilterSortOption = DEFAULT_SORT_OPTION,
   ) => {
     try {
       const response = await getUserPageApi({
         page,
         page_size: pageSize,
         filters,
-        filter_sort_option: filterSortOption,
+        sort_option: sortOption,
       });
 
       return response; // 直接返回数据给VxeTable

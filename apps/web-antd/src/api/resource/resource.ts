@@ -1,11 +1,12 @@
-import type { PhpPageResponse } from '#/types';
+import type { GoPageModel } from '@ay-shared-core/types/api';
+import type { PageQueryDTO } from '@ay-shared-core/utils/page_query';
+
 import type {
   CreateResourceFolderDTO,
   ResourceFolderModel,
   ResourceModel,
   UpdateResourceFolderDTO,
 } from '#/types/resource';
-import type { RequestGetPageQuery } from '#/utils/filter';
 
 import { apiPrefix } from '#/api/config';
 import { http } from '#/api/request';
@@ -15,7 +16,7 @@ import { http } from '#/api/request';
  */
 export async function getResourceFolderTree() {
   return http.get<{ list: ResourceFolderModel[] }>(
-    `${apiPrefix}/resource/folders/tree`,
+    `${apiPrefix}/admin/resource/folders/tree`,
   );
 }
 
@@ -24,21 +25,21 @@ export async function getResourceFolderTree() {
  */
 export async function getResourceFiles(folderId: number) {
   return http.get<{ list: ResourceModel[] }>(
-    `${apiPrefix}/resource/folders/${folderId}/files`,
+    `${apiPrefix}/admin/resource/folders/${folderId}/files`,
   );
 }
 
 /**
  * 获取资源列表（分页）
  */
-export async function getResourceList(params: RequestGetPageQuery) {
-  const response = await http.post<PhpPageResponse<ResourceModel>>(
-    `${apiPrefix}/resource/list/page`,
+export async function getResourceList(params: PageQueryDTO) {
+  const response = await http.post<GoPageModel<ResourceModel>>(
+    `${apiPrefix}/admin/resource/list/page`,
     params,
   );
 
   return {
-    items: response.data,
+    items: response.list,
     total: response.total,
   };
 }
@@ -47,7 +48,7 @@ export async function getResourceList(params: RequestGetPageQuery) {
  * 获取资源文件详情
  */
 export async function getResourceFileDetail(id: number) {
-  return http.get<ResourceModel>(`${apiPrefix}/resource/files/${id}`);
+  return http.get<ResourceModel>(`${apiPrefix}/admin/resource/files/${id}`);
 }
 
 /**
@@ -55,7 +56,7 @@ export async function getResourceFileDetail(id: number) {
  */
 export async function uploadResourceFiles(data: FormData) {
   return http.post<{ list: ResourceModel[] }>(
-    `${apiPrefix}/resource/files`,
+    `${apiPrefix}/admin/resource/files`,
     data,
     {
       headers: {
@@ -69,7 +70,7 @@ export async function uploadResourceFiles(data: FormData) {
  * 批量删除文件
  */
 export async function deleteResourceFiles(ids: number[]) {
-  return http.delete(`${apiPrefix}/resource/files`, {
+  return http.delete(`${apiPrefix}/admin/resource/files`, {
     data: { ids },
   });
 }
@@ -78,16 +79,22 @@ export async function deleteResourceFiles(ids: number[]) {
  * 移动文件到其他目录
  */
 export async function moveResourceFile(id: number, folderId: number) {
-  return http.put<ResourceModel>(`${apiPrefix}/resource/files/${id}/folder`, {
-    folder_id: folderId,
-  });
+  return http.put<ResourceModel>(
+    `${apiPrefix}/admin/resource/files/${id}/folder`,
+    {
+      folder_id: folderId,
+    },
+  );
 }
 
 /**
  * 创建资源目录
  */
 export async function createResourceFolder(data: CreateResourceFolderDTO) {
-  return http.post<ResourceFolderModel>(`${apiPrefix}/resource/folders`, data);
+  return http.post<ResourceFolderModel>(
+    `${apiPrefix}/admin/resource/folders`,
+    data,
+  );
 }
 
 /**
@@ -98,7 +105,7 @@ export async function updateResourceFolder(
   data: UpdateResourceFolderDTO,
 ) {
   return http.put<ResourceFolderModel>(
-    `${apiPrefix}/resource/folders/${id}`,
+    `${apiPrefix}/admin/resource/folders/${id}`,
     data,
   );
 }
@@ -107,5 +114,5 @@ export async function updateResourceFolder(
  * 删除资源目录
  */
 export async function deleteResourceFolder(id: number) {
-  return http.delete(`${apiPrefix}/resource/folders/${id}`);
+  return http.delete(`${apiPrefix}/admin/resource/folders/${id}`);
 }

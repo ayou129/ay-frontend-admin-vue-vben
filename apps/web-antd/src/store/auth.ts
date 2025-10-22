@@ -10,7 +10,7 @@ import { resetAllStores, useAccessStore, useUserStore } from '@vben/stores';
 import { notification } from 'ant-design-vue';
 import { defineStore } from 'pinia';
 
-import { getAccessCodesApi, getProfileApi, loginApi } from '#/api';
+import { getProfileApi, loginApi } from '#/api';
 import { $t } from '#/locales';
 
 export const useAuthStore = defineStore('auth', () => {
@@ -43,10 +43,11 @@ export const useAuthStore = defineStore('auth', () => {
         accessStore.setRefreshToken(refresh_token);
 
         // 获取用户信息并存储到 accessStore 中
-        const [fetchProfileResult, accessCodes] = await Promise.all([
-          fetchProfile(),
-          getAccessCodesApi(),
-        ]);
+        // const [fetchProfileResult] = await Promise.all([
+        //   fetchProfile(),
+        //   // getAccessCodesApi(),
+        // ]);
+        const fetchProfileResult = await fetchProfile();
 
         profile = {
           avatar: fetchProfileResult.avatar_url ?? '',
@@ -60,7 +61,7 @@ export const useAuthStore = defineStore('auth', () => {
         };
 
         userStore.setProfile(profile);
-        accessStore.setAccessCodes(accessCodes);
+        accessStore.setAccessCodes(['AC_100010', 'AC_100020', 'AC_100030']);
 
         if (accessStore.loginExpired) {
           accessStore.setLoginExpired(false);

@@ -2,4 +2,4 @@
 export const host = import.meta.env.VITE_API_URL;
 
 // 导出一个 api_prefix 的变量
-export const apiPrefix = `${host}/api/v1/admin`;
+export const apiPrefix = `${host}/api/v1`;

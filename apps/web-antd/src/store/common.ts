@@ -1,26 +1,16 @@
-import type {
-  PhpPageResponse,
-  RequestFilterQuery,
-  RequestFilterSortOption,
-} from '#/types';
+import type { GoPageModel } from '@ay-shared-core/types/api';
 
-export const EMPTY_PHP_PAGE_RESPONSE: Omit<PhpPageResponse<any>, 'data'> & {
-  data: any[];
-  filter_sort_option: RequestFilterSortOption;
-  filters: RequestFilterQuery[];
+import type { FilterQuery, FilterSortOption } from '#/types';
+
+export const EMPTY_GO_PAGE_RESPONSE: Omit<GoPageModel<any>, 'list'> & {
+  filters: FilterQuery[];
+  list: any[];
+  sort_option: FilterSortOption;
 } = {
-  data: [],
-  current_page: 1,
-  first_page_url: '',
-  from: 0,
-  last_page: 1,
-  last_page_url: '',
-  next_page_url: null,
-  path: '',
-  per_page: 10,
-  prev_page_url: null,
-  to: 0,
+  list: [],
+  page: 1,
+  pageSize: 20,
   total: 0,
   filters: [],
-  filter_sort_option: { sort_field: 'id', sort_order: 'desc' },
+  sort_option: { sort_field: 'id', sort_order: 'desc' },
 };

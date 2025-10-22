@@ -11,6 +11,8 @@
 git commit -m 'fix: add xxxxx'
 # 忽略提交规范
 git commit -m 'feat: 商品管理页面 UI' --no-verify
+
+pnpm run dev:antd
 ```
 
 ## 商品管理 - SKU 库存管理功能
