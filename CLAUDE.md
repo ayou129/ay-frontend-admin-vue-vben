@@ -3,14 +3,11 @@
 > 当前项目针对的是 apps/web-antd 应用
 
 1. 页面UI 模板 参考： playground/src/views 中的所有页面 以供参考
-2. 页面有关表格筛选的功能，参考 apps/web-antd/src/utils/filter.ts 文件
-3. 当需要新增/编辑页面时，优先参考 playground/src/views 文件夹下的所有页面，例如：
+2. 当需要新增/编辑页面时，优先参考 playground/src/views 文件夹下的所有页面，例如：
    - playground/src/views/system/menu/list.vue 页面有搜索筛选Panel 和 正文Panel 等可以参考的区域
    - playground/src/views/examples/form 文件夹下 提供了表单的参考
-4. API 参考： #/api 文件夹下的所有文件，并且有 apiPrefix 配置(从config.ts 中获取)，要利用上
-5. 不同的数据结构要放在合理的文件夹下，例如
-
-- apps/web-antd/src/api/store/spu.ts
+3. API 参考： #/api 文件夹下的所有文件，并且有 apiPrefix 配置(从config.ts 中获取)，要利用上
+4. 不同的数据结构要放在合理的文件夹下，例如 apps/web-antd/src/api/store/spu.ts
 
 ### 商品功能
 
@@ -274,66 +271,6 @@ async function handleInsertImage() {
 3. 业务组件：SpuResourceSelector
 4. 集成测试：在SPU编辑表单中使用
 
-## VbenModal + Tabs 滚动布局解决方案
-
-### 问题：VbenModal 中使用 Tabs 时的滚动问题
-
-当在 VbenModal 中嵌套 Tabs 组件时，常见问题：
-
-- Tab 标签无法固定在顶部（滚动时消失）
-- 出现双滚动条（Modal body + TabPane）
-- TabPane 内容无法滚动
-- 全屏时高度不正确
-
-### 解决方案
-
-**核心原理：单一滚动容器 + 完整 Flex 布局链**
-
-```
-VbenModal (固定高度)
-├── Modal Body (flex:1, overflow:hidden)
-│   └── 内容组件 (flex:1)
-│       └── Tabs (flex:1)
-│           ├── TabNav (flex-shrink:0) ← 固定
-│           └── TabPane (flex:1, overflow-y:auto) ← 唯一滚动点
-```
-
-**代码示例：**
-
-```vue
-<!-- Modal 配置 - 使用 Tailwind class 直接设置宽高 -->
-<VbenModal
-  class="!h-[80vh] !max-h-[80vh] !w-[65vw] !max-w-[65vw]"
-  content-class="!overflow-hidden !p-4 !flex-1 !flex !flex-col !min-h-0"
->
-  <YourTabsComponent />
-</VbenModal>
-
-<!-- Tabs 组件样式 -->
-<style scoped>
-.tabs-wrapper {
-  flex: 1; /* 使用 flex:1 而非 height:100% */
-  display: flex;
-  flex-direction: column;
-  min-height: 0; /* 允许正确收缩 */
-}
-
-.tabs-wrapper :deep(.ant-tabs-tabpane) {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto; /* 唯一滚动点 */
-}
-</style>
-```
-
-**关键点：**
-
-1. **修改 Modal 宽高**：直接在 `class` 属性中使用 Tailwind，如 `!w-[65vw] !h-[80vh]`
-2. `contentClass` 必须包含 `!overflow-hidden` 禁用 VbenModal 默认滚动
-3. 使用 `flex: 1` 而非 `height: 100%` 进行高度传递
-4. 每层都要添加 `min-height: 0` 允许 flex 子元素收缩
-5. 只在 TabPane 层设置 `overflow-y: auto`
-
 ## 表单提示文本样式
 
 在表单字段下方显示提示信息时，使用统一的样式类：
@@ -364,106 +301,22 @@ VbenModal (固定高度)
 - 操作提示（如：最多上传 10 张图片）
 - 补充说明（如：动态有效期输入天数）
 
-## Tabs 中子组件延迟挂载问题
+## 项目特定规范
 
-**问题：** 在 Modal 中使用 Tabs 时，非激活 Tab 中的子组件不会立即挂载，导致无法通过 ref 访问子组件方法。
+**Swagger 数据源**
+- Swagger 地址：http://localhost:9500/http.json
+- 所有 API、参数、返回体、枚举必须根据 Swagger 定义
 
-**场景：** 编辑表单打开时在"基础信息" Tab，需要设置"库存管理" Tab 中 SkuManagement 组件的数据。
-
-**解决方案：** 使用待处理数据 + watch ref 的模式
-
-```vue
-<script setup>
-// 1. 创建待处理数据的 ref
-const pendingSkuData = ref(null);
-const skuManagementRef = ref();
-
-// 2. 设置表单值时，先保存到待处理数据
-const setFormValues = async (data) => {
-  // ... 其他表单字段设置
-
-  // 由于子组件可能还未挂载，先保存数据
-  if (data.skus) {
-    pendingSkuData.value = data.skus;
-  }
-};
-
-// 3. 监听子组件 ref，挂载后自动设置数据
-watch(
-  skuManagementRef,
-  (ref) => {
-    if (ref && pendingSkuData.value) {
-      ref.setSkuList(pendingSkuData.value);
-      pendingSkuData.value = null; // 清除待处理数据
-    }
-  },
-  { immediate: true },
-);
-
-// 4. 重置时也要清除待处理数据
-const resetForm = () => {
-  pendingSkuData.value = null;
-  // ... 其他重置逻辑
-};
-</script>
-```
-
-**核心要点：**
-
-- Tabs 默认只挂载激活的 TabPane 中的组件（性能优化）
-- 不要在 `setFormValues` 中直接访问子组件 ref
-- 使用 watch 监听 ref 变化，在组件挂载后自动设置数据
-- 确保在重置表单时清除待处理数据
-
-待解决问题：
-
-下面是前端开发规范：
-
-## 数据源规范
-
-1. 所有 API、参数、返回体、枚举 必须根据 swagger JSON 定义 swagger 地址：http://localhost:9500/http.json 。
-
-- 获取值的时候 可以通过 swagger json 的格式去匹配，因为 json 太大了，但是格式是固定的
-
-```json
-{
-  "openapi": "3.0.0",
-  "paths": {
-    //这里是路径 以及对应的细节(包括但不限于schema等)，可以根据关键词去匹配，这样搜索效率更高
-    "/api/v1/admin/login": {}
-  },
-  "components": {
-    "schemas": {
-      "Paginate": {},
-      "ApiResponse": {},
-      "其他数据模型 以及枚举 以及 其他特殊的schemas": {}
+**Vite 配置别名**
+```typescript
+// vite.config.mts
+export default defineConfig({
+  vite: {
+    resolve: {
+      alias: {
+        '@ay-shared-core': resolve(__dirname, '../../../ay-shared-core'),
+      },
     },
-    //这里是鉴权 Schemas
-    "securitySchemes": {}
   },
-  "tags": [],
-  "servers": [],
-  "info": []
-}
+});
 ```
-
-2. 错误提示规范网络错误：只在 HTTP 拦截器中提示 "网络错误，换个网络试试" 业务错误：所有其他地方只提示后端返回的 msg。
-3. 字段特殊情况：前端校验错误自拟提示（如 "请输入xxx"、"请先阅读并同意用户协议"）。
-
-## 命名规范
-
-类型 命名规则 示例模型 XXXModel UserModel、StoreOrderModel、UserAddressModel DTO 操作动词 + DTO CreateAddressDTO、MpLoginSmsDTO 枚举 业务名称 OrderStatus、DeliveryType 映射 xxxTextMap、xxxColorMap orderStatusTextMap 工具函数 getXxx() getOrderActions() 注意 ✅ 模型名对应后端表名（如 UserModel 对应 User 表，而非 UserProfileModel）✅ 字段名与后端 swagger 完全一致（蛇形命名就用蛇形，驼峰就用驼峰）
-
-API 定义规范 // 注意点 1：导入 apiPrefix , 这个是通用前缀，用于拼接接口路径 import { apiPrefix } from '#/api/config';
-
-// 注意点 2：有些 api.ts 文件 是不需要 `return http.get<{ list: Category[] }>(`${apiPrefix}/store/categories/tree`); ` ApiResponse 包裹的，是因为其他文件已经包裹了 ApiResponse 了，根据实际情况判断，下面示例是假设没有包裹
-
-// ✅ 正确：单个对象 export function getUserProfile() { return http.get<ApiResponse<UserModel>>(`${ApiPrefix}/user/profile`) }
-
-// ✅ 正确：list/page 接口（POST + PageParams）export function getOrderList(params?: PageParams) { return http.post<ApiResponse<PaginateResponse<StoreOrderModel>>>( `${ApiPrefix}/user/order/list/page`, params, ) }
-
-// ❌ 错误：不使用空对象 export function someApi() { return http.post<ApiResponse<{}>>(`${ApiPrefix}/path`) // 类型不明确 }
-
-// ❌ 错误：不直接返回数组 export function getList() { return http.get<ApiResponse<UserModel[]>>(`${ApiPrefix}/list`) // data 必须是对象 } 特别说明：list/page 接口
-
-方法：POST（不是 GET），原因是支持复杂筛选和排序参数：PageParams（可选），包含 page、page_size、filters、filter_sort_option 返回：PaginateResponse<T> 或 { list: T[] } 空值处理：必须检查 res.data 是否存在 const res = await getOrderList(params) if (res.code === 0 && res.data) { // 必须检查 orders.value = (res.data as unknown as PaginateResponse<StoreOrderModel>).data } 类型定义原则职责分离：API 文件只放函数，类型统一在 src/types/ 管理枚举+映射同文件：OrderStatus 和 orderStatusTextMap 放在同一文件严格遵循 swagger：字段名、枚举值必须与后端一致 data 必须是对象：数组要包装在对象中，如 { list: XXXModel[] }
