@@ -304,10 +304,12 @@ async function handleInsertImage() {
 ## 项目特定规范
 
 **Swagger 数据源**
+
 - Swagger 地址：http://localhost:9500/http.json
 - 所有 API、参数、返回体、枚举必须根据 Swagger 定义
 
 **Vite 配置别名**
+
 ```typescript
 // vite.config.mts
 export default defineConfig({
