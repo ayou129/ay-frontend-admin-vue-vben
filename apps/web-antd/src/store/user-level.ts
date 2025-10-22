@@ -1,6 +1,11 @@
-import type { FilterQuery, FilterSortOption } from '#/types';
+import type {
+  FilterQuery,
+  FilterSortOption,
+} from '@ay-shared-core/utils/page_query';
+
 import type { UserLevelDTO } from '#/types/user-level';
 
+import { DEFAULT_SORT_OPTION } from '@ay-shared-core/utils/page_query';
 import { defineStore } from 'pinia';
 
 import {
@@ -10,7 +15,6 @@ import {
   getUserLevelPageApi,
   updateUserLevelApi,
 } from '#/api/core/user-level';
-import { DEFAULT_SORT_OPTION } from '#/types';
 import { UserLevelStatus } from '#/types/user-level';
 
 export const useUserLevelStore = defineStore('userLevel', () => {

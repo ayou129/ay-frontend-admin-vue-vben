@@ -160,7 +160,6 @@ const gridOptions: VxeGridProps<SpuRankingItem> = {
               field: 'created_at',
               operator: 'between',
               value: formValues.date_range,
-              value_type: 'string',
             },
           ];
         }

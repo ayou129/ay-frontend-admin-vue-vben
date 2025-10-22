@@ -8,15 +8,15 @@ import { ref } from 'vue';
 
 import { Plus, SvgDownloadIcon } from '@vben/icons';
 
-import { Button, Image, message, TabPane, Tabs } from 'ant-design-vue';
-
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { deleteSpu, getSpuList } from '#/api/store/spu';
 import {
   createNumberFilter,
   createStringFilter,
   FILTER_OPERATORS,
-} from '#/types';
+} from '@ay-shared-core/utils/page_query';
+import { Button, Image, message, TabPane, Tabs } from 'ant-design-vue';
+
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { deleteSpu, getSpuList } from '#/api/store/spu';
 
 // Props和Emits定义
 interface Props {

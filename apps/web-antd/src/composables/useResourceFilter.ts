@@ -4,8 +4,12 @@ import type { ResourceModel } from '#/types/resource';
 
 import { computed, onUnmounted, ref, watch } from 'vue';
 
+import {
+  createLikeFilter,
+  FILTER_OPERATORS,
+} from '@ay-shared-core/utils/page_query';
+
 import { getResourceList } from '#/api/resource/resource';
-import { createLikeFilter, FILTER_OPERATORS } from '#/types';
 import { ResourceType } from '#/types/resource';
 
 interface FilterState {
