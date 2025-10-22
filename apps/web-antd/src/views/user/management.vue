@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { UserModel } from '#/types';
+import type { UserModel } from '@ay-shared-core/types/user';
 
 import { Page, useVbenModal } from '@vben/common-ui';
 
@@ -7,8 +7,12 @@ import { Button, Popconfirm, Tag } from 'ant-design-vue';
 
 import { useVbenForm } from '#/adapter/form';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import {
+  FILTER_OPERATORS,
+  VALUE_TYPES,
+} from '@ay-shared-core/utils/page_query';
+import { UserStatusEnum } from '@ay-shared-core/types/user';
 import { useUserStore } from '#/store/user';
-import { FilterOperators, UserStatus, ValueTypes } from '#/types';
 
 // Store
 const userStore = useUserStore();
@@ -19,42 +23,37 @@ const getFieldFilterConfig = (field: string, value: any) => {
     case 'email': {
       // 邮箱：模糊搜索
       return {
-        operator: FilterOperators.LIKE,
+        operator: FILTER_OPERATORS.LIKE,
         value,
-        valueType: ValueTypes.STRING,
       };
     }
     case 'nick_name':
     case 'real_name': {
       // 姓名、昵称：模糊搜索
       return {
-        operator: FilterOperators.LIKE,
+        operator: FILTER_OPERATORS.LIKE,
         value,
-        valueType: ValueTypes.STRING,
       };
     }
     case 'phone': {
       // 手机号：支持模糊搜索（部分匹配）
       return {
-        operator: FilterOperators.LIKE,
+        operator: FILTER_OPERATORS.LIKE,
         value,
-        valueType: ValueTypes.STRING,
       };
     }
     case 'status': {
       // 状态：精确匹配
       return {
-        operator: FilterOperators.EQUAL,
+        operator: FILTER_OPERATORS.EQUAL,
         value,
-        valueType: ValueTypes.NUMBER,
       };
     }
     default: {
       // 默认：模糊搜索
       return {
-        operator: FilterOperators.LIKE,
+        operator: FILTER_OPERATORS.LIKE,
         value,
-        valueType: ValueTypes.STRING,
       };
     }
   }
@@ -108,7 +107,6 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
                 field,
                 operator: filterConfig.operator,
                 value: filterConfig.value,
-                value_type: filterConfig.valueType,
               };
             });
 
@@ -118,7 +116,7 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
             filters,
           );
           return {
-            items: response.data || [],
+            items: response.list || [],
             total: response.total || 0,
           };
         },
@@ -153,10 +151,8 @@ const [VxeGrid, gridApi] = useVbenVxeGrid({
         componentProps: {
           allowClear: true,
           options: [
-            { label: '未激活', value: UserStatus.Inactive },
-            { label: '正常', value: UserStatus.Active },
-            { label: '冻结', value: UserStatus.Frozen },
-            { label: '已删除', value: UserStatus.Deleted },
+            { label: '未激活', value: UserStatusEnum.DISABLED },
+            { label: '正常', value: UserStatusEnum.ACTIVE },
           ],
           placeholder: '请选择状态',
         },
@@ -197,10 +193,8 @@ const userFormSchema = [
     component: 'Select',
     componentProps: {
       options: [
-        { label: '未激活', value: UserStatus.Inactive },
-        { label: '正常', value: UserStatus.Active },
-        { label: '冻结', value: UserStatus.Frozen },
-        { label: '已删除', value: UserStatus.Deleted },
+        { label: '未激活', value: UserStatusEnum.DISABLED },
+        { label: '正常', value: UserStatusEnum.ACTIVE },
       ],
     },
     fieldName: 'status',

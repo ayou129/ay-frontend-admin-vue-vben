@@ -5,6 +5,7 @@ import type {
 
 import type { UserLevelDTO } from '#/types/user-level';
 
+import { EMPTY_GO_PAGE_RESPONSE } from '@ay-shared-core/types/api';
 import { DEFAULT_SORT_OPTION } from '@ay-shared-core/utils/page_query';
 import { defineStore } from 'pinia';
 
@@ -87,7 +88,7 @@ export const useUserLevelStore = defineStore('userLevel', () => {
 
       return response; // 直接返回数据给VxeTable
     } catch {
-      return { data: [], total: 0 }; // 返回空数据
+      return EMPTY_GO_PAGE_RESPONSE; // 返回空数据
     }
   };
 

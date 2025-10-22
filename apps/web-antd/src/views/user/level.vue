@@ -9,8 +9,11 @@ import { Button, Popconfirm, Switch } from 'ant-design-vue';
 
 import { useVbenForm } from '#/adapter/form';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import {
+  FILTER_OPERATORS,
+  VALUE_TYPES,
+} from '@ay-shared-core/utils/page_query';
 import { useUserLevelStore } from '#/store/user-level';
-import { FilterOperators, ValueTypes } from '#/types';
 import { UserLevelStatus } from '#/types/user-level';
 
 defineOptions({
@@ -27,30 +30,26 @@ const getFieldFilterConfig = (field: string, value: any) => {
     case 'point_max':
     case 'point_min': {
       return {
-        operator: FilterOperators.EQUAL,
+        operator: FILTER_OPERATORS.EQUAL,
         value,
-        valueType: ValueTypes.NUMBER,
       };
     }
     case 'name': {
       return {
-        operator: FilterOperators.LIKE,
+        operator: FILTER_OPERATORS.LIKE,
         value,
-        valueType: ValueTypes.STRING,
       };
     }
     case 'status': {
       return {
-        operator: FilterOperators.EQUAL,
+        operator: FILTER_OPERATORS.EQUAL,
         value,
-        valueType: ValueTypes.NUMBER,
       };
     }
     default: {
       return {
-        operator: FilterOperators.LIKE,
+        operator: FILTER_OPERATORS.LIKE,
         value,
-        valueType: ValueTypes.STRING,
       };
     }
   }

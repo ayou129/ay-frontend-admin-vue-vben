@@ -27,14 +27,14 @@ export namespace AuthApi {
  * 登录
  */
 export async function loginApi(data: AuthApi.LoginParams) {
-  return http.post<AuthApi.LoginResult>(`${apiPrefix}/login`, data);
+  return http.post<AuthApi.LoginResult>(`${apiPrefix}/admin/login`, data);
 }
 
 /**
  * 获取用户信息
  */
 export async function getProfileApi() {
-  return http.get<UserModel>(`${apiPrefix}/profile`);
+  return http.get<UserModel>(`${apiPrefix}/admin/profile`);
 }
 
 /**
@@ -42,7 +42,7 @@ export async function getProfileApi() {
  */
 export async function refreshTokenApi() {
   return http.post<AuthApi.RefreshTokenResult>(
-    `${apiPrefix}/refresh-token`,
+    `${apiPrefix}/admin/refresh-token`,
     {},
     {
       __skipAuthRefresh: true, // 标记这个请求不需要被认证拦截器处理

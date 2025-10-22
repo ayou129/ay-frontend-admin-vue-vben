@@ -4,6 +4,7 @@ import type {
   FilterSortOption,
 } from '@ay-shared-core/utils/page_query';
 
+import { EMPTY_GO_PAGE_RESPONSE } from '@ay-shared-core/types/api';
 import { UserStatusEnum } from '@ay-shared-core/types/user';
 import { DEFAULT_SORT_OPTION } from '@ay-shared-core/utils/page_query';
 import { defineStore } from 'pinia';
@@ -50,7 +51,7 @@ export const useUserStore = defineStore('user', () => {
 
       return response; // 直接返回数据给VxeTable
     } catch {
-      return { data: [], total: 0 }; // 返回空数据
+      return EMPTY_GO_PAGE_RESPONSE; // 返回空数据
     }
   };
 
