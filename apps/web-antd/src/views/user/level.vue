@@ -5,14 +5,11 @@ import { reactive } from 'vue';
 
 import { Page, useVbenModal } from '@vben/common-ui';
 
+import { FILTER_OPERATORS } from '@ay-shared-core/utils/page_query';
 import { Button, Popconfirm, Switch } from 'ant-design-vue';
 
 import { useVbenForm } from '#/adapter/form';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import {
-  FILTER_OPERATORS,
-  VALUE_TYPES,
-} from '@ay-shared-core/utils/page_query';
 import { useUserLevelStore } from '#/store/user-level';
 import { UserLevelStatus } from '#/types/user-level';
 
