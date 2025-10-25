@@ -9,7 +9,6 @@ import { Button, Input, message, Modal, Select, Upload } from 'ant-design-vue';
 
 import {
   deleteResourceFiles,
-  getResourceFiles,
   uploadResourceFiles,
 } from '#/api/resource/resource';
 import { useResourceFilter } from '#/composables/useResourceFilter';
@@ -57,6 +56,7 @@ const {
   resetFilters,
   updateSearchKeyword,
   updateTypeFilter,
+  updateFolderFilter,
 } = useResourceFilter();
 
 // 当前选中的资源IDs
@@ -79,18 +79,9 @@ const typeOptions = [
   { label: '压缩包', value: ResourceType.Archive },
 ];
 
-// 过滤后的资源列表（结合服务端筛选和客户端筛选）
+// 直接使用服务端筛选结果，不做客户端二次筛选
 const filteredResources = computed(() => {
-  let result = filterResult.value.resources;
-
-  // 接受类型筛选（客户端筛选）
-  if (props.acceptTypes.length > 0) {
-    result = result.filter((r: ResourceModel) =>
-      props.acceptTypes.includes(r.type),
-    );
-  }
-
-  return result;
+  return filterResult.value.resources;
 });
 
 // 已选中的资源
@@ -100,31 +91,10 @@ const selectedResources = computed(() => {
   );
 });
 
-// 加载资源列表
-const loadResources = async (folderId?: number) => {
-  try {
-    // 如果选中了目录，使用目录文件 API
-    if (folderId === undefined) {
-      // 使用筛选逻辑加载所有资源
-      await loadFilteredResources();
-    } else {
-      const response = await getResourceFiles(folderId);
-      filterResult.value = {
-        resources: response.list,
-        total: response.list.length,
-        loading: false,
-      };
-    }
-  } catch (error) {
-    console.error('加载资源列表失败:', error);
-    // 错误信息已由 HTTP 拦截器处理，不需要再次提示
-  }
-};
-
 // 选择目录
 const handleFolderSelect = (folderId?: number) => {
   currentFolderId.value = folderId;
-  loadResources(folderId);
+  updateFolderFilter(folderId);
 };
 
 // 选择资源
@@ -170,7 +140,7 @@ const beforeUpload = (_file: File, fileList: File[]) => {
 // 上传文件
 const handleUpload = async (options: any) => {
   const formData = new FormData();
-  formData.append('files[]', options.file);
+  formData.append('files', options.file);
 
   // 如果有选中目录，则上传到指定目录；否则上传到根目录（传 folder_id = 0 或不传）
   if (currentFolderId.value !== undefined) {
@@ -182,11 +152,11 @@ const handleUpload = async (options: any) => {
     message.success('上传成功');
 
     // 重新加载资源列表
-    await loadResources(currentFolderId.value);
+    await loadFilteredResources();
 
     // 自动选中上传的资源
-    if (response.list && response.list.length > 0) {
-      for (const resource of response.list) {
+    if (response && response.length > 0) {
+      for (const resource of response) {
         if (!selectedResourceIds.value.includes(resource.id)) {
           selectedResourceIds.value.push(resource.id);
         }
@@ -222,7 +192,7 @@ const handleDeleteResource = (resource: ResourceModel) => {
         await deleteResourceFiles([resource.id]);
         message.success('删除文件成功');
         // 重新加载资源列表
-        await loadResources(currentFolderId.value);
+        await loadFilteredResources();
         // 从选中列表中移除
         const index = selectedResourceIds.value.indexOf(resource.id);
         if (index !== -1) {
@@ -245,7 +215,7 @@ const handleMoveResource = (resource: ResourceModel) => {
 // 移动成功后刷新列表
 const handleMoveSuccess = () => {
   moveModalVisible.value = false;
-  loadResources(currentFolderId.value);
+  loadFilteredResources();
 };
 
 // 监听弹窗打开，初始化选中状态并加载资源
@@ -254,8 +224,15 @@ watch(
   (isOpen) => {
     if (isOpen) {
       selectedResourceIds.value = [...props.selectedIds];
-      // 每次打开都重新加载当前目录的资源（如果没有选中目录，则加载所有资源）
-      loadResources(currentFolderId.value);
+
+      // 如果传入了 acceptTypes，设置类型筛选
+      if (props.acceptTypes.length > 0) {
+        // 只支持单个类型筛选
+        updateTypeFilter(props.acceptTypes[0]);
+      }
+
+      // 加载资源
+      loadFilteredResources();
     } else {
       // 关闭时重置筛选状态
       resetFilters();

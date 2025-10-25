@@ -55,9 +55,8 @@ export interface ResourceModel {
   file_path: string;
   file_size: number;
   file_slug: string;
-  folder?: ResourceFolderModel;
   folder_id: number;
-  formatted_size?: string; // 格式化后的文件大小
+  formatted_size?: string; // 格式化后的文件大小（前端计算）
   id: number;
   is_public: number;
   type: ResourceType;

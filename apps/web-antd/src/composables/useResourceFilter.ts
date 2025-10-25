@@ -15,6 +15,7 @@ import { ResourceType } from '#/types/resource';
 interface FilterState {
   searchKeyword: string;
   typeFilter: ResourceType | undefined;
+  folderFilter: number | undefined;
   currentPage: number;
   pageSize: number;
 }
@@ -25,10 +26,11 @@ interface FilterResult {
   loading: boolean;
 }
 
-export function useResourceFilter(pageSize = 1000) {
+export function useResourceFilter(pageSize = 100) {
   const state = ref<FilterState>({
     searchKeyword: '',
     typeFilter: undefined,
+    folderFilter: undefined,
     currentPage: 1,
     pageSize,
   });
@@ -74,6 +76,14 @@ export function useResourceFilter(pageSize = 1000) {
       });
     }
 
+    if (state.value.folderFilter !== undefined) {
+      filters.push({
+        field: 'folder_id',
+        operator: FILTER_OPERATORS.EQUAL,
+        value: state.value.folderFilter,
+      });
+    }
+
     return filters;
   };
 
@@ -100,10 +110,13 @@ export function useResourceFilter(pageSize = 1000) {
   };
 
   // 自动加载
-  watch([debouncedKeyword, () => state.value.typeFilter], () => {
-    state.value.currentPage = 1;
-    loadResources();
-  });
+  watch(
+    [debouncedKeyword, () => state.value.typeFilter, () => state.value.folderFilter],
+    () => {
+      state.value.currentPage = 1;
+      loadResources();
+    },
+  );
 
   // 清理定时器
   onUnmounted(() => {
@@ -115,6 +128,7 @@ export function useResourceFilter(pageSize = 1000) {
       ...state.value,
       searchKeyword: '',
       typeFilter: undefined,
+      folderFilter: undefined,
       currentPage: 1,
     };
   };
@@ -125,6 +139,10 @@ export function useResourceFilter(pageSize = 1000) {
 
   const updateTypeFilter = (type: ResourceType | undefined) => {
     state.value.typeFilter = type;
+  };
+
+  const updateFolderFilter = (folderId: number | undefined) => {
+    state.value.folderFilter = folderId;
   };
 
   const updatePagination = (page: number, pageSize?: number) => {
@@ -146,6 +164,7 @@ export function useResourceFilter(pageSize = 1000) {
     resetFilters,
     updateSearchKeyword,
     updateTypeFilter,
+    updateFolderFilter,
     updatePagination,
   };
 }

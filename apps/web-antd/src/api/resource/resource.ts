@@ -15,17 +15,8 @@ import { http } from '#/api/request';
  * 获取资源目录树
  */
 export async function getResourceFolderTree() {
-  return http.get<{ list: ResourceFolderModel[] }>(
+  return http.get<ResourceFolderModel[]>(
     `${apiPrefix}/admin/resource/folders/tree`,
-  );
-}
-
-/**
- * 获取目录下的资源文件列表
- */
-export async function getResourceFiles(folderId: number) {
-  return http.get<{ list: ResourceModel[] }>(
-    `${apiPrefix}/admin/resource/folders/${folderId}/files`,
   );
 }
 
@@ -55,7 +46,7 @@ export async function getResourceFileDetail(id: number) {
  * 批量上传文件
  */
 export async function uploadResourceFiles(data: FormData) {
-  return http.post<{ list: ResourceModel[] }>(
+  return http.post<ResourceModel[]>(
     `${apiPrefix}/admin/resource/files`,
     data,
     {

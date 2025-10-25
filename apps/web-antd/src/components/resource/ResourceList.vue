@@ -181,9 +181,9 @@ const handleMove = (resource: ResourceModel) => {
               class="text-4xl text-gray-400"
             />
 
-            <!-- 预览按钮（图片中间） -->
+            <!-- 预览按钮（图片/视频/音频） -->
             <div
-              v-if="isImage(resource)"
+              v-if="isImage(resource) || resource.type === ResourceType.Video || resource.type === ResourceType.Audio"
               class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all group-hover/preview:bg-black/20 group-hover/preview:opacity-100"
             >
               <div

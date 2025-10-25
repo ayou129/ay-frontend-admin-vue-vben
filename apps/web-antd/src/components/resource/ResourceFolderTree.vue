@@ -70,7 +70,7 @@ const loadFolderTree = async () => {
   try {
     loading.value = true;
     const response = await getResourceFolderTree();
-    folderTree.value = response.list;
+    folderTree.value = response;
   } catch (error) {
     console.error('加载目录树失败:', error);
   } finally {
