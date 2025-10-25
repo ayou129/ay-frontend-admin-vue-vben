@@ -111,7 +111,11 @@ export function useResourceFilter(pageSize = 100) {
 
   // 自动加载
   watch(
-    [debouncedKeyword, () => state.value.typeFilter, () => state.value.folderFilter],
+    [
+      debouncedKeyword,
+      () => state.value.typeFilter,
+      () => state.value.folderFilter,
+    ],
     () => {
       state.value.currentPage = 1;
       loadResources();

@@ -46,15 +46,11 @@ export async function getResourceFileDetail(id: number) {
  * 批量上传文件
  */
 export async function uploadResourceFiles(data: FormData) {
-  return http.post<ResourceModel[]>(
-    `${apiPrefix}/admin/resource/files`,
-    data,
-    {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+  return http.post<ResourceModel[]>(`${apiPrefix}/admin/resource/files`, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
     },
-  );
+  });
 }
 
 /**
