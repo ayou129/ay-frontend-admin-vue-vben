@@ -10,8 +10,7 @@ packages:
   - packages/business/*
   - apps/*
   - scripts/*
-  - docs
-  - playground
+  # pruned: docs, playground
 
 catalog:
   '@ast-grep/napi': ^0.37.0
