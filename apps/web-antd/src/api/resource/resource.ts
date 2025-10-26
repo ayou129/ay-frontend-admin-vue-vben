@@ -16,7 +16,7 @@ import { http } from '#/api/request';
  */
 export async function getResourceFolderTree() {
   return http.get<ResourceFolderModel[]>(
-    `${apiPrefix}/admin/resource/folders/tree`,
+    `${apiPrefix}/admin/resource/folder/list/tree`,
   );
 }
 
@@ -79,7 +79,7 @@ export async function moveResourceFile(id: number, folderId: number) {
  */
 export async function createResourceFolder(data: CreateResourceFolderDTO) {
   return http.post<ResourceFolderModel>(
-    `${apiPrefix}/admin/resource/folders`,
+    `${apiPrefix}/admin/resource/folder`,
     data,
   );
 }
@@ -92,7 +92,7 @@ export async function updateResourceFolder(
   data: UpdateResourceFolderDTO,
 ) {
   return http.put<ResourceFolderModel>(
-    `${apiPrefix}/admin/resource/folders/${id}`,
+    `${apiPrefix}/admin/resource/folder/${id}`,
     data,
   );
 }
@@ -101,5 +101,5 @@ export async function updateResourceFolder(
  * 删除资源目录
  */
 export async function deleteResourceFolder(id: number) {
-  return http.delete(`${apiPrefix}/admin/resource/folders/${id}`);
+  return http.delete(`${apiPrefix}/admin/resource/folder/${id}`);
 }

@@ -378,11 +378,11 @@ type ResourceRelation struct {
 
 **目录管理**
 
-- `GET    /api/v1/admin/resource/folders/tree` - 获取目录树（递归children）
-- `GET    /api/v1/admin/resource/folders/{id}/files` - 获取指定目录下的文件列表
-- `POST   /api/v1/admin/resource/folders` - 创建目录（name, parent_id, description）
-- `PUT    /api/v1/admin/resource/folders/{id}` - 更新目录
-- `DELETE /api/v1/admin/resource/folders/{id}` - 删除目录（需级联处理子目录）
+- `GET    /api/v1/admin/resource/folder/list/tree` - 获取目录树（递归children）
+- `GET    /api/v1/admin/resource/folder/{id}/files` - 获取指定目录下的文件列表
+- `POST   /api/v1/admin/resource/folder` - 创建目录（name, parent_id, description）
+- `PUT    /api/v1/admin/resource/folder/{id}` - 更新目录
+- `DELETE /api/v1/admin/resource/folder/{id}` - 删除目录（需级联处理子目录）
 
 **文件管理**
 
